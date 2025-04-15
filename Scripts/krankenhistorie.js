@@ -1,3 +1,7 @@
+const krankenhistorie = [];
+
+
+
 class krankheit{
     constructor(vitalwerte, allergien, vorerkrankungen){
 
@@ -11,7 +15,6 @@ class krankheit{
 
 
 
-    const krankenhistorie = [];
 
 function vorerkrankung_hinzufügen(vitalwerte, allergien, vorerkrankungen){
 
@@ -25,11 +28,13 @@ function vorerkrankung_loeschen(){
 }
 
 function vorerkrankung_bearbeiten(krankheit, neueVitalwerte, neueAllergien, neueVorerkrankungen) {
+
+  fehlermeldung = "Vorerkrankung nicht vorhanden";
     if (krankheit instanceof krankheit) {
       krankheit.vitalwerte = neueVitalwerte;
       krankheit.allergien = neueAllergien;
       krankheit.vorerkrankungen = neueVorerkrankungen;
     } else {
-      console.log("Ungültiges Objekt");
+      console.log(fehlermeldung);
     }
   }
