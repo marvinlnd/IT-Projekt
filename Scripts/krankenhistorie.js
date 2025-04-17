@@ -23,7 +23,15 @@ function vorerkrankung_hinzufügen(vitalwerte, allergien, vorerkrankungen){
 
 }
 
-function vorerkrankung_loeschen(){
+function vorerkrankung_loeschen(index){
+
+  if(index >= 0 && index < krankenhistorie.length){
+    krankenhistorie.splice(index, 1);
+  }
+  else{
+    console.log("Ungültige Eingabe");
+  }
+
 
 }
 
