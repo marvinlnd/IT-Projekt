@@ -42,7 +42,7 @@ function kontaktBearbeiten(index, neueDaten) {
     kontaktListe[index].aktualisieren(neueDaten);
     speichereKontakte();
   } else {
-    console.log("Kontakt konnte nicht gefunden werden! \n Bearbeiten Fehlgeschlagen!");
+    console.log("Kontakt mit dem Index:"+ index + "konnte nicht gefunden werden. \n Bearbeiten Fehlgeschlagen!");
   }
 }
 
@@ -51,6 +51,6 @@ function kontaktLoeschen(index) {
     kontaktListe.splice(index, 1);
     speichereKontakte();
   } else {
-    console.log("Kontakt konnte nicht gefunden werden! \n Löschen Fehlgeschlagen!");
+    console.log("Kontakt mit dem Index:"+ index + "konnte nicht gefunden werden. \n Löschen Fehlgeschlagen!");
   }
 }
