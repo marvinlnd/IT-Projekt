@@ -1,5 +1,4 @@
-const krankenhistorie = [];
-
+let krankenhistorie = ladeHistorie();
 
 
 class krankheit{
@@ -14,12 +13,23 @@ class krankheit{
 }
 
 
+function speichereHistorie() {
+  localStorage.setItem("krankenhistorie", JSON.stringify(krankenhistorie));
+}
+
+function ladeHistorie() {
+  const gespeicherteDaten = localStorage.getItem("krankenhistorie");
+  return gespeicherteDaten ? JSON.parse(gespeicherteDaten) : [];
+}
+
+
 
 
 function vorerkrankung_hinzufügen(vitalwerte, allergien, vorerkrankungen){
 
     const neueVorerkrankung = new krankheit(vitalwerte, allergien, vorerkrankungen);
     krankenhistorie.push(neueVorerkrankung);
+    speichereHistorie();
 
 }
 
@@ -42,7 +52,9 @@ function vorerkrankung_bearbeiten(krankheit, neueVitalwerte, neueAllergien, neue
       krankheit.vitalwerte = neueVitalwerte;
       krankheit.allergien = neueAllergien;
       krankheit.vorerkrankungen = neueVorerkrankungen;
+      speichereHistorie();
     } else {
       console.log(fehlermeldung);
     }
   }
+
