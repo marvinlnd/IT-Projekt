@@ -45,16 +45,16 @@ function vorerkrankung_loeschen(index){
 
 }
 
-function vorerkrankung_bearbeiten(krankheit, neueVitalwerte, neueAllergien, neueVorerkrankungen) {
-
-  fehlermeldung = "Vorerkrankung nicht vorhanden";
-    if (krankheit instanceof krankheit) {
-      krankheit.vitalwerte = neueVitalwerte;
-      krankheit.allergien = neueAllergien;
-      krankheit.vorerkrankungen = neueVorerkrankungen;
-      speichereHistorie();
-    } else {
-      console.log(fehlermeldung);
-    }
+function vorerkrankung_bearbeiten(index, neueVitalwerte, neueAllergien, neueVorerkrankungen) {
+  const eintrag = krankenhistorie[index];
+  if (eintrag) {
+    eintrag.vitalwerte = neueVitalwerte;
+    eintrag.allergien = neueAllergien;
+    eintrag.vorerkrankungen = neueVorerkrankungen;
+    speichereHistorie();
+    console.log("Eintrag bearbeitet:", eintrag);
+  } else {
+    console.log("Kein Eintrag gefunden");
   }
+}
 
