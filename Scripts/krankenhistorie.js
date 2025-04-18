@@ -2,11 +2,12 @@ let krankenhistorie = ladeHistorie();
 
 
 class krankheit{
-    constructor(vitalwerte, allergien, vorerkrankungen){
+    constructor(nameDerKrankheit, datumDerFeststellung){
 
-        this.vitalwerte = vitalwerte;
-        this.allergien = allergien;
-        this.vorerkrankungen = vorerkrankungen;
+        this.nameDerKrankheit = nameDerKrankheit;
+        this.datumDerFeststellung = datumDerFeststellung;
+    
+
 
     }
 
@@ -25,9 +26,9 @@ function ladeHistorie() {
 
 
 
-function vorerkrankung_hinzufügen(vitalwerte, allergien, vorerkrankungen){
+function vorerkrankung_hinzufügen(nameDerKrankheit, datumDerFeststellung){
 
-    const neueVorerkrankung = new krankheit(vitalwerte, allergien, vorerkrankungen);
+    const neueVorerkrankung = new krankheit(nameDerKrankheit, datumDerFeststellung);
     krankenhistorie.push(neueVorerkrankung);
     speichereHistorie();
 
@@ -45,12 +46,11 @@ function vorerkrankung_loeschen(index){
 
 }
 
-function vorerkrankung_bearbeiten(index, neueVitalwerte, neueAllergien, neueVorerkrankungen) {
+function vorerkrankung_bearbeiten(index, neuerName, neuesDatum) {
   const eintrag = krankenhistorie[index];
   if (eintrag) {
-    eintrag.vitalwerte = neueVitalwerte;
-    eintrag.allergien = neueAllergien;
-    eintrag.vorerkrankungen = neueVorerkrankungen;
+    eintrag.nameDerKrankheit = neuerName;
+    eintrag.datumDerFeststellung = neuesDatum;
     speichereHistorie();
     console.log("Eintrag bearbeitet:", eintrag);
   } else {
