@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Krankenhistorie</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    input, textarea { margin-bottom: 10px; display: block; width: 300px; }
+    button { margin-top: 5px; }
+    .eintrag { border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h1>🩺 Krankenhistorie bearbeiten</h1>
+
+  <h2>➕ Neue Erkrankung hinzufügen</h2>
+  <input type="text" id="nameDerKrankheit" placeholder="Name der Krankheit">
+  <input type="text" id="datumDerFeststellung" placeholder="Datum der Feststellung (DD.MM.YYYY)">
+  <button onclick="vorerkrankung_hinzufügen(document.getElementById('nameDerKrankheit').value, document.getElementById('datumDerFeststellung').value)">Hinzufügen</button>
+
+  <h2>Erkrankung bearbeiten</h2>
+  <input type= "number" id="index" placeholder="Index">
+  <input type="text" id="neuerNameDerKrankheit" placeholder="Neuer Name">
+  <input type="text" id="neuesDatumDerFeststellung" placeholder="Neues Datum (DD.MM.YYYY)">
+  <button onclick="vorerkrankung_bearbeiten(parseInt(document.getElementById('index').value), document.getElementById('neuerNameDerKrankheit').value, document.getElementById('neuesDatumDerFeststellung').value)">Änderungen Speichern</button>
+
+
+  <h2>Erkrankung löschen</h2>
+  <input type= "number" id="index" placeholder="Index">
+  <button onclick="vorerkrankung_loeschen(document.getElementById('index').value)">Löschen</button>
+
+ 
+
+
+
+  <h2>📋 Krankenhistorie</h2>
+  <div id="liste"></div>
+
+  <button onclick="localStorage.clear(); location.reload()">🧹 Alles löschen</button>
+
+  <script src="../Scripts/krankenhistorie.js"></script>
+</body>
+</html>

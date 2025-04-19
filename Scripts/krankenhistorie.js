@@ -28,9 +28,12 @@ function ladeHistorie() {
 
 function vorerkrankung_hinzufügen(nameDerKrankheit, datumDerFeststellung){
 
+
+
     const neueVorerkrankung = new krankheit(nameDerKrankheit, datumDerFeststellung);
     krankenhistorie.push(neueVorerkrankung);
     speichereHistorie();
+    console.log("Erfolg");
 
 }
 
@@ -38,6 +41,7 @@ function vorerkrankung_loeschen(index){
 
   if(index >= 0 && index < krankenhistorie.length){
     krankenhistorie.splice(index, 1);
+    speichereHistorie();
   }
   else{
     console.log("Ungültige Eingabe");
