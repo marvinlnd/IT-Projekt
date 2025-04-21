@@ -1,4 +1,4 @@
-let aktivitäten = ladeAktivität();
+let aktivitäten = ladeAktivitäten();
 
 
 class aktivität{
@@ -31,7 +31,7 @@ function aktivitätHinzufügen(nameDerAktivität, beginn, ende, notitz){
 
 
     const neueAktivität = new aktivität(nameDerAktivität, beginn, ende, notitz);
-    aktivität.push(neueAktivität);
+    aktivitäten.push(neueAktivität);
     speichereAktivität();
     console.log("Erfolg");
 
@@ -40,7 +40,7 @@ function aktivitätHinzufügen(nameDerAktivität, beginn, ende, notitz){
 function aktivität_loeschen(index){
 
   if(index >= 0 && index < aktivität.length){
-    aktivität.splice(index, 1);
+    aktivitäten.splice(index, 1);
     speichereAktivität();
   }
   else{
@@ -51,9 +51,9 @@ function aktivität_loeschen(index){
 }
 
 function aktivität_bearbeiten(index, neuerName, neuBeginn, neuEnde, neueNotitz) {
-  const eintrag = aktivität[index];
+  const eintrag = aktivitäten[index];
   if (eintrag) {
-    eintrag.neueAktivität = neuerName;
+    eintrag.nameDerAktivität = neuerName;
     eintrag.beginn = neuBeginn;
     eintrag.ende = neuEnde;
     eintrag.notitz = neueNotitz;
