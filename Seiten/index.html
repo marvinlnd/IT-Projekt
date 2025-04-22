@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MediAssist</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <!-- Logo klickbar -->
+    <a href="index.html" class="logo">
+      <img src="../Bilder/Logo.png" alt="MediAssist Logo">
+      <!--<div>
+        <h1>MediAssist</h1>
+        <p>UNTERSTÜTZUNG FÜR ARZTBESUCHE</p>
+      </div>-->
+    </a>
+
+    <div class="tools">
+      <!-- Suche mit Icon -->
+      <div class="search">
+        <input type="text" id="search-input" placeholder="Suche…">
+        <button id="search-button" aria-label="Suche"><img src="../Bilder/suche-icon.png" alt=""></button>
+      </div>
+
+      <!-- Sprachwechsel -->
+      <div class="language-icon" id="lang-icon" title="Sprache wechseln">
+        <img src="../Bilder/lang-icon.png" alt="Sprache wählen">
+      </div>
+
+      <!-- Login / Registrierung -->
+      <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
+        <img src="../Bilder/login-icon.png" alt="User">
+      </div>
+    </div>
+  </header>
+
+  <!-- Dashboard-Kacheln -->
+  <main class="dashboard">
+    <div class="card" data-name="Patientenübersicht">
+      <div class="icon"><img src="../Bilder/Patient-icon.png" alt=""></div>
+      <h2 data-key="card.patienten">Patienten</h2>
+    </div>
+
+     <!-- Dashboard-Kacheln 
+    <div class="card" data-name="Terminübersicht">
+      <div class="icon">
+        <a href="../IT_Projekt/html/termin.html">
+          <img src="../IT_Projekt/Bild/icon-calendar.png" alt=""></div>
+          <h2 data-key="card.termine">Terminübersicht</h2>
+        </a>
+
+    </div>  -->
+
+    <a href="html/termin.html" class="card" data-name="Terminübersicht">
+      <div class="icon"><img src="Bild/icon-calendar.png" alt=""></div>
+      <h2 data-key="card.termine">Termine</h2>
+    </a>
+
+    <div class="card" data-name="Notizbereich">
+      <div class="icon" id="notizen"><img src="../Bilder/notiz-icon.png" alt=""></div>
+      <h2 data-key="card.notizen">Begleitprotokoll</h2>
+    </div>
+    <!--<div class="card" data-name="Zeiterfassung">
+      <div class="icon"><img src="../IT_Projekt/Bild/Clock-icon.png" alt=""></div>
+      <h2 data-key="card.zeit">Zeiterfassung</h2>
+    </div>-->
+  </main>
+
+  <!-- Footer-Links -->
+  <footer class="footer-nav">
+    <ul>
+      <li><a href="#" data-key="footer.termine">Datenschutzerklärung</a></li>
+      <li><a href="#" data-key="footer.zeit">Impressum</a></li>
+    </ul>
+  </footer>
+
+  <script src="../IT_Projekt/javascript/script.js"></script>
+</body>
+</html>
