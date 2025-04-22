@@ -173,7 +173,7 @@
     font-weight: 500;
   }
   
-  
+  /* 5) Responsive für Tablet (<=760px) */
   @media (max-width: 760px) {
     .dashboard {
       grid-template-columns: repeat(2, 1fr);
