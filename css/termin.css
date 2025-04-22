@@ -1,0 +1,121 @@
+/* Kalender-Container */
+#calendar {
+  max-width: 100%;
+  margin: 24px auto;
+  background: var(--bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 0;
+  min-height: 600px;
+  display: block;
+}
+
+/* Toolbar-Grundstil */
+.fc-toolbar {
+  position: relative;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+/* Titel mittig platzieren */
+.fc-toolbar .fc-toolbar-chunk.fc-toolbar-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+}
+
+.fc-toolbar-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+}
+
+/* Standard-Buttons */
+.fc .fc-button {
+  background: /*var(--bg)*/ #004aad;
+  border: 1px solid var(--secondary);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-right: 4px;
+}
+.fc .fc-button:hover {
+  background: rgb(202, 197, 197);
+  color: var(--bg);
+}
+.fc .fc-button.fc-button-active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--bg);
+}
+
+/* Icons für Buttons */
+.fc .fc-button .fc-icon {
+  stroke: var(--secondary);
+  fill: var(--secondary);
+}
+.fc .fc-button:hover .fc-icon,
+.fc .fc-button.fc-button-active .fc-icon {
+  stroke: var(--bg);
+  fill: var(--bg);
+}
+/* Styles für den Inline-Formular */
+.event-form-container {
+    max-width: 500px;
+    margin: 16px auto;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    display: none; /* hidden by default */
+  }
+  .event-form-container form {
+    display: flex;
+    flex-direction: column;
+  }
+  .event-form-container label {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+  .event-form-container input[type="text"],
+  .event-form-container input[type="datetime-local"] {
+    padding: 6px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  .event-form-container .buttons {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .event-form-container .buttons button {
+    margin-left: 8px;
+    padding: 6px 12px;
+    border: 1px solid var(--secondary);
+    background: var(--bg);
+    color: var(--secondary);
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .event-form-container .buttons button.save {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--bg);
+  }
+  /* Delete-Button */
+  .event-form-container .buttons button.delete {
+    border-color: #d9534f;
+    color: #d9534f;
+  }
+  .event-form-container .buttons button.delete:hover {
+    background: #d9534f;
+    color: #fff;
+  }
