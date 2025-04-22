@@ -174,32 +174,15 @@
   }
   
   
-   @media (min-width: 600px) and (max-width: 1024px) {
+  @media (max-width: 760px) {
     .dashboard {
-      display: grid;
-      /* genau 2 Spalten */
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 24px;               /* großzügiger Abstand */
-      padding: 32px 24px;      /* innen mehr Luft */
-      max-width: 900px;        /* begrenze Breite und zentriere */
-      margin: 0 auto;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 16px;
     }
-  
-    .card {
-      padding: 32px 24px;      /* innen großzügiger */
-      /* opt. Mindesthöhe für gleichmäßiges Aussehen */
-      min-height: 180px;
-    }
-  
-    .card .icon img {
-      width: 50px;             /* etwas größere Icons */
-      height: 50px;
-      margin-bottom: 16px;
-    }
-  
-    .card h2 {
-      font-size: 1.125rem;     /* etwas größerer Text */
-      margin: 0;
+    .footer-nav ul,
+    .main-nav ul {
+      padding: 6px 12px;
     }
   }
   
