@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Patientendaten</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+
+    input, textarea {
+      margin-bottom: 10px;
+      display: block;
+      width: 300px;
+    }
+
+    button {
+      margin-top: 5px;
+    }
+
+    .container {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+    }
+
+    .form-section {
+      flex: 1;
+    }
+
+    .tabelle-section {
+      flex: 1;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <h1>📄 Patientendaten verwalten</h1>
+
+  <div class="container">
+    <!-- Linke Seite: Formular -->
+    <div class="form-section">
+      <h2>➕ Neuer Patient</h2>
+      <input type="text" id="vorname" placeholder="Vorname">
+      <input type="text" id="nachname" placeholder="Nachname">
+      <input type="text" id="email" placeholder="E-Mail-Adresse">
+      <input type="text" id="geburtsdatum" placeholder="Geburtsdatum (DD.MM.YYYY)">
+      <input type="text" id="adresse" placeholder="Adresse">
+      <input type="text" id="telefon" placeholder="Telefonnummer">
+      <button onclick="patientHinzufuegen(
+        document.getElementById('vorname').value,
+        document.getElementById('nachname').value,
+        document.getElementById('email').value,
+        document.getElementById('telefon').value,
+        document.getElementById('adresse').value,
+        document.getElementById('geburtsdatum').value
+); aktualisierePatiententabelle();">Hinzufügen</button>
+
+
+      <h2>🛠️ Patient bearbeiten</h2>
+      <input type="number" id="patientIndex" placeholder="Index">
+      <input type="text" id="neuerVorname" placeholder="Neuer Vorname">
+      <input type="text" id="neuerNachname" placeholder="Neuer Nachname">
+      <input type="text" id="neuesGeburtsdatum" placeholder="Neues Geburtsdatum">
+      <input type="text" id="neueAdresse" placeholder="Neue Adresse">
+      <input type="text" id="neuesTelefon" placeholder="Neue Telefonnummer">
+      <button onclick="patientBearbeiten(
+        parseInt(document.getElementById('patientIndex').value),
+        {
+          vorname: document.getElementById('neuerVorname').value,
+          nachname: document.getElementById('neuerNachname').value,
+          geburtsdatum: document.getElementById('neuesGeburtsdatum').value,
+          adresse: document.getElementById('neueAdresse').value,
+          telefon: document.getElementById('neuesTelefon').value
+        }
+      ); aktualisierePatiententabelle();">Änderungen speichern</button>
+
+      <h2>🗑️ Patient löschen</h2>
+      <input type="number" id="indexLoeschen" placeholder="Index">
+      <button onclick="patientLoeschen(parseInt(document.getElementById('indexLoeschen').value)); aktualisierePatiententabelle();">Löschen</button>
+
+      <br>
+      <button onclick="localStorage.clear(); location.reload()">🪜 Alles löschen</button>
+    </div>
+
+    <!-- Rechte Seite: Tabelle -->
+    <div class="tabelle-section">
+      <h2>📃 Patiententabelle</h2>
+      <table id="patientenTabelle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Vorname</th>
+            <th>Nachname</th>
+            <th>Geburtsdatum</th>
+            <th>Adresse</th>
+            <th>Telefon</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dynamische Inhalte -->
+        </tbody>
+      </table>
+    </div>
+    <script src="../Scripts/Patientendaten.js"></script>
+  </div>
