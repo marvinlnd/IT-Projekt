@@ -50,3 +50,21 @@ class Medikation {
     }
   }
   
+  function aktualisiereTabelle() {
+    const tabelle = document.getElementById("medikationsTabelle").querySelector("tbody");
+    tabelle.innerHTML = "";
+    medikationsplan.forEach((eintrag, index) => {
+      const zeile = document.createElement("tr");
+      zeile.innerHTML = `
+        <td>${index}</td>
+        <td>${eintrag.medikament}</td>
+        <td>${eintrag.anzahl}</td>
+        <td>${eintrag.tageszeit}</td>
+        <td>${eintrag.wochentage}</td>
+      `;
+      tabelle.appendChild(zeile);
+    });
+  }
+  
+  window.onload = aktualisiereTabelle;
+  
