@@ -1,0 +1,216 @@
+/* 1) Reset & Basis */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    color: #333;
+    line-height: 1.4;
+  }
+  
+  /* 2) Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  /* Logo (Link) */
+  .header .logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;   /* Link‑Unterstreichung entfernen */
+    color: inherit;           /* Link‑Farbe wie Text */
+  }
+  .header .logo img {
+    width: 230px;
+    height: 80px;
+    margin-right: 8px;
+  }
+  .header .logo h1 {
+    font-size: 1.5rem;
+    color: #004aad;
+    line-height: 1;
+  }
+  .header .logo p {
+    font-size: 0.75rem;
+    color: #0078d4;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+  
+  /* Tools‑Bereich */
+  .header .tools {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Suchfeld mit Button */
+  .search {
+    position: relative;
+  }
+  .search input {
+    padding: 6px 36px 6px 12px; /* rechts Platz für Lupe */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .search button {
+    position: absolute;
+    top: 60%;
+    right: 4px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+  }
+  .search button img {
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* Sprach‑Icon */
+  .language-icon {
+    margin-left: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  .language-icon img {
+    width: 24px;
+    height: 24px;
+  }
+  
+  /* Login‑Icon */
+  .login-icon {
+    margin-left: 12px;
+    margin-right: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  .login-icon img {
+    width: 27px;
+    height: 27px;
+  }
+  
+  /* 3) Dashboard‑Kacheln */
+  .dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    padding: 24px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    text-align: center;
+    padding: 24px 16px;
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+  }
+  .card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .card .icon img {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 12px;
+    
+  }
+  .card h2 {
+    font-size: 1rem;
+    color: #004aad;
+    margin: 0;
+  }
+
+  /*#notizen img {
+    width: 60px;
+    height: 50px;
+    margin-top: 0px;
+    margin-bottom: 12px;
+    margin-left: 20px;
+  }*/
+
+  /* Links als Cards ohne Unterstreichung */
+.dashboard a.card {
+    text-decoration: none; /* keine Linie */
+    color: inherit;        /* Textfarbe beibehalten */
+  }
+  
+  /* Optional: Beim Hover noch einen Pointer-Cursor */
+  .dashboard a.card:hover {
+    cursor: pointer;
+  }
+  
+  
+  /* 4) Footer‑Links */
+  .footer-nav {
+    background: #fff;
+    border-top: 1px solid #e0e0e0;
+  }
+  .footer-nav ul {
+    display: flex;
+    list-style: none;
+    justify-content: center;
+    padding: 8px 16px;
+
+  }
+  .footer-nav li + li {
+    margin-left: 40px;
+  }
+  .footer-nav a {
+    text-decoration: none;
+    color: #0078d4;
+    font-weight: 500;
+  }
+  
+  /* 5) Responsive für Tablet (<=760px) */
+  @media (max-width: 760px) {
+    .dashboard {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 16px;
+    }
+    .footer-nav ul,
+    .main-nav ul {
+      padding: 6px 12px;
+    }
+  }
+  
+  
+  /* 6) Responsive für Smartphone (<=480px) */
+  @media (max-width: 480px) {
+    .header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .header .tools {
+      margin-top: 12px;
+      justify-content: space-between;
+    }
+    .search input {
+      width: 100%;
+    }
+    .dashboard {
+      grid-template-columns: 1fr;
+      padding: 12px;
+    }
+    .footer-nav ul {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .footer-nav li + li {
+      margin-top: 8px;
+      margin-left: 0;
+    }
+  }
+  

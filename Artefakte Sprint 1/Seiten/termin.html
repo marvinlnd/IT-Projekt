@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminübersicht – MediAssist</title>
+
+  <!-- Basis‑CSS -->
+  <link rel="stylesheet" href="../css/styles.css">
+  <!-- Kalender‑Styles -->
+  <link rel="stylesheet" href="../css/termin.css">
+  <!-- FullCalendar CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+</head>
+<body>
+  <!-- HEADER aus index.html -->
+  <header class="header">
+    <a href="index.html" class="logo">
+      <img src="../Bilder/IT_Projekt/Bild/Logo.png" alt="MediAssist Logo">
+      <!--<div>
+        <h1>MediAssist</h1>
+        <p>UNTERSTÜTZUNG FÜR ARZTBESUCHE</p>
+      </div>-->
+    </a>
+    <div class="tools">
+      <div class="search">
+        <input type="text" id="search-input" placeholder="Suche…">
+        <button id="search-button" aria-label="Suche">
+          <img src="../Bilder/IT_Projekt/Bild/suche-icon.png" alt="Suche">
+        </button>
+      </div>
+      <div class="language-icon" id="lang-icon" title="Sprache wechseln">
+        <img src="../Bilder/IT_Projekt/Bild/lang-icon.png" alt="Sprache wählen">
+      </div>
+      <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
+        <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User">
+      </div>
+    </div>
+  </header>
+
+  <!-- Kalender-Container und Inline Formular -->
+  <main>
+    <div id="calendar"></div>
+    <div id="event-form-container" class="event-form-container"></div>
+  </main>
+
+  <!-- FullCalendar JS -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <!-- Termin‑Logik -->
+  <script src="../Scripts/termin.js" defer></script>
+  <!-- Core Interaction Logic: search, language, login -->
+  <script src="../Scripts/script.js" defer></script>
+</body>
+</html>
