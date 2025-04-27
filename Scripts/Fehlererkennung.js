@@ -54,3 +54,39 @@ function istNameGueltig(name) {
     return true;
   }
   
+  function medikationHinzufuegen(medikament, anzahl, tageszeit, wochentage) {
+    if (!medikament.trim() || !anzahl.trim() || !tageszeit.trim() || !wochentage.trim()) {
+      alert("❗ Bitte alle Felder ausfüllen, bevor du eine Medikation hinzufügst.❗");
+      return;
+    }
+  
+    const neueMedikation = new Medikation(medikament, anzahl, tageszeit, wochentage);
+    medikationsplan.push(neueMedikation);
+    speichereMedikationsplan();
+    aktualisiereTabelle();
+  }
+  
+  function medikationBearbeiten(index, neueDaten) {
+    if (isNaN(index) || index < 0 || index >= medikationsplan.length) {
+      alert("❗ Ungültiger Index beim Bearbeiten!❗");
+      return;
+    }
+  
+    medikationsplan[index].aktualisieren(neueDaten);
+    speichereMedikationsplan();
+    aktualisiereTabelle();
+  }
+  
+  function medikationLoeschen(index) {
+    if (isNaN(index) || index < 0 || index >= medikationsplan.length) {
+      alert("❗ Ungültiger Index beim Löschen!❗");
+      return;
+    }
+  
+    if (confirm("❓ Willst du diese Medikation wirklich löschen?❓")) {
+      medikationsplan.splice(index, 1);
+      speichereMedikationsplan();
+      aktualisiereTabelle();
+    }
+  }
+  

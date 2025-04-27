@@ -9,7 +9,7 @@
       margin: 20px;
     }
 
-    input, textarea {
+    input, select, textarea {
       margin-bottom: 10px;
       display: block;
       width: 300px;
@@ -49,44 +49,52 @@
     }
   </style>
 </head>
+
 <body>
   <h1>💊 Medikationsplan verwalten</h1>
 
   <div class="container">
-
+    
     <!-- Linke Seite: Formular -->
     <div class="form-section">
       <h2>➕ Neue Medikation hinzufügen</h2>
       <input type="text" id="medikament" placeholder="Medikamentenname">
       <input type="text" id="anzahl" placeholder="Anzahl / Dosierung">
-      <input type="text" id="tageszeit" placeholder="Tageszeit (z. B. morgens, abends)">
+
+      <input type="text" id="tageszeit" placeholder="Tageszeit (z. B. morgens, mittags, abends, nachts)">
+
       <input type="text" id="wochentage" placeholder="Wochentage (z. B. Mo, Mi, Fr)">
       <button onclick="medikationHinzufuegen(
         document.getElementById('medikament').value,
         document.getElementById('anzahl').value,
         document.getElementById('tageszeit').value,
         document.getElementById('wochentage').value
-      ); aktualisiereTabelle();">Hinzufügen</button>
+      )">Hinzufügen</button>
 
       <h2>🛠️ Medikation bearbeiten</h2>
-      <input type="number" id="index" placeholder="Index">
+      <label for="indexDropdown">Index auswählen:</label>
+      <select id="indexDropdown"></select>
+      
       <input type="text" id="neuesMedikament" placeholder="Neuer Medikamentenname">
       <input type="text" id="neueAnzahl" placeholder="Neue Anzahl">
+
       <input type="text" id="neueTageszeit" placeholder="Neue Tageszeit">
       <input type="text" id="neueWochentage" placeholder="Neue Wochentage">
       <button onclick="medikationBearbeiten(
-        parseInt(document.getElementById('index').value),
+        parseInt(document.getElementById('indexDropdown').value),
         {
           medikament: document.getElementById('neuesMedikament').value,
           anzahl: document.getElementById('neueAnzahl').value,
           tageszeit: document.getElementById('neueTageszeit').value,
           wochentage: document.getElementById('neueWochentage').value
         }
-      ); aktualisiereTabelle();">Änderungen speichern</button>
+      )">Änderungen speichern</button>
 
       <h2>🗑️ Medikation löschen</h2>
-      <input type="number" id="indexLoeschen" placeholder="Index">
-      <button onclick="medikationLoeschen(parseInt(document.getElementById('indexLoeschen').value)); aktualisiereTabelle();">Löschen</button>
+      <label for="indexLoeschenDropdown">Index auswählen:</label>
+      <select id="indexLoeschenDropdown"></select>
+      
+      <button onclick="medikationLoeschen(parseInt(document.getElementById('indexLoeschenDropdown').value))">Löschen</button>
 
       <br>
       <button onclick="localStorage.clear(); location.reload()">🧹 Alles löschen</button>
@@ -106,9 +114,15 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Dynamische Inhalte -->
+          <!-- Hier wird per JavaScript der Inhalt eingefügt -->
         </tbody>
       </table>
     </div>
-    <script src="../Scripts/Medikationsplan.js"></script>
+
   </div>
+
+  <!-- JavaScript einbinden -->
+  <script src="../Scripts/Medikationsplan.js"></script>
+  <script src="../Scripts/Fehlererkennung.js"></script>
+</body>
+</html>

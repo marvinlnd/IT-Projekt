@@ -65,6 +65,27 @@ class Medikation {
       tabelle.appendChild(zeile);
     });
   }
+  function aktualisiereIndexDropdown() {
+    const indexDropdown = document.getElementById('indexDropdown');
+    const indexLoeschenDropdown = document.getElementById('indexLoeschenDropdown');
+  
+    // Leeren der Dropdowns
+    indexDropdown.innerHTML = '';
+    indexLoeschenDropdown.innerHTML = '';
+  
+    // Hinzufügen der Optionen zum Dropdown für Bearbeitung und Löschen
+    medikationsplan.forEach((medikation, index) => {
+      const option = document.createElement('option');
+      option.value = index;
+      option.textContent = `${index + 1}: ${medikation.medikament}`;
+      
+      indexDropdown.appendChild(option);
+      indexLoeschenDropdown.appendChild(option.cloneNode(true));  // Das gleiche Element für das Löschen-Dropdown
+    });
+  }
+  
+  // Diese Funktion nach jedem Hinzufügen, Bearbeiten oder Löschen von Medikation aufrufen:
+  aktualisiereIndexDropdown();
   
   window.onload = aktualisiereTabelle;
   
