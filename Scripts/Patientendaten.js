@@ -21,37 +21,49 @@ class Patient {
 function ladePatienten() {
   const daten = localStorage.getItem("patientListe");
   if (!daten) return [];
-
   const rohDaten = JSON.parse(daten);
   return rohDaten.map(p => new Patient(
-    p.vorname,
-    p.nachname,
-    p.email,
-    p.telefon,
-    p.adresse,
-    p.geburtsdatum
+    p.vorname, p.nachname, p.email, p.telefon, p.adresse, p.geburtsdatum
   ));
 }
 
-let patientListe = ladePatienten(); 
+let patientListe = ladePatienten();
 
 function speicherePatienten() {
   localStorage.setItem("patientListe", JSON.stringify(patientListe));
 }
 
 function patientHinzufuegen(vorname, nachname, email, telefon, adresse, geburtsdatum) {
+  if (!validierePatient(vorname, nachname, email, telefon, adresse, geburtsdatum)) {
+    return;
+  }
+
   const neuerPatient = new Patient(vorname, nachname, email, telefon, adresse, geburtsdatum);
   patientListe.push(neuerPatient);
   speicherePatienten();
+  aktualisierePatiententabelle();
   return neuerPatient;
 }
 
 function patientBearbeiten(index, neueDaten) {
   if (index >= 0 && index < patientListe.length) {
+    const aktuellerPatient = patientListe[index];
+    const vorname = neueDaten.vorname || aktuellerPatient.vorname;
+    const nachname = neueDaten.nachname || aktuellerPatient.nachname;
+    const email = neueDaten.email || aktuellerPatient.email;
+    const telefon = neueDaten.telefon || aktuellerPatient.telefon;
+    const adresse = neueDaten.adresse || aktuellerPatient.adresse;
+    const geburtsdatum = neueDaten.geburtsdatum || aktuellerPatient.geburtsdatum;
+
+    if (!validierePatient(vorname, nachname, email, telefon, adresse, geburtsdatum)) {
+      return;
+    }
+
     patientListe[index].aktualisieren(neueDaten);
     speicherePatienten();
+    aktualisierePatiententabelle();
   } else {
-    console.log("Patient mit dem Index:" + index + " konnte nicht gefunden werden.\nBearbeiten fehlgeschlagen!");
+    console.log(`Patient mit dem Index: ${index} konnte nicht gefunden werden.`);
   }
 }
 
@@ -61,16 +73,15 @@ function patientLoeschen(index) {
     speicherePatienten();
     aktualisierePatiententabelle();
   } else {
-    console.log("Patient mit dem Index:" + index + " konnte nicht gefunden werden.\nLöschen fehlgeschlagen!");
+    console.log(`Patient mit dem Index: ${index} konnte nicht gefunden werden.`);
   }
 }
 
 function aktualisierePatiententabelle() {
-  // Liste neu aus dem Speicher laden
   patientListe = ladePatienten();
-
   const tabelle = document.getElementById("patientenTabelle").querySelector("tbody");
   tabelle.innerHTML = "";
+
   patientListe.forEach((eintrag, index) => {
     const zeile = document.createElement("tr");
     zeile.innerHTML = `
@@ -83,7 +94,37 @@ function aktualisierePatiententabelle() {
     `;
     tabelle.appendChild(zeile);
   });
+
+  aktualisiereDropdowns();
 }
 
+function aktualisiereDropdowns() {
+  const bearbeitungsDropdown = document.getElementById("patientIndex");
+  const loeschDropdown = document.getElementById("indexLoeschen");
+
+  bearbeitungsDropdown.innerHTML = "";
+  loeschDropdown.innerHTML = "";
+
+  if (patientListe.length === 0) {
+    const optionKeinePatienten = document.createElement("option");
+    optionKeinePatienten.textContent = "Keine Patienten vorhanden";
+    optionKeinePatienten.disabled = true;
+    bearbeitungsDropdown.appendChild(optionKeinePatienten);
+    loeschDropdown.appendChild(optionKeinePatienten.cloneNode(true));
+    return;
+  }
+
+  patientListe.forEach((patient, index) => {
+    const optionBearbeiten = document.createElement("option");
+    optionBearbeiten.value = index;
+    optionBearbeiten.textContent = `${index} – ${patient.vorname} ${patient.nachname}`;
+    bearbeitungsDropdown.appendChild(optionBearbeiten);
+
+    const optionLoeschen = document.createElement("option");
+    optionLoeschen.value = index;
+    optionLoeschen.textContent = `${index} – ${patient.vorname} ${patient.nachname}`;
+    loeschDropdown.appendChild(optionLoeschen);
+  });
+}
 
 aktualisierePatiententabelle();

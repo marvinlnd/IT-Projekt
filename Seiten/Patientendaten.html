@@ -69,11 +69,10 @@
         document.getElementById('telefon').value,
         document.getElementById('adresse').value,
         document.getElementById('geburtsdatum').value
-); aktualisierePatiententabelle();">Hinzufügen</button>
-
+      ); aktualisierePatiententabelle();">Hinzufügen</button>
 
       <h2>🛠️ Patient bearbeiten</h2>
-      <input type="number" id="patientIndex" placeholder="Index">
+      <select id="patientIndex"></select>
       <input type="text" id="neuerVorname" placeholder="Neuer Vorname">
       <input type="text" id="neuerNachname" placeholder="Neuer Nachname">
       <input type="text" id="neuesGeburtsdatum" placeholder="Neues Geburtsdatum">
@@ -91,7 +90,7 @@
       ); aktualisierePatiententabelle();">Änderungen speichern</button>
 
       <h2>🗑️ Patient löschen</h2>
-      <input type="number" id="indexLoeschen" placeholder="Index">
+      <select id="indexLoeschen"></select>
       <button onclick="patientLoeschen(parseInt(document.getElementById('indexLoeschen').value)); aktualisierePatiententabelle();">Löschen</button>
 
       <br>
@@ -117,5 +116,9 @@
         </tbody>
       </table>
     </div>
-    <script src="../Scripts/Patientendaten.js"></script>
   </div>
+
+  <script src="../Scripts/Patientendaten.js"></script>
+  <script src="../Scripts/Fehlererkennung.js"></script>
+</body>
+</html>
