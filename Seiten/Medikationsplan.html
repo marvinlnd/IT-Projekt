@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="UTF-8">
   <title>Medikationsplan</title>
@@ -82,12 +86,12 @@
       </div>
     </div>
   </header>
-  <h1>💊 Medikationsplan verwalten</h1>
+  <h1 class="animate__animated animate__zoomIn">💊 Medikationsplan verwalten</h1>
 
   <div class="container">
     
     <!-- Linke Seite: Formular -->
-    <div class="form-section">
+    <div class="form-section animate__animated animate__fadeInLeft">
       <h2>➕ Neue Medikation hinzufügen</h2>
       <input type="text" id="medikament" placeholder="Medikamentenname">
       <input type="text" id="anzahl" placeholder="Anzahl / Dosierung">
@@ -126,12 +130,12 @@
       <select id="indexLoeschenDropdown"></select>
 
       <!-- Löschen Button -->
-      <button onclick="medikationLoeschen(parseInt(document.getElementById('indexLoeschenDropdown').value))">
+      <button onclick="medikationLoeschen(parseInt(document.getElementById('indexLoeschenDropdown').value));this.classList.add('animate__animated', 'animate__bounce');setTimeout(() => this.classList.remove('animate__animated', 'animate__bounce'), 1000)">
       🗑️ Löschen
       </button>
 
       <!-- Erledigt Button -->
-      <button onclick="medikationErledigt(parseInt(document.getElementById('indexLoeschenDropdown').value))" style="margin-left: 10px; background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 5px 10px; border-radius: 5px;">
+      <button onclick="medikationErledigt(parseInt(document.getElementById('indexLoeschenDropdown').value));this.classList.add('animate__animated', 'animate__bounce'); setTimeout(() => this.classList.remove('animate__animated', 'animate__bounce'), 1000)" style="margin-left: 10px; background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 5px 10px; border-radius: 5px;">
       ✅ Erledigt
       </button>
 
@@ -141,7 +145,7 @@
     </div>
 
     <!-- Rechte Seite: Tabelle -->
-    <div class="tabelle-section">
+    <div class="tabelle-section animate__animated animate__fadeInRight">
       <h2>📄 Medikationsplan</h2>
       <table id="medikationsTabelle">
         <thead>
