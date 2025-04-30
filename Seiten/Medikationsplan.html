@@ -124,11 +124,20 @@
       <h2>🗑️ Medikation löschen</h2>
       <label for="indexLoeschenDropdown">Index auswählen:</label>
       <select id="indexLoeschenDropdown"></select>
-      
-      <button onclick="medikationLoeschen(parseInt(document.getElementById('indexLoeschenDropdown').value))">Löschen</button>
+
+      <!-- Löschen Button -->
+      <button onclick="medikationLoeschen(parseInt(document.getElementById('indexLoeschenDropdown').value))">
+      🗑️ Löschen
+      </button>
+
+      <!-- Erledigt Button -->
+      <button onclick="medikationErledigt(parseInt(document.getElementById('indexLoeschenDropdown').value))" style="margin-left: 10px; background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 5px 10px; border-radius: 5px;">
+      ✅ Erledigt
+      </button>
 
       <br>
       <button onclick="localStorage.clear(); location.reload()">🧹 Alles löschen</button>
+
     </div>
 
     <!-- Rechte Seite: Tabelle -->
