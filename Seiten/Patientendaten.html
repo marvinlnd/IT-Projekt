@@ -1,8 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Patientendaten</title>
+  <link rel="stylesheet" href="../css/styles.css">
   <style>
     body {
       font-family: sans-serif;
@@ -50,11 +56,40 @@
   </style>
 </head>
 <body>
-  <h1>📄 Patientendaten verwalten</h1>
+  <!-- Header -->
+  <header class="header">
+    <!-- Logo klickbar -->
+    <a href="index.html" class="logo">
+      <img src="../Bilder/IT_Projekt/Bild/Logo.png" alt="MediAssist Logo" style="width: 250px; height: auto;">
+        <!--<div>
+          <h1>MediAssist</h1>
+          <p>UNTERSTÜTZUNG FÜR ARZTBESUCHE</p>
+        </div>-->
+    </a>
+
+    <div class="tools">
+      <!-- Suche mit Icon -->
+      <div class="search">
+        <input type="text" id="search-input" placeholder="Suche…">
+        <button id="search-button" aria-label="Suche"></button>
+      </div>
+
+      <!-- Sprachwechsel -->
+      <div class="language-icon" id="lang-icon" title="Sprache wechseln">
+        <img src="../Bilder/IT_Projekt/Bild/lang-icon.png" alt="Sprache wählen">
+      </div>
+
+      <!-- Login / Registrierung -->
+      <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
+        <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User">
+      </div>
+    </div>
+  </header>
+  <h1 class="animate__animated animate__zoomIn">📄 Patientendaten verwalten</h1>
 
   <div class="container">
     <!-- Linke Seite: Formular -->
-    <div class="form-section">
+    <div class="form-section animate__animated animate__fadeInLeft">
       <h2>➕ Neuer Patient</h2>
       <input type="text" id="vorname" placeholder="Vorname">
       <input type="text" id="nachname" placeholder="Nachname">
@@ -98,7 +133,7 @@
     </div>
 
     <!-- Rechte Seite: Tabelle -->
-    <div class="tabelle-section">
+    <div class="tabelle-section animate__animated animate__fadeInRight">
       <h2>📃 Patiententabelle</h2>
       <table id="patientenTabelle">
         <thead>

@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
   <meta charset="UTF-8">
   <title>Aktivitäten</title>
+  <link rel="stylesheet" href="../css/styles.css">
   <style>
     body { font-family: sans-serif; margin: 20px; }
     input, textarea { margin-bottom: 10px; display: block; width: 300px; }
@@ -11,42 +16,74 @@
   </style>
 </head>
 <body>
+  <!-- Header -->
+  <header class="header">
+    <!-- Logo klickbar -->
+    <a href="index.html" class="logo">
+      <img src="../Bilder/IT_Projekt/Bild/Logo.png" alt="MediAssist Logo" style="width: 250px; height: auto;">
+        <!--<div>
+          <h1>MediAssist</h1>
+          <p>UNTERSTÜTZUNG FÜR ARZTBESUCHE</p>
+        </div>-->
+    </a>
+
+    <div class="tools">
+      <!-- Suche mit Icon -->
+      <div class="search">
+        <input type="text" id="search-input" placeholder="Suche…">
+        <button id="search-button" aria-label="Suche"></button>
+      </div>
+
+      <!-- Sprachwechsel -->
+      <div class="language-icon" id="lang-icon" title="Sprache wechseln">
+        <img src="../Bilder/IT_Projekt/Bild/lang-icon.png" alt="Sprache wählen">
+      </div>
+
+      <!-- Login / Registrierung -->
+      <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
+        <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User">
+      </div>
+    </div>
+  </header>
   <h1>Aktivitäten bearbeiten</h1>
+  <div class="container">
+    <div class="form-section animate__animated animate__fadeInLeft">
+      <h2>➕ Neue Aktivität hinzufügen</h2>
+      <input type="text" id="nameDerAktivität" placeholder="Name der Aktivität">
+      <input type="text" id="beginn" placeholder="Uhrzeit beginn">
+      <input type="text" id="ende" placeholder="Uhrzeit Ende">
+      <input type="text" id="notitz" placeholder="Notiz ">
 
-  <h2>➕ Neue Aktivität hinzufügen</h2>
-  <input type="text" id="nameDerAktivität" placeholder="Name der Aktivität">
-  <input type="text" id="beginn" placeholder="Uhrzeit">
-  <input type="text" id="ende" placeholder="Uhrzeit">
-  <input type="text" id="notitz" placeholder=" ">
+      <button onclick="aktivitätHinzufügen(document.getElementById('nameDerAktivität').value, 
+      document.getElementById('beginn').value, document.getElementById('ende').value, 
+      document.getElementById('notitz').value)">Hinzufügen</button>
 
-  <button onclick="aktivitätHinzufügen(document.getElementById('nameDerAktivität').value, 
-  document.getElementById('beginn').value, document.getElementById('ende').value, 
-  document.getElementById('notitz').value)">Hinzufügen</button>
+      <h2>Aktivität bearbeiten</h2>
+      <input type= "number" id="index" placeholder="Index">
+      <input type="text" id="neuerNameDerAktivität" placeholder="Neuer Name">
+      <input type="text" id="beginnÄndern" placeholder="beginn Ändern">
+      <input type="text" id="endeÄndern" placeholder="ende Ändern">
+      <input type="text" id="notitzÄndern" placeholder="notitz Ändern">
 
-  <h2>Aktivität bearbeiten</h2>
-  <input type= "number" id="index" placeholder="Index">
-  <input type="text" id="neuerNameDerAktivität" placeholder="Neuer Name">
-  <input type="text" id="beginnÄndern" placeholder="">
-  <input type="text" id="endeÄndern" placeholder="">
-  <input type="text" id="notitzÄndern" placeholder="">
-
-  <button onclick="aktivität_bearbeiten(parseInt(document.getElementById('index').value), 
-  document.getElementById('neuerNameDerAktivität').value, document.getElementById('beginnÄndern').value, 
-  document.getElementById('endeÄndern').value, document.getElementById('notitzÄndern').value)">Änderungen Speichern</button>
-
-
-  <h2>Aktivität löschen</h2>
-  <input type= "number" id="index" placeholder="Index">
-  <button onclick="aktivität_loeschen(document.getElementById('index').value)">Löschen</button>
-
- 
+      <button onclick="aktivität_bearbeiten(parseInt(document.getElementById('index').value), 
+      document.getElementById('neuerNameDerAktivität').value, document.getElementById('beginnÄndern').value, 
+      document.getElementById('endeÄndern').value, document.getElementById('notitzÄndern').value)">Änderungen Speichern</button>
 
 
+      <h2>Aktivität löschen</h2>
+      <input type= "number" id="index" placeholder="Index">
+      <button onclick="aktivität_loeschen(document.getElementById('index').value)">Löschen</button>
 
-  <h2>📋 Aktivitäten</h2>
-  <div id="liste"></div>
+    
 
-  <button onclick="localStorage.clear(); location.reload()">🧹 Alles löschen</button>
+
+
+      <h2>📋 Aktivitäten</h2>
+      <div id="liste"></div>
+
+      <button onclick="localStorage.clear(); location.reload()">🧹 Alles löschen</button>
+    </div>
+  </div>
 
   <script src="../Scripts/aktivitäten.js"></script>
 </body>

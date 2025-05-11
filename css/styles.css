@@ -123,10 +123,11 @@
     text-align: center;
     padding: 24px 16px;
     cursor: pointer;
-    transition: box-shadow 0.2s;
+    transition: box-shadow 0.3s ease,  transform 0.3s ease;
   }
   .card:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    transform: scale(1.05);
   }
   .card .icon img {
     width: 40px;
