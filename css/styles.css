@@ -34,8 +34,13 @@
     display: flex;
     align-items: center;
     text-decoration: none;   /* Link‑Unterstreichung entfernen */
-    color: inherit;           /* Link‑Farbe wie Text */
+    transition: transform 0.3s ease;
   }
+
+  .header .logo:hover,
+  .header .logo:focus {
+  transform: scale(1.05);
+  } 
   .header .logo img {
     width: 230px;
     height: 80px;
