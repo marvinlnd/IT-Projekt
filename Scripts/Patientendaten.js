@@ -48,24 +48,33 @@ function patientHinzufuegen(vorname, nachname, email, telefon, adresse, geburtsd
 function patientBearbeiten(index, neueDaten) {
   if (index >= 0 && index < patientListe.length) {
     const aktuellerPatient = patientListe[index];
-    const vorname = neueDaten.vorname || aktuellerPatient.vorname;
-    const nachname = neueDaten.nachname || aktuellerPatient.nachname;
-    const email = neueDaten.email || aktuellerPatient.email;
-    const telefon = neueDaten.telefon || aktuellerPatient.telefon;
-    const adresse = neueDaten.adresse || aktuellerPatient.adresse;
-    const geburtsdatum = neueDaten.geburtsdatum || aktuellerPatient.geburtsdatum;
 
-    if (!validierePatient(vorname, nachname, email, telefon, adresse, geburtsdatum)) {
+    // Leere Eingaben durch bestehende Werte ersetzen
+    const vorname = neueDaten.vorname.trim() || aktuellerPatient.vorname;
+    const nachname = neueDaten.nachname.trim() || aktuellerPatient.nachname;
+    const email = neueDaten.email.trim() || aktuellerPatient.email;
+    const telefon = neueDaten.telefon.trim() || aktuellerPatient.telefon;
+    const adresse = neueDaten.adresse.trim() || aktuellerPatient.adresse;
+    const geburtsdatum = neueDaten.geburtsdatum.trim() || aktuellerPatient.geburtsdatum;
+
+    // Neue Funktion verwenden
+    if (!validiereBearbeitungsDaten(vorname, nachname, email, telefon, adresse, geburtsdatum)) {
+      alert("Valiedierung klappt");
       return;
     }
 
-    patientListe[index].aktualisieren(neueDaten);
+    // Aktualisieren
+    patientListe[index].aktualisieren({
+      vorname, nachname, email, telefon, adresse, geburtsdatum
+    });
+
     speicherePatienten();
     aktualisierePatiententabelle();
   } else {
-    console.log(`Patient mit dem Index: ${index} konnte nicht gefunden werden.`);
+    alert(`❌ Patient mit dem Index ${index} konnte nicht gefunden werden.`);
   }
 }
+
 
 function patientLoeschen(index) {
   if (index >= 0 && index < patientListe.length) {
@@ -88,6 +97,7 @@ function aktualisierePatiententabelle() {
       <td>${index}</td>
       <td>${eintrag.vorname}</td>
       <td>${eintrag.nachname}</td>
+      <td>${eintrag.email}</td>
       <td>${eintrag.geburtsdatum}</td>
       <td>${eintrag.adresse}</td>
       <td>${eintrag.telefon}</td>

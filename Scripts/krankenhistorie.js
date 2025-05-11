@@ -26,17 +26,19 @@ function ladeHistorie() {
 
 
 
-function vorerkrankung_hinzufügen(nameDerKrankheit, datumDerFeststellung){
-
-
-
-    const neueVorerkrankung = new krankheit(nameDerKrankheit, datumDerFeststellung);
-    krankenhistorie.push(neueVorerkrankung);
-    speichereHistorie();
-    zeigeKrankenhistorieAlsTabelle();
-    console.log("Erfolg");
-
+function vorerkrankung_hinzufügen(nameDerKrankheit, datumDerFeststellung) {
+  if (!validiereKrankheit(nameDerKrankheit, datumDerFeststellung)) {
+    return;
+  }
+  const neueVorerkrankung = new krankheit(nameDerKrankheit, datumDerFeststellung);
+  krankenhistorie.push(neueVorerkrankung);
+  speichereHistorie();
+  zeigeKrankenhistorieAlsTabelle();
+  console.log("Erfolg");
+  
 }
+
+
 
 function vorerkrankung_loeschen(index){
 
@@ -53,6 +55,10 @@ function vorerkrankung_loeschen(index){
 }
 
 function vorerkrankung_bearbeiten(index, neuerName, neuesDatum) {
+  if (!validiereKrankheit(neuerName, neuesDatum)) {
+    return;
+  }
+
   const eintrag = krankenhistorie[index];
   if (eintrag) {
     eintrag.nameDerKrankheit = neuerName;
@@ -64,6 +70,7 @@ function vorerkrankung_bearbeiten(index, neuerName, neuesDatum) {
     console.log("Kein Eintrag gefunden");
   }
 }
+
 
 
 function zeigeKrankenhistorieAlsTabelle() {

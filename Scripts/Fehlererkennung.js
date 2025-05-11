@@ -20,16 +20,13 @@ function istNameGueltig(name) {
     return /^\d{2}\.\d{2}\.\d{4}$/.test(datum.trim());
   }
   
-  function sindPflichtfelderAusgefuellt(...felder) {
-    // Keins der Felder darf leer sein
-    return felder.every(feld => feld.trim() !== "");
-  }
   
   function validierePatient(vorname, nachname, email, telefon, adresse, geburtsdatum) {
-    if (!sindPflichtfelderAusgefuellt(vorname, nachname, email, telefon, adresse, geburtsdatum)) {
-      alert("❌ Bitte alle Felder ausfüllen! ❌");
+    if (!vorname || !nachname || !email || !telefon || !adresse || !geburtsdatum) {
+      alert("❌Bitte füllen Sie alle Felder aus.❌");
       return false;
     }
+  
   
     if (!istNameGueltig(vorname) || !istNameGueltig(nachname)) {
       alert("❌ Vorname und Nachname dürfen nur Buchstaben enthalten! ❌");
@@ -53,6 +50,59 @@ function istNameGueltig(name) {
   
     return true;
   }
+
+  function istNameGueltig(neuerName) {
+    // Name darf nur Buchstaben und evtl. Leerzeichen enthalten
+    return /^[A-Za-zÄÖÜäöüß\s'-]+$/.test(neuerName.trim());
+  }
+  
+  function istEmailGueltig(neueEmail) {
+    // Sehr einfache E-Mail-Überprüfung
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(neueEmail.trim());
+  }
+  
+  function istTelefonnummerGueltig(neuesTelefon) {
+    // Telefonnummer darf nur Ziffern, Leerzeichen, Bindestriche und Plus enthalten
+    return /^[0-9+\s-]+$/.test(neuesTelefon.trim());
+  }
+  
+  function istGeburtsdatumGueltig(neuesGeburtsdatum) {
+    // Format DD.MM.YYYY
+    return /^\d{2}\.\d{2}\.\d{4}$/.test(neuesGeburtsdatum.trim());
+  }
+  function validiereBearbeitungsDaten(neuerVorname,neuerNachname,neueEmail,neuesTelefon,neueAdresse,neuesGeburtsdatum,) {
+    if (!neuerVorname || !neuerNachname || !neueEmail || !neuesTelefon || !neueAdresse || !neuesGeburtsdatum) {
+      alert("❌Bitte füllen Sie alle Felder aus.(Test 1)❌");
+      return false;
+    }
+    if (!istNameGueltig(neuerVorname)) {
+      alert("❌ Vorname darf nur Buchstaben enthalten!");
+      return false;
+    }
+  
+    if (!istNameGueltig(neuerNachname)) {
+      alert("❌ Nachname darf nur Buchstaben enthalten!");
+      return false;
+    }
+    alert("Hier");
+    if (!istEmailGueltig(neueEmail)) {
+      alert("❌ Bitte eine gültige E-Mail-Adresse eingeben!");
+      return false;
+    }
+  
+    if (!istTelefonnummerGueltig(neuesTelefon)) {
+      alert("❌ Telefonnummer darf nur Zahlen, Plus, Minus oder Leerzeichen enthalten!");
+      return false;
+    }
+  
+    if (!istGeburtsdatumGueltig(neuesGeburtsdatum)) {
+      alert("❌ Geburtsdatum muss im Format DD.MM.YYYY sein!");
+      return false;
+    }
+  
+    return true;
+  }
+  
  // #endregion
 // #region Medikationsplan Fehlererkennung
 

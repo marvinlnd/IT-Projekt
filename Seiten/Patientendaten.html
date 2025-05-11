@@ -110,6 +110,7 @@
       <select id="patientIndex"></select>
       <input type="text" id="neuerVorname" placeholder="Neuer Vorname">
       <input type="text" id="neuerNachname" placeholder="Neuer Nachname">
+      <input type="text" id="neueEmail" placeholder="Neue E-Mail-Adresse">
       <input type="text" id="neuesGeburtsdatum" placeholder="Neues Geburtsdatum">
       <input type="text" id="neueAdresse" placeholder="Neue Adresse">
       <input type="text" id="neuesTelefon" placeholder="Neue Telefonnummer">
@@ -118,6 +119,7 @@
         {
           vorname: document.getElementById('neuerVorname').value,
           nachname: document.getElementById('neuerNachname').value,
+          mail: document.getElementById('neueEmail').value,
           geburtsdatum: document.getElementById('neuesGeburtsdatum').value,
           adresse: document.getElementById('neueAdresse').value,
           telefon: document.getElementById('neuesTelefon').value
@@ -141,6 +143,7 @@
             <th>#</th>
             <th>Vorname</th>
             <th>Nachname</th>
+            <th>E-Mail</th>
             <th>Geburtsdatum</th>
             <th>Adresse</th>
             <th>Telefon</th>
