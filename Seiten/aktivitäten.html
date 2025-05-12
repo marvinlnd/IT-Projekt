@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <meta charset="UTF-8">
   <title>Aktivitäten</title>
   <link rel="stylesheet" href="../css/styles.css">
@@ -12,79 +9,95 @@
     body { font-family: sans-serif; margin: 20px; }
     input, textarea { margin-bottom: 10px; display: block; width: 300px; }
     button { margin-top: 5px; }
-    .eintrag { border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 6px; }
+    .container { display: flex; gap: 40px; align-items: flex-start; }
+    .form-section, .tabelle-section { flex: 1; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
   </style>
 </head>
 <body>
+
   <!-- Header -->
   <header class="header">
-    <!-- Logo klickbar -->
     <a href="index.html" class="logo">
       <img src="../Bilder/IT_Projekt/Bild/Logo.png" alt="MediAssist Logo" style="width: 250px; height: auto;">
-        <!--<div>
-          <h1>MediAssist</h1>
-          <p>UNTERSTÜTZUNG FÜR ARZTBESUCHE</p>
-        </div>-->
     </a>
 
     <div class="tools">
-      <!-- Suche mit Icon -->
       <div class="search">
         <input type="text" id="search-input" placeholder="Suche…">
         <button id="search-button" aria-label="Suche"></button>
       </div>
-
-      <!-- Sprachwechsel -->
       <div class="language-icon" id="lang-icon" title="Sprache wechseln">
         <img src="../Bilder/IT_Projekt/Bild/lang-icon.png" alt="Sprache wählen">
       </div>
-
-      <!-- Login / Registrierung -->
       <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
         <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User">
       </div>
     </div>
   </header>
-  <h1>Aktivitäten bearbeiten</h1>
+
+  <h1 class="animate__animated animate__zoomIn">🗓️ Aktivitäten bearbeiten</h1>
+
   <div class="container">
+    <!-- Linke Seite: Formular -->
     <div class="form-section animate__animated animate__fadeInLeft">
       <h2>➕ Neue Aktivität hinzufügen</h2>
       <input type="text" id="nameDerAktivität" placeholder="Name der Aktivität">
-      <input type="text" id="beginn" placeholder="Uhrzeit beginn">
-      <input type="text" id="ende" placeholder="Uhrzeit Ende">
-      <input type="text" id="notitz" placeholder="Notiz ">
+      <input type="text" id="beginn" placeholder="Uhrzeit Beginn (HH:MM)">
+      <input type="text" id="ende" placeholder="Uhrzeit Ende (HH:MM)">
+      <input type="text" id="notitz" placeholder="Notiz">
+      <button onclick="aktivitätHinzufügen(
+        document.getElementById('nameDerAktivität').value, 
+        document.getElementById('beginn').value, 
+        document.getElementById('ende').value, 
+        document.getElementById('notitz').value
+      )">Hinzufügen</button>
 
-      <button onclick="aktivitätHinzufügen(document.getElementById('nameDerAktivität').value, 
-      document.getElementById('beginn').value, document.getElementById('ende').value, 
-      document.getElementById('notitz').value)">Hinzufügen</button>
-
-      <h2>Aktivität bearbeiten</h2>
-      <input type= "number" id="index" placeholder="Index">
+      <h2>🛠️ Aktivität bearbeiten</h2>
+      <input type="number" id="index" placeholder="Index">
       <input type="text" id="neuerNameDerAktivität" placeholder="Neuer Name">
-      <input type="text" id="beginnÄndern" placeholder="beginn Ändern">
-      <input type="text" id="endeÄndern" placeholder="ende Ändern">
-      <input type="text" id="notitzÄndern" placeholder="notitz Ändern">
+      <input type="text" id="beginnÄndern" placeholder="Beginn ändern">
+      <input type="text" id="endeÄndern" placeholder="Ende ändern">
+      <input type="text" id="notitzÄndern" placeholder="Notiz ändern">
+      <button onclick="aktivität_bearbeiten(
+        parseInt(document.getElementById('index').value),
+        document.getElementById('neuerNameDerAktivität').value, 
+        document.getElementById('beginnÄndern').value, 
+        document.getElementById('endeÄndern').value, 
+        document.getElementById('notitzÄndern').value
+      )">Änderungen speichern</button>
 
-      <button onclick="aktivität_bearbeiten(parseInt(document.getElementById('index').value), 
-      document.getElementById('neuerNameDerAktivität').value, document.getElementById('beginnÄndern').value, 
-      document.getElementById('endeÄndern').value, document.getElementById('notitzÄndern').value)">Änderungen Speichern</button>
+      <h2>🗑️ Aktivität löschen</h2>
+      <input type="number" id="indexLoeschen" placeholder="Index">
+      <button onclick="aktivität_loeschen(parseInt(document.getElementById('indexLoeschen').value)); this.classList.add('animate__animated', 'animate__bounce'); setTimeout(() => this.classList.remove('animate__animated', 'animate__bounce'), 1000);">Löschen</button>
 
-
-      <h2>Aktivität löschen</h2>
-      <input type= "number" id="index" placeholder="Index">
-      <button onclick="aktivität_loeschen(document.getElementById('index').value)">Löschen</button>
-
-    
-
-
-
-      <h2>📋 Aktivitäten</h2>
-      <div id="liste"></div>
-
+      <br><br>
       <button onclick="localStorage.clear(); location.reload()">🧹 Alles löschen</button>
+    </div>
+
+    <!-- Rechte Seite: Tabelle -->
+    <div class="tabelle-section animate__animated animate__fadeInRight">
+      <h2>📋 Aktivitäten-Tabelle</h2>
+      <table id="aktivitätenTabelle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Aktivität</th>
+            <th>Beginn</th>
+            <th>Ende</th>
+            <th>Notiz</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dynamisch eingefügt -->
+        </tbody>
+      </table>
     </div>
   </div>
 
+  <script src="../Scripts/Fehlererkennung.js"></script>
   <script src="../Scripts/aktivitäten.js"></script>
 </body>
 </html>

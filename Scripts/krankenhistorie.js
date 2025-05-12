@@ -50,7 +50,12 @@ function vorerkrankung_loeschen(index){
   else{
     console.log("Ungültige Eingabe");
   }
-
+  if (confirm("❓ Willst du diese Krankenhistorie wirklich löschen?❓")) {
+      krankenhistorie.splice(index, 1);
+      speichereHistorie();
+      aktualisiereTabelle();
+      aktualisiereIndexDropdown();
+  }
 
 }
 

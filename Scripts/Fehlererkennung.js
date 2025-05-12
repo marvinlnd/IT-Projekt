@@ -165,6 +165,9 @@ function istNameGueltig(name) {
   
     return true;
   }
+
+  
+
   // #endregion
 // #region Krankenhistorie Fehlererkennung
 
@@ -204,16 +207,39 @@ function validiereKrankheit(name, datum) {
 
 // #endregion
 
-  function medikationLoeschen(index) {
-    if (isNaN(index) || index < 0 || index >= medikationsplan.length) {
-      alert("❗ Ungültiger Index beim Löschen!❗");
-      return;
-    }
-  
-    if (confirm("❓ Willst du diese Medikation wirklich löschen?❓")) {
-      medikationsplan.splice(index, 1);
-      speichereMedikationsplan();
-      aktualisiereTabelle();
-    }
+// #region Aktivitäten Fehlererkennung
+function istAktivitaetsNameGueltig(name) {
+  // Aktivitätsname darf Buchstaben, Zahlen, Leerzeichen und einfache Sonderzeichen enthalten
+  return /^[A-Za-zÄÖÜäöüß0-9\s.,!?()/-]+$/.test(name.trim());
+}
+
+function istUhrzeitGueltig(uhrzeit) {
+  // Uhrzeit im Format HH:MM, erlaubt 00:00 bis 23:59
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(uhrzeit.trim());
+}
+
+function validiereAktivitaet(name, beginn, ende, notiz) {
+  if (!name || !beginn || !ende || !notiz) {
+    alert("❌ Bitte füllen Sie alle Felder aus!");
+    return false;
   }
-  
+
+  if (!istAktivitaetsNameGueltig(name)) {
+    alert("❌ Der Name der Aktivität enthält ungültige Zeichen!");
+    return false;
+  }
+
+  if (!istUhrzeitGueltig(beginn)) {
+    alert("❌ Bitte geben Sie eine gültige Start-Uhrzeit im Format HH:MM ein!");
+    return false;
+  }
+
+  if (!istUhrzeitGueltig(ende)) {
+    alert("❌ Bitte geben Sie eine gültige End-Uhrzeit im Format HH:MM ein!");
+    return false;
+  }
+
+  return true;
+}
+
+// #endregion

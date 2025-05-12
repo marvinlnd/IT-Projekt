@@ -1,3 +1,6 @@
+let medikationsplan = ladeMedikationsplan();
+
+
 class Medikation {
     constructor(medikament, anzahl, tageszeit, wochentage) {
       this.medikament = medikament;
@@ -12,45 +15,62 @@ class Medikation {
       if (neueDaten.tageszeit !== undefined) this.tageszeit = neueDaten.tageszeit;
       if (neueDaten.wochentage !== undefined) this.wochentage = neueDaten.wochentage;
     }
-  }
+}
   
-  let medikationsplan = ladeMedikationsplan();
   
-  function ladeMedikationsplan() {
+  
+function ladeMedikationsplan() {
     const daten = localStorage.getItem("medikationsplan");
     return daten ? JSON.parse(daten) : [];
-  }
+}
   
-  function speichereMedikationsplan() {
+function speichereMedikationsplan() {
     localStorage.setItem("medikationsplan", JSON.stringify(medikationsplan));
-  }
+}
   
-  function medikationHinzufuegen(medikament, anzahl, tageszeit, wochentage) {
-    const neueMedikation = new Medikation(medikament, anzahl, tageszeit, wochentage);
-    medikationsplan.push(neueMedikation);
-    speichereMedikationsplan();
-    return neueMedikation;
-  }
+function medikationHinzufuegen(medikament, anzahl, tageszeit, wochentage) {
+  if (!validiereMedikation(medikament, anzahl, tageszeit, wochentage)) return;
+
+  const neueMedikation = new Medikation(medikament, anzahl, tageszeit, wochentage);
+  medikationsplan.push(neueMedikation);
+  speichereMedikationsplan();
+  aktualisiereTabelle();
+  aktualisiereIndexDropdown();
+  return neueMedikation;
+}
+
   
-  function medikationBearbeiten(index, neueDaten) {
-    if (index >= 0 && index < medikationsplan.length) {
-      medikationsplan[index].aktualisieren(neueDaten);
-      speichereMedikationsplan();
-    } else {
-      console.log("Medikation mit dem Index:"+ index + "konnte nicht gefunden werden. \n Bearbeiten Fehlgeschlagen!");
+function medikationBearbeiten(index, neueDaten) {
+  if (index < 0 || index >= medikationsplan.length) {
+    alert("❗ Ungültiger Index beim Bearbeiten! ❗");
+    return;
+  }
+
+  const { medikament, anzahl, tageszeit, wochentage } = neueDaten;
+  if (!validiereMedikation(medikament, anzahl, tageszeit, wochentage)) return;
+
+  medikationsplan[index].aktualisieren(neueDaten);
+  speichereMedikationsplan();
+  aktualisiereTabelle();
+  aktualisiereIndexDropdown();
+}
+
+  
+function medikationLoeschen(index) {
+    if (isNaN(index) || index < 0 || index >= medikationsplan.length) {
+      alert("❗ Ungültiger Index beim Löschen!❗");
+      return;
     }
-  }
   
-  function medikationLoeschen(index) {
-    if (index >= 0 && index < medikationsplan.length) {
+    if (confirm("❓ Willst du diese Medikation wirklich löschen?❓")) {
       medikationsplan.splice(index, 1);
       speichereMedikationsplan();
-    } else {
-      console.log("Medikation mit dem Index:"+ index + "konnte nicht gefunden werden. \n Löschen Fehlgeschlagen!");
+      aktualisiereTabelle();
+      aktualisiereIndexDropdown();
     }
   }
   
-  function aktualisiereTabelle() {
+function aktualisiereTabelle() {
     const tabelle = document.getElementById("medikationsTabelle").querySelector("tbody");
     tabelle.innerHTML = "";
     medikationsplan.forEach((eintrag, index) => {
@@ -65,7 +85,7 @@ class Medikation {
       tabelle.appendChild(zeile);
     });
   }
-  function aktualisiereIndexDropdown() {
+function aktualisiereIndexDropdown() {
     const indexDropdown = document.getElementById('indexDropdown');
     const indexLoeschenDropdown = document.getElementById('indexLoeschenDropdown');
   
@@ -82,10 +102,21 @@ class Medikation {
       indexDropdown.appendChild(option);
       indexLoeschenDropdown.appendChild(option.cloneNode(true));  // Das gleiche Element für das Löschen-Dropdown
     });
-  }
+    if (indexDropdown.options.length > 0) {
+  indexDropdown.selectedIndex = 0;
+}
+if (indexLoeschenDropdown.options.length > 0) {
+  indexLoeschenDropdown.selectedIndex = 0;
+}
+
+}
   
   // Diese Funktion nach jedem Hinzufügen, Bearbeiten oder Löschen von Medikation aufrufen:
-  aktualisiereIndexDropdown();
+aktualisiereIndexDropdown();
   
-  window.onload = aktualisiereTabelle;
+window.onload = () => {
+  aktualisiereTabelle();
+  aktualisiereIndexDropdown();
+};
+
   
