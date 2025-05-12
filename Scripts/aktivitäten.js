@@ -28,11 +28,15 @@ function aktivitätHinzufügen(nameDerAktivität, beginn, ende, notitz) {
 }
 
 function aktivität_loeschen(index) {
-  if (index >= 0 && index < aktivitäten.length) {
-    aktivitäten.splice(index, 1);
-    speichereAktivität();
-  } else {
-    console.log("Ungültiger Index");
+  if (isNaN(index) || index < 0 || index >= aktivitäten.length) {
+      alert("❗ Ungültiger Index beim Löschen!❗");
+      return;
+    }
+  if (confirm("❓ Willst du diese Aktivität wirklich löschen?❓")) {
+      aktivitäten.splice(index, 1);
+      speichereAktivität();
+      aktualisiereTabelle();
+      
   }
 }
 

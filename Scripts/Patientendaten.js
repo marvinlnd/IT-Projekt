@@ -75,16 +75,20 @@ function patientBearbeiten(index, neueDaten) {
   }
 }
 
-
 function patientLoeschen(index) {
-  if (index >= 0 && index < patientListe.length) {
-    patientListe.splice(index, 1);
-    speicherePatienten();
+  if (isNaN(index) || index < 0 || index >= patientListe.length) {
+      alert("❗ Ungültiger Index beim Löschen!❗");
+      return;
+    }
+  if (confirm("❓ Willst du diesen Patienten wirklich löschen?❓")) {
+      patientListe.splice(index, 1)
+      speicherePatienten();
     aktualisierePatiententabelle();
-  } else {
-    console.log(`Patient mit dem Index: ${index} konnte nicht gefunden werden.`);
+      
   }
 }
+
+
 
 function aktualisierePatiententabelle() {
   patientListe = ladePatienten();
