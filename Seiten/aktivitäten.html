@@ -74,7 +74,7 @@
       <button onclick="aktivität_loeschen(parseInt(document.getElementById('indexLoeschen').value)); this.classList.add('animate__animated', 'animate__bounce'); setTimeout(() => this.classList.remove('animate__animated', 'animate__bounce'), 1000);">Löschen</button>
 
       <br><br>
-      <button onclick="localStorage.clear(); location.reload()">🧹 Alles löschen</button>
+      <button onclick="if(confirm('⚠️ Wollen Sie wirklich ALLE Aktivitäten unwiderruflich löschen? ⚠️')) { localStorage.clear(); location.reload(); }">🪜 Alles löschen</button>
     </div>
 
     <!-- Rechte Seite: Tabelle -->

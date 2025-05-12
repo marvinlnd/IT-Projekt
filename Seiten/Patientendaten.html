@@ -131,7 +131,7 @@
       <button onclick="patientLoeschen(parseInt(document.getElementById('indexLoeschen').value)); aktualisierePatiententabelle();">Löschen</button>
 
       <br>
-      <button onclick="localStorage.clear(); location.reload()">🪜 Alles löschen</button>
+      <button onclick="if(confirm('⚠️ Wollen Sie wirklich ALLE Patientendaten unwiderruflich löschen? ⚠️')) { localStorage.clear(); location.reload(); }">🪜 Alles löschen</button>
     </div>
 
     <!-- Rechte Seite: Tabelle -->

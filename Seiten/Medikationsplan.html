@@ -141,7 +141,7 @@
       </button>
 
       <br>
-      <button onclick="localStorage.clear(); location.reload()">🧹 Alles löschen</button>
+      <button onclick="if(confirm('⚠️ Wollen Sie wirklich ALLE Mediaktionspläne unwiderruflich löschen? ⚠️')) { localStorage.clear(); location.reload(); }">🪜 Alles löschen</button>
 
     </div>
 
