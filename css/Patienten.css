@@ -224,5 +224,11 @@
     width: 22px;
     height: 22px;
   }
+  .list-header .search input {
+    width: 100%;
+  }
+  .list-header .search button {
+    margin-top: 2px;
+  }
 }
 
