@@ -1,83 +1,142 @@
-// 1) Logo: zurück zur Startseite
-document.querySelector('.logo').addEventListener('click', e => {
+// javascript/script.js
+document.addEventListener('DOMContentLoaded', () => {
+  // 1) Logo: zurück zur Startseite
+  const logoLink = document.querySelector('.logo');
+  logoLink?.addEventListener('click', e => {
     e.preventDefault();
     window.location.href = 'index.html';
   });
-  
-  // 2) Suche: Enter oder Klick auf Button → Filter der Cards
-  const searchInput = document.getElementById('search-input');
+
+  // 2) Suche: nur falls vorhanden
+  const searchInput  = document.getElementById('search-input');
   const searchButton = document.getElementById('search-button');
-  function doFilter() {
-    const term = searchInput.value.trim().toLowerCase();
-    document.querySelectorAll('.card').forEach(card => {
-      const name = card.dataset.name.toLowerCase();
-      card.style.display = name.includes(term) ? '' : 'none';
+  if (searchInput && searchButton) {
+    const doFilter = () => {
+      const term = searchInput.value.trim().toLowerCase();
+      document.querySelectorAll('.card').forEach(card => {
+        const name = card.dataset.name.toLowerCase();
+        card.style.display = name.includes(term) ? '' : 'none';
+      });
+    };
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') doFilter();
     });
+    searchButton.addEventListener('click', doFilter);
   }
-  searchInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') doFilter();
-  });
-  searchButton.addEventListener('click', doFilter);
-  
+
   // 3) Sprachwechsel
-  const texts = {
+  const TEXTS = {
     de: {
-      'nav.datenschutz': 'Datenschutz & Sicherheit',
-      'nav.funktionen': 'Funktionen',
-      'nav.sprache': 'Sprachauswahl',
-      'nav.kontakt': 'Kontakt',
-      'nav.profil': 'Benutzprofil',
-      'card.patienten': 'Patientenübersicht',
-      'card.termine': 'Terminübersicht',
-      'card.notizen': 'Notizbereich',
-      'card.zeit': 'Zeiterfassung',
-      'footer.patienten': 'Patientenübersicht',
-      'footer.termine': 'Terminübersicht',
-      'footer.zeit': 'Zeiterfassung',
-      'placeholder.search': 'Suche…'
+      'card.patienten':    'Patienten',
+      'card.termine':      'Termine',
+      'card.notizen':      'Begleitprotokoll',
+      'placeholder.search':'Suche…',
+      'footer.termine':    'Datenschutzerklärung',
+      'footer.zeit':       'Impressum'
     },
     en: {
-      'nav.datenschutz': 'Privacy & Security',
-      'nav.funktionen': 'Features',
-      'nav.sprache': 'Language',
-      'nav.kontakt': 'Contact',
-      'nav.profil': 'Profile',
-      'card.patienten': 'Patients',
-      'card.termine': 'Appointments',
-      'card.notizen': 'Notes',
-      'card.zeit': 'Time tracking',
-      'footer.patienten': 'Patients',
-      'footer.termine': 'Appointments',
-      'footer.zeit': 'Time tracking',
-      'placeholder.search': 'Search…'
+      'card.patienten':    'Patients',
+      'card.termine':      'Appointments',
+      'card.notizen':      'Notes',
+      'placeholder.search':'Search…',
+      'footer.termine':    'Privacy & Security',
+      'footer.zeit':       'Imprint'
     }
   };
-  let currentLang = 'de';
-  document.getElementById('lang-icon').addEventListener('click', () => {
-    const choice = prompt('Sprache wählen: "de" oder "en"', currentLang);
-    if (!choice || !texts[choice]) return;
-    currentLang = choice;
-    // alle Elemente mit data-key updaten
+  let currentLang = localStorage.getItem('lang') || 'de';
+
+  const langButton   = document.getElementById('lang-button');
+  const langDropdown = document.getElementById('lang-dropdown');
+  const langItems    = Array.from(langDropdown.querySelectorAll('li'));
+
+  const updateTexts = () => {
     document.querySelectorAll('[data-key]').forEach(el => {
       const key = el.getAttribute('data-key');
-      if (el.tagName === 'INPUT') {
-        el.placeholder = texts[currentLang][key] || el.placeholder;
-      } else {
-        el.textContent = texts[currentLang][key] || el.textContent;
-      }
+      const txt = TEXTS[currentLang][key];
+      if (!txt) return;
+      if (el.tagName === 'INPUT') el.placeholder = txt;
+      else el.textContent = txt;
     });
-    // Suchplatzhalter
-    searchInput.placeholder = texts[currentLang]['placeholder.search'];
+    if (searchInput) {
+      searchInput.placeholder = TEXTS[currentLang]['placeholder.search'];
+    }
+  };
+
+  // Initialisierung
+  langButton.textContent = currentLang.toUpperCase() + ' ▾';
+  langButton.setAttribute('aria-expanded', 'false');
+  updateTexts();
+
+  // Dropdown öffnen/schließen
+  langButton.addEventListener('click', () => {
+    const open = langDropdown.classList.toggle('open');
+    langButton.setAttribute('aria-expanded', open);
+    if (open) langItems[0].focus();
   });
-  
-  // 4) Login / Registrierung
-  document.getElementById('login-icon').addEventListener('click', () => {
-    const isLogin = confirm('Bestehender Benutzer? OK = Login, Abbrechen = Registrierung');
-    if (isLogin) {
-      // hier könntest Du tatsächlich ein Login-Formular anzeigen oder umleiten:
-      window.location.href = 'login.html';
-    } else {
-      window.location.href = 'register.html';
+
+  // Klick außerhalb schließt Dropdown
+  document.addEventListener('click', e => {
+    if (!langButton.contains(e.target) && !langDropdown.contains(e.target)) {
+      langDropdown.classList.remove('open');
+      langButton.setAttribute('aria-expanded', 'false');
     }
   });
-  
+
+  // Esc-Taste schließt Dropdown
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && langDropdown.classList.contains('open')) {
+      langDropdown.classList.remove('open');
+      langButton.setAttribute('aria-expanded', 'false');
+      langButton.focus();
+    }
+  });
+
+  // ArrowDown öffnet Dropdown
+  langButton.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (!langDropdown.classList.contains('open')) {
+        langDropdown.classList.add('open');
+        langButton.setAttribute('aria-expanded', 'true');
+      }
+      langItems[0].focus();
+    }
+  });
+
+  // Navigation & Auswahl
+  langItems.forEach((item, idx) => {
+    item.addEventListener('keydown', e => {
+      let newIdx;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        newIdx = (idx + 1) % langItems.length;
+        langItems[newIdx].focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        newIdx = (idx - 1 + langItems.length) % langItems.length;
+        langItems[newIdx].focus();
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        item.click();
+      }
+    });
+    item.addEventListener('click', () => {
+      const chosen = item.dataset.lang;
+      if (!TEXTS[chosen]) return;
+      currentLang = chosen;
+      localStorage.setItem('lang', chosen);
+      langDropdown.classList.remove('open');
+      langButton.setAttribute('aria-expanded', 'false');
+      langButton.textContent = chosen.toUpperCase() + ' ▾';
+      langButton.focus();
+      updateTexts();
+    });
+  });
+
+  // 4) Login / Registrierung
+  const loginIcon = document.getElementById('login-icon');
+  loginIcon?.addEventListener('click', () => {
+    const isLogin = confirm('Bestehender Benutzer? OK = Login, Abbrechen = Registrierung');
+    window.location.href = isLogin ? 'login.html' : 'register.html';
+  });
+});
