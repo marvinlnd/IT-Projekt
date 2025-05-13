@@ -18,20 +18,32 @@
 </head>
 <body>
 
-  <!-- Header -->
+   <!-- Header -->
   <header class="header">
+    <!-- Logo klickbar -->
     <a href="index.html" class="logo">
       <img src="../Bilder/IT_Projekt/Bild/Logo.png" alt="MediAssist Logo" style="width: 250px; height: auto;">
     </a>
 
     <div class="tools">
-      <div class="search">
-        <input type="text" id="search-input" placeholder="Suche…">
-        <button id="search-button" aria-label="Suche"></button>
+      <!-- Sprach-Dropdown -->
+      <div class="language-switcher">
+        <button
+          id="lang-button"
+          type="button"
+          aria-haspopup="true"
+          aria-controls="lang-dropdown"
+          aria-expanded="false"
+        >
+          DE <span class="arrow">▾</span>
+        </button>
+        <ul id="lang-dropdown" class="lang-dropdown" role="menu">
+          <li role="menuitem" tabindex="-1" data-lang="de">DE</li>
+          <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
+        </ul>
       </div>
-      <div class="language-icon" id="lang-icon" title="Sprache wechseln">
-        <img src="../Bilder/IT_Projekt/Bild/lang-icon.png" alt="Sprache wählen">
-      </div>
+
+      <!-- Login / Registrierung -->
       <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
         <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User">
       </div>
