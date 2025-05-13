@@ -1,4 +1,11 @@
-/* Kalender-Container */
+/* 1) Wrapper um Kalender + Formular für absolute Positionierung */
+#calendar-wrapper {
+  position: relative;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* 2) Kalender-Container */
 #calendar {
   max-width: 100%;
   margin: 24px auto;
@@ -7,12 +14,11 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   padding: 0;
   min-height: 600px;
-  display: block;
+  overflow-x: hidden;
 }
 
-/* Toolbar-Grundstil */
+/* 3) Toolbar-Grundstil */
 .fc-toolbar {
-  position: relative;
   padding: 12px 24px;
   display: flex;
   justify-content: space-between;
@@ -20,35 +26,28 @@
   background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
-/* Titel mittig platzieren */
 .fc-toolbar .fc-toolbar-chunk.fc-toolbar-center {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  width: auto;
 }
-
 .fc-toolbar-title {
   font-size: 1.25rem;
   font-weight: 500;
   color: var(--text);
-  margin: 0;
 }
 
-/* Standard-Buttons */
+/* 4) Standard-Buttons */
 .fc .fc-button {
-  background: /*var(--bg)*/ #004aad;
+  background: #004aad;
   border: 1px solid var(--secondary);
   color: white;
   padding: 4px 8px;
   border-radius: 4px;
-  font-size: 0.9rem;
-  cursor: pointer;
   margin-right: 4px;
 }
 .fc .fc-button:hover {
-  background: rgb(202, 197, 197);
-  color: var(--bg);
+  background: black;
 }
 .fc .fc-button.fc-button-active {
   background: var(--primary);
@@ -56,66 +55,166 @@
   color: var(--bg);
 }
 
-/* Icons für Buttons */
-.fc .fc-button .fc-icon {
-  stroke: var(--secondary);
-  fill: var(--secondary);
-}
-.fc .fc-button:hover .fc-icon,
-.fc .fc-button.fc-button-active .fc-icon {
-  stroke: var(--bg);
-  fill: var(--bg);
-}
-/* Styles für den Inline-Formular */
+/* 5) Inline-Formular (absolut positioniert über dem Kalender) */
 .event-form-container {
-    max-width: 500px;
-    margin: 16px auto;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px;
-    display: none; /* hidden by default */
+  position: absolute;
+  top: 300px;              /* direkt unter der Toolbar */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 500px;
+  z-index: 1000;
+  background:#004aad;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  display: none;
+  color:white;
+  font-weight: bold;
+}
+.event-form-container form {
+  display: flex;
+  flex-direction: column;
+}
+.event-form-container label {
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.event-form-container input {
+  padding: 6px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.event-form-container .buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+.event-form-container .buttons button {
+  margin-left: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--secondary);
+  background: var(--bg);
+  color: var(--secondary);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.event-form-container .buttons .save {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--bg);
+}
+.event-form-container .buttons .delete {
+  border-color: #d9534f;
+  color: #d9534f;
+}
+.event-form-container .buttons .delete:hover {
+  background: #d9534f;
+  color: #fff;
+}
+
+/* 6) View-Switcher */
+.view-switcher {
+  display: none;
+  position: relative;
+  margin: 16px auto;
+  max-width: 300px;
+}
+.view-switcher button {
+  width: 30%;
+  background: #004aad;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-left: -9%;
+}
+
+.view-switcher button:hover {
+  background:black;
+}
+.view-switcher .view-dropdown {
+  display: none;
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  list-style: none;
+  z-index: 1000;
+}
+.view-switcher .view-dropdown.open {
+  display: block;
+}
+.view-switcher .view-dropdown li {
+  padding: 10px;
+  cursor: pointer;
+}
+.view-switcher .view-dropdown li:hover {
+  background: #f0f0f0;
+}
+
+#calendar .fc-toolbar .fc-toolbar-title {
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+/* 7) Mobile-Override */
+@media (max-width: 600px) {
+  /* a) FullCalendar View-Buttons ausblenden */
+  .fc-toolbar .fc-dayGridMonth-button,
+  .fc-toolbar .fc-timeGridWeek-button,
+  .fc-toolbar .fc-timeGridDay-button {
+    display: none;
   }
-  .event-form-container form {
-    display: flex;
-    flex-direction: column;
+
+  /* b) Switcher anzeigen */
+  .view-switcher {
+    display: block;
   }
-  .event-form-container label {
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-    color: var(--text);
+
+  /* c) Wochen-Ansicht: Spalten scrollbar machen */
+  .fc-timegrid-body {
+    overflow-x: auto;
   }
-  .event-form-container input[type="text"],
-  .event-form-container input[type="datetime-local"] {
-    padding: 6px;
-    margin-bottom: 12px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
+  .fc-timegrid-col {
+    min-width: 100px;
   }
-  .event-form-container .buttons {
-    display: flex;
-    justify-content: flex-end;
+
+  /* d) Toolbar-Title kleiner in Mobile */
+  #calendar .fc-toolbar .fc-toolbar-title {
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 1.2;
   }
-  .event-form-container .buttons button {
-    margin-left: 8px;
-    padding: 6px 12px;
-    border: 1px solid var(--secondary);
-    background: var(--bg);
-    color: var(--secondary);
-    border-radius: 4px;
-    cursor: pointer;
+
+  /* e) Toolbar-Padding reduzieren */
+  #calendar .fc-toolbar {
+    padding: 8px 12px;
   }
-  .event-form-container .buttons button.save {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: var(--bg);
-  }
-  /* Delete-Button */
-  .event-form-container .buttons button.delete {
-    border-color: #d9534f;
-    color: #d9534f;
-  }
-  .event-form-container .buttons button.delete:hover {
-    background: #d9534f;
-    color: #fff;
-  }
+
+  /* 5) Inline-Formular (absolut positioniert über dem Kalender) */
+.event-form-container {
+  position: absolute;
+  top: 300px;              /* direkt unter der Toolbar */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  max-width: 500px;
+  z-index: 1000;
+  background:#004aad;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  display: none;
+  color:white;
+  font-weight: bold;
+}
+}
