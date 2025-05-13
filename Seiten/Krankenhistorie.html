@@ -21,7 +21,6 @@
     <a href="index.html" class="logo">
       <img src="../Bilder/IT_Projekt/Bild/Logo.png" alt="MediAssist Logo" style="width: 250px; height: auto;">
     </a>
-
     <div class="tools">
       <!-- Sprach-Dropdown -->
       <div class="language-switcher">
@@ -39,69 +38,61 @@
           <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
         </ul>
       </div>
-
-      <!-- Login / Registrierung -->
+      <!-- Login/Registrierung -->
       <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
-        <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User">
+        <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User" />
       </div>
     </div>
   </header>
+
   <main>
     <!-- Zurück-Link -->
-    <a href="Patienten.html" class="back-link">&larr; Zurück zur Übersicht</a>
-    <h1 class="animate__animated animate__zoomIn">🩺 Krankenhistorie bearbeiten</h1>
+    <a href="../Seiten/Patienten.html" class="back-link">&larr; Zurück zur Übersicht</a>
 
-  <div class="container">
+    <!-- Überschrift und Patient Name -->
+    <h1>🩺 Krankenhistorie bearbeiten</h1>
+    <h2 id="patient-name" class="patient-name">Patient: —</h2>
 
-    <!-- Linke Seite: Formular -->
-    <div class="form-section animate__animated animate__fadeInLeft">
-      <h2>➕ Neue Erkrankung hinzufügen</h2>
-      <input type="text" id="nameDerKrankheit" placeholder="Name der Krankheit">
-      <input type="text" id="datumDerFeststellung" placeholder="Datum der Feststellung (DD.MM.YYYY)">
-      <button onclick="vorerkrankung_hinzufügen(
-        document.getElementById('nameDerKrankheit').value,
-        document.getElementById('datumDerFeststellung').value
-      )">Hinzufügen</button>
+    <div class="container">
+      <!-- Linke Spalte: Formular -->
+      <div class="form-section">
+        <h2>➕ Neue Erkrankung hinzufügen</h2>
+        <input type="text" id="nameDerKrankheit" placeholder="Name der Krankheit">
+        <input type="text" id="datumDerFeststellung" placeholder="Datum (DD.MM.YYYY)">
+        <button id="add-history" type="button">Hinzufügen</button>
 
-      <h2>🛠️ Erkrankung bearbeiten</h2>
-      <input type="number" id="index" placeholder="Index">
-      <input type="text" id="neuerNameDerKrankheit" placeholder="Neuer Name">
-      <input type="text" id="neuesDatumDerFeststellung" placeholder="Neues Datum (DD.MM.YYYY)">
-      <button onclick="vorerkrankung_bearbeiten(
-        parseInt(document.getElementById('index').value),
-        document.getElementById('neuerNameDerKrankheit').value,
-        document.getElementById('neuesDatumDerFeststellung').value
-      )">Änderungen speichern</button>
+        <h2>🛠️ Erkrankung bearbeiten</h2>
+        <input type="number" id="index" placeholder="Index">
+        <input type="text" id="neuerNameDerKrankheit" placeholder="Neuer Name">
+        <input type="text" id="neuesDatumDerFeststellung" placeholder="Neues Datum (DD.MM.YYYY)">
+        <button id="edit-history" type="button">Änderungen speichern</button>
 
-      <h2>🗑️ Erkrankung löschen</h2>
-      <input type="number" id="indexLoeschen" placeholder="Index">
-      <button onclick="vorerkrankung_loeschen(parseInt(document.getElementById('indexLoeschen').value));this.classList.add('animate__animated', 'animate__bounce');setTimeout(() => this.classList.remove('animate__animated', 'animate__bounce'), 1000);">Löschen</button>
+        <h2>🗑️ Erkrankung löschen</h2>
+        <input type="number" id="indexLoeschen" placeholder="Index">
+        <button id="delete-history" type="button">Löschen</button>
 
-      <br>
-      <button onclick="if(confirm('⚠️ Wollen Sie wirklich ALLE Krankenhistorien unwiderruflich löschen? ⚠️')) { localStorage.clear(); location.reload(); }">🪜 Alles löschen</button>
+        <br>
+        <button id="clear-history" type="button">🧹 Alles löschen</button>
+      </div>
+
+      <!-- Rechte Spalte: Tabelle -->
+      <div class="tabelle-section">
+        <h2>📄 Krankenhistorie-Tabelle</h2>
+        <table id="krankenhistorieTabelle">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Krankheit</th>
+              <th>Feststellung</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
+  </main>
 
-    <!-- Rechte Seite: Tabelle -->
-    <div class="tabelle-section animate__animated animate__fadeInRight"">
-      <h2>📄 Krankenhistorie-Tabelle</h2>
-      <table id="krankenhistorieTabelle">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Krankheit</th>
-            <th>Feststellung</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Hier wird dynamisch eingefügt -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-</main>
-
-  <script src="../Scripts/Fehlererkennung.js"></script>
-  <script src="../Scripts/krankenhistorie.js"></script>
-
+  <!-- JavaScript -->
+  <script src="../Scripts/krankenhistorie.js" defer></script>
 </body>
 </html>

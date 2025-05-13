@@ -39,99 +39,57 @@
           <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
         </ul>
       </div>
-
-      <!-- Login / Registrierung -->
+      <!-- Login/Registrierung -->
       <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
-        <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User">
+        <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User" />
       </div>
     </div>
   </header>
+
   <main>
-    <!-- Zurück-Link -->
-    <a href="Patienten.html" class="back-link">&larr; Zurück zur Patientenliste</a>
+    <a href="../Seiten/Patienten.html" class="back-link">&larr; Zurück zur Patientenliste</a>
     <h1>💊 Medikationsplan verwalten</h1>
+    <h2 id="patient-name" class="patient-name">Patient: —</h2>
 
-  <div class="container">
-    
-    <!-- Linke Seite: Formular -->
-    <div class="form-section animate__animated animate__fadeInLeft">
-      <h2>➕ Neue Medikation hinzufügen</h2>
-      <input type="text" id="medikament" placeholder="Medikamentenname">
-      <input type="text" id="anzahl" placeholder="Anzahl / Dosierung">
+    <div class="container">
+      <div class="form-section">
+        <h2>➕ Neue Medikation hinzufügen</h2>
+        <input type="text" id="medikament" placeholder="Medikamentenname">
+        <input type="text" id="anzahl" placeholder="Anzahl / Dosierung">
+        <input type="text" id="tageszeit" placeholder="Tageszeit (z. B. morgens)">
+        <input type="text" id="wochentage" placeholder="Wochentage (z. B. Mo, Mi)">
+        <button id="add-med" type="button">Hinzufügen</button>
 
-      <input type="text" id="tageszeit" placeholder="Tageszeit (z. B. morgens, mittags, abends, nachts)">
+        <h2>🛠️ Medikation bearbeiten</h2>
+        <label for="indexDropdown">Index auswählen:</label>
+        <select id="indexDropdown"></select>
+        <input type="text" id="neuesMedikament" placeholder="Neuer Medikamentenname">
+        <input type="text" id="neueAnzahl" placeholder="Neue Anzahl">
+        <input type="text" id="neueTageszeit" placeholder="Neue Tageszeit">
+        <input type="text" id="neueWochentage" placeholder="Neue Wochentage">
+        <button id="edit-med" type="button">Änderungen speichern</button>
 
-      <input type="text" id="wochentage" placeholder="Wochentage (z. B. Mo, Mi, Fr)">
-      <button onclick="medikationHinzufuegen(
-        document.getElementById('medikament').value,
-        document.getElementById('anzahl').value,
-        document.getElementById('tageszeit').value,
-        document.getElementById('wochentage').value
-      )">Hinzufügen</button>
+        <h2>🗑️ Medikation löschen</h2>
+        <label for="indexLoeschenDropdown">Index auswählen:</label>
+        <select id="indexLoeschenDropdown"></select>
+        <button id="delete-med" type="button">Löschen</button>
 
-      <h2>🛠️ Medikation bearbeiten</h2>
-      <label for="indexDropdown">Index auswählen:</label>
-      <select id="indexDropdown"></select>
-      
-      <input type="text" id="neuesMedikament" placeholder="Neuer Medikamentenname">
-      <input type="text" id="neueAnzahl" placeholder="Neue Anzahl">
+        <br>
+        <button id="clear-med" type="button">🧹 Alles löschen</button>
+      </div>
 
-      <input type="text" id="neueTageszeit" placeholder="Neue Tageszeit">
-      <input type="text" id="neueWochentage" placeholder="Neue Wochentage">
-      <button onclick="medikationBearbeiten(
-        parseInt(document.getElementById('indexDropdown').value),
-        {
-          medikament: document.getElementById('neuesMedikament').value,
-          anzahl: document.getElementById('neueAnzahl').value,
-          tageszeit: document.getElementById('neueTageszeit').value,
-          wochentage: document.getElementById('neueWochentage').value
-        }
-      )">Änderungen speichern</button>
-
-      <h2>🗑️ Medikation löschen</h2>
-      <label for="indexLoeschenDropdown">Index auswählen:</label>
-      <select id="indexLoeschenDropdown"></select>
-
-      <!-- Löschen Button -->
-      <button onclick="medikationLoeschen(parseInt(document.getElementById('indexLoeschenDropdown').value));this.classList.add('animate__animated', 'animate__bounce');setTimeout(() => this.classList.remove('animate__animated', 'animate__bounce'), 1000)">
-      🗑️ Löschen
-      </button>
-
-      <!-- Erledigt Button -->
-      <button onclick="medikationErledigt(parseInt(document.getElementById('indexLoeschenDropdown').value));this.classList.add('animate__animated', 'animate__bounce'); setTimeout(() => this.classList.remove('animate__animated', 'animate__bounce'), 1000)" style="margin-left: 10px; background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 5px 10px; border-radius: 5px;">
-      ✅ Erledigt
-      </button>
-
-      <br>
-      <button onclick="if(confirm('⚠️ Wollen Sie wirklich ALLE Mediaktionspläne unwiderruflich löschen? ⚠️')) { localStorage.clear(); location.reload(); }">🪜 Alles löschen</button>
-
+      <div class="tabelle-section">
+        <h2>📄 Medikationsplan</h2>
+        <table id="medikationsTabelle">
+          <thead>
+            <tr><th>#</th><th>Medikament</th><th>Anzahl</th><th>Tageszeit</th><th>Wochentage</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
+  </main>
 
-    <!-- Rechte Seite: Tabelle -->
-    <div class="tabelle-section animate__animated animate__fadeInRight">
-      <h2>📄 Medikationsplan</h2>
-      <table id="medikationsTabelle">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Medikament</th>
-            <th>Anzahl</th>
-            <th>Tageszeit</th>
-            <th>Wochentage</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Hier wird per JavaScript der Inhalt eingefügt -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-</main>
-
-
-  <!-- JavaScript einbinden -->
-  <script src="../Scripts/Fehlererkennung.js"></script>
-  <script src="../Scripts/Medikationsplan.js"></script>
-  
+  <script src="../Scripts/Medikationsplan.js" defer></script>
 </body>
 </html>
