@@ -57,14 +57,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function deletePatient(id) {
-    const idx = patientListe.findIndex(p => p.id === id);
-    if (idx !== -1) {
-      patientListe.splice(idx, 1);
-      speicherePatienten();
-      applyFilterAndSort();
-      modal.style.display = 'none';
-    }
+  if (!confirm('Möchten Sie diesen Patienten wirklich löschen?')) {
+    return; // Abbruch, wenn der Nutzer „Abbrechen“ klickt
   }
+  const idx = patientListe.findIndex(p => p.id === id);
+  if (idx !== -1) {
+    patientListe.splice(idx, 1);
+    speicherePatienten();
+    applyFilterAndSort();
+    modal.style.display = 'none';
+  }
+}
+
 
   function applyFilterAndSort() {
     const term = searchInput.value.toLowerCase();
