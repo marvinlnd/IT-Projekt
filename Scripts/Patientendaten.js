@@ -1,144 +1,132 @@
+// javascript/Patientendaten.js
+
 class Patient {
-  constructor(vorname, nachname, email, telefon, adresse, geburtsdatum) {
-    this.vorname = vorname;
-    this.nachname = nachname;
-    this.email = email;
-    this.telefon = telefon;
-    this.adresse = adresse;
-    this.geburtsdatum = geburtsdatum;
-  }
-
-  aktualisieren(neueDaten) {
-    if (neueDaten.vorname !== undefined) this.vorname = neueDaten.vorname;
-    if (neueDaten.nachname !== undefined) this.nachname = neueDaten.nachname;
-    if (neueDaten.email !== undefined) this.email = neueDaten.email;
-    if (neueDaten.telefon !== undefined) this.telefon = neueDaten.telefon;
-    if (neueDaten.adresse !== undefined) this.adresse = neueDaten.adresse;
-    if (neueDaten.geburtsdatum !== undefined) this.geburtsdatum = neueDaten.geburtsdatum;
+  constructor(vorname = '', nachname = '', email = '', telefon = '', adresse = '', geburtsdatum = '') {
+    this.id = Date.now().toString();
+    this.personalData = { vorname, nachname, email, telefon, adresse, geburtsdatum };
+    this.history = [];
+    this.medicationPlan = [];
   }
 }
 
-function ladePatienten() {
-  const daten = localStorage.getItem("patientListe");
-  if (!daten) return [];
-  const rohDaten = JSON.parse(daten);
-  return rohDaten.map(p => new Patient(
-    p.vorname, p.nachname, p.email, p.telefon, p.adresse, p.geburtsdatum
-  ));
-}
-
-let patientListe = ladePatienten();
+const STORAGE_KEY = 'patientListe';
+let patientListe = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
 function speicherePatienten() {
-  localStorage.setItem("patientListe", JSON.stringify(patientListe));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(patientListe));
 }
 
-function patientHinzufuegen(vorname, nachname, email, telefon, adresse, geburtsdatum) {
-  if (!validierePatient(vorname, nachname, email, telefon, adresse, geburtsdatum)) {
-    return;
-  }
+document.addEventListener('DOMContentLoaded', () => {
+  const tableBody     = document.querySelector('#patient-table tbody');
+  const addButton     = document.getElementById('add-button');
+  const modal         = document.getElementById('overview-modal');
+  const closeBtn      = modal.querySelector('.close');
+  const modalName     = document.getElementById('modal-name');
+  const btnPersonal   = document.getElementById('btn-personal');
+  const btnHistory    = document.getElementById('btn-history');
+  const btnMedication = document.getElementById('btn-medication');
+  const btnDelete     = document.getElementById('btn-delete');
+  const searchInput   = document.getElementById('search-input');
 
-  const neuerPatient = new Patient(vorname, nachname, email, telefon, adresse, geburtsdatum);
-  patientListe.push(neuerPatient);
-  speicherePatienten();
-  aktualisierePatiententabelle();
-  return neuerPatient;
-}
+  const filterToggle   = document.getElementById('filter-toggle');
+  const filterDropdown = document.getElementById('filter-dropdown');
+  const sortButtons    = filterDropdown.querySelectorAll('button');
 
-function patientBearbeiten(index, neueDaten) {
-  if (index >= 0 && index < patientListe.length) {
-    const aktuellerPatient = patientListe[index];
+  let currentSort = 'az';
 
-    // Leere Eingaben durch bestehende Werte ersetzen
-    const vorname = neueDaten.vorname.trim() || aktuellerPatient.vorname;
-    const nachname = neueDaten.nachname.trim() || aktuellerPatient.nachname;
-    const email = neueDaten.email.trim() || aktuellerPatient.email;
-    const telefon = neueDaten.telefon.trim() || aktuellerPatient.telefon;
-    const adresse = neueDaten.adresse.trim() || aktuellerPatient.adresse;
-    const geburtsdatum = neueDaten.geburtsdatum.trim() || aktuellerPatient.geburtsdatum;
-
-    // Neue Funktion verwenden
-    if (!validiereBearbeitungsDaten(vorname, nachname, email, telefon, adresse, geburtsdatum)) {
-      alert("Valiedierung klappt");
-      return;
-    }
-
-    // Aktualisieren
-    patientListe[index].aktualisieren({
-      vorname, nachname, email, telefon, adresse, geburtsdatum
+  function renderTable(liste = patientListe) {
+    tableBody.innerHTML = '';
+    liste.forEach(p => {
+      const name = (`${p.personalData.vorname} ${p.personalData.nachname}`.trim()) || '— Unbenannt —';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${name}</td>`;
+      tr.addEventListener('click', () => openModal(p.id));
+      tableBody.appendChild(tr);
     });
-
-    speicherePatienten();
-    aktualisierePatiententabelle();
-  } else {
-    alert(`❌ Patient mit dem Index ${index} konnte nicht gefunden werden.`);
   }
-}
 
-function patientLoeschen(index) {
-  if (isNaN(index) || index < 0 || index >= patientListe.length) {
-      alert("❗ Ungültiger Index beim Löschen!❗");
-      return;
-    }
-  if (confirm("❓ Willst du diesen Patienten wirklich löschen?❓")) {
-      patientListe.splice(index, 1)
+  function openModal(id) {
+    const p = patientListe.find(x => x.id === id);
+    if (!p) return;
+    modalName.textContent = (`${p.personalData.vorname} ${p.personalData.nachname}`.trim()) || '— Unbenannt —';
+    modal.style.display = 'block';
+    btnPersonal.onclick   = () => location.href = `PersoenlicheDaten.html?id=${id}`;
+    btnHistory.onclick    = () => location.href = `Krankenhistorie.html?id=${id}`;
+    btnMedication.onclick = () => location.href = `Medikationsplan.html?id=${id}`;
+    btnDelete.onclick     = () => deletePatient(id);
+  }
+
+  function deletePatient(id) {
+    const idx = patientListe.findIndex(p => p.id === id);
+    if (idx !== -1) {
+      patientListe.splice(idx, 1);
       speicherePatienten();
-    aktualisierePatiententabelle();
-      
-  }
-}
-
-
-
-function aktualisierePatiententabelle() {
-  patientListe = ladePatienten();
-  const tabelle = document.getElementById("patientenTabelle").querySelector("tbody");
-  tabelle.innerHTML = "";
-
-  patientListe.forEach((eintrag, index) => {
-    const zeile = document.createElement("tr");
-    zeile.innerHTML = `
-      <td>${index}</td>
-      <td>${eintrag.vorname}</td>
-      <td>${eintrag.nachname}</td>
-      <td>${eintrag.email}</td>
-      <td>${eintrag.geburtsdatum}</td>
-      <td>${eintrag.adresse}</td>
-      <td>${eintrag.telefon}</td>
-    `;
-    tabelle.appendChild(zeile);
-  });
-
-  aktualisiereDropdowns();
-}
-
-function aktualisiereDropdowns() {
-  const bearbeitungsDropdown = document.getElementById("patientIndex");
-  const loeschDropdown = document.getElementById("indexLoeschen");
-
-  bearbeitungsDropdown.innerHTML = "";
-  loeschDropdown.innerHTML = "";
-
-  if (patientListe.length === 0) {
-    const optionKeinePatienten = document.createElement("option");
-    optionKeinePatienten.textContent = "Keine Patienten vorhanden";
-    optionKeinePatienten.disabled = true;
-    bearbeitungsDropdown.appendChild(optionKeinePatienten);
-    loeschDropdown.appendChild(optionKeinePatienten.cloneNode(true));
-    return;
+      applyFilterAndSort();
+      modal.style.display = 'none';
+    }
   }
 
-  patientListe.forEach((patient, index) => {
-    const optionBearbeiten = document.createElement("option");
-    optionBearbeiten.value = index;
-    optionBearbeiten.textContent = `${index} – ${patient.vorname} ${patient.nachname}`;
-    bearbeitungsDropdown.appendChild(optionBearbeiten);
+  function applyFilterAndSort() {
+    const term = searchInput.value.toLowerCase();
+    let filtered = patientListe.filter(p => {
+      const name = `${p.personalData.vorname} ${p.personalData.nachname}`.toLowerCase();
+      return name.includes(term);
+    });
+    switch (currentSort) {
+      case 'az':
+        filtered.sort((a,b) =>
+          (`${a.personalData.vorname}`).localeCompare(`${b.personalData.vorname}`)
+        );
+        break;
+      case 'za':
+        filtered.sort((a,b) =>
+          (`${b.personalData.vorname}`).localeCompare(`${a.personalData.vorname}`)
+        );
+        break;
+      case 'neueste':
+        filtered.sort((a,b) => parseInt(b.id) - parseInt(a.id));
+        break;
+      case 'aelteste':
+        filtered.sort((a,b) => parseInt(a.id) - parseInt(b.id));
+        break;
+    }
+    renderTable(filtered);
+  }
 
-    const optionLoeschen = document.createElement("option");
-    optionLoeschen.value = index;
-    optionLoeschen.textContent = `${index} – ${patient.vorname} ${patient.nachname}`;
-    loeschDropdown.appendChild(optionLoeschen);
+  // Modal schließen
+  closeBtn.onclick = () => modal.style.display = 'none';
+  window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
+
+  // Neuer Patient
+  addButton.addEventListener('click', () => {
+    location.href = 'PersoenlicheDaten.html';
   });
-}
 
-aktualisierePatiententabelle();
+  // Suche
+  searchInput.addEventListener('input', applyFilterAndSort);
+
+  // Sortier-Dropdown
+  filterToggle.addEventListener('click', () => {
+    const vis = filterDropdown.style.display === 'block';
+    filterDropdown.style.display = vis ? 'none' : 'block';
+    sortButtons.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.sort === currentSort);
+    });
+  });
+  document.addEventListener('click', e => {
+    if (!filterDropdown.contains(e.target) && !filterToggle.contains(e.target)) {
+      filterDropdown.style.display = 'none';
+    }
+  });
+  sortButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      currentSort = button.dataset.sort;
+      sortButtons.forEach(btn => btn.classList.toggle('active', btn === button));
+      filterDropdown.style.display = 'none';
+      applyFilterAndSort();
+    });
+  });
+
+  // initial render
+  applyFilterAndSort();
+});
