@@ -1,0 +1,102 @@
+/* Zurück-Link */
+.back-link {
+    display: inline-block;
+    margin: 16px 24px;
+    color: #0078d4;
+    text-decoration: none;
+  }
+  .back-link:hover {
+    text-decoration: underline;
+  }
+  
+  /* Container für Formular + Tabelle */
+  .container {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    padding: 0 24px 24px;
+  }
+  
+  /* Formular-Sektion */
+  .form-section {
+    flex: 1;
+  }
+  .form-section h2 {
+    margin: 16px 0 8px;
+    color: #004aad;
+  }
+  .form-section input,
+  .form-section select {
+    margin-bottom: 10px;
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .form-section button {
+    margin-top: 5px;
+    padding: 6px 12px;
+    background: #0078d4;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .form-section button:hover {
+    background: #005fa3;
+  }
+  
+  /* Tabelle-Sektion */
+  .tabelle-section {
+    flex: 1;
+  }
+  .tabelle-section h2 {
+    margin-bottom: 8px;
+    color: #004aad;
+  }
+  #medikationsTabelle {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+  }
+  #medikationsTabelle th,
+  #medikationsTabelle td {
+    padding: 8px;
+    border: 1px solid #e0e0e0;
+    text-align: left;
+  }
+  #medikationsTabelle th {
+    background-color: #f5f5f5;
+  }
+  
+  /* Responsive */
+  @media (max-width: 800px) {
+    .container {
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: 480px) {
+    /* Header wieder in einer Zeile halten und Werkzeuge am rechten Rand bündeln */
+    .header {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+    }
+    .header .tools {
+      margin-top: 0;
+      justify-content: flex-end;
+      gap: 8px; /* optional: Abstand zwischen Icon und Dropdown */
+    }
+  
+    /* Optional: etwas kleinere Icons, damit alles schön nebeneinander passt */
+    .header .tools img {
+      width: 22px;
+      height: 22px;
+    }
+  }
+  
+  
