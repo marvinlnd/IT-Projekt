@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MediAssist – Medikationsplan</title>
+  <link rel="icon" type="image/x-icon" href="../Bilder/IT_Projekt/Bild/favicon-32x32.png">
+  <!-- Globale Styles -->
+  <link rel="stylesheet" href="../css/styles.css"> 
+  <!-- Spezifische Styles -->
+  <link rel="stylesheet" href="../css/Medikationsplan.css">
+</head>
+<body>
+   <!-- Header -->
+   <header class="header">
+    <!-- Logo klickbar -->
+    <a href="index.html" class="logo">
+      <img src="../Bilder/IT_Projekt/Bild/Logo.png" alt="MediAssist Logo"/>       
+    </a>
+
+    <div class="tools">
+      <!-- Sprach-Dropdown -->
+      <div class="language-switcher">
+        <button
+          id="lang-button"
+          type="button"
+          aria-haspopup="true"
+          aria-controls="lang-dropdown"
+          aria-expanded="false"
+        >
+          DE <span class="arrow">▾</span>
+        </button>
+        <ul id="lang-dropdown" class="lang-dropdown" role="menu">
+          <li role="menuitem" tabindex="-1" data-lang="de">DE</li>
+          <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
+        </ul>
+      </div>
+      <!-- Login/Registrierung -->
+      <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
+        <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User" />
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <a href="../Seiten/Patienten.html" class="back-link">&larr; Zurück zur Patientenliste</a>
+    <h1 class="animate__animated animate__zoomIn">💊 Medikationsplan verwalten</h1>
+    <h2 id="patient-name" class="patient-name">Patient: —</h2>
+
+    <div class="container">
+      <div class="form-section animate__animated animate__fadeInLeft">
+        <h2>➕ Neue Medikation hinzufügen</h2>
+        <input type="text" id="medikament" placeholder="Medikamentenname">
+        <input type="text" id="anzahl" placeholder="Anzahl / Dosierung">
+        <input type="text" id="tageszeit" placeholder="Tageszeit (z. B. morgens)">
+        <input type="text" id="wochentage" placeholder="Wochentage (z. B. Mo, Mi)">
+        <button id="add-med" type="button">Hinzufügen</button>
+
+        <h2>🛠️ Medikation bearbeiten</h2>
+        <label for="indexDropdown">Index auswählen:</label>
+        <select id="indexDropdown"></select>
+        <input type="text" id="neuesMedikament" placeholder="Neuer Medikamentenname">
+        <input type="text" id="neueAnzahl" placeholder="Neue Anzahl">
+        <input type="text" id="neueTageszeit" placeholder="Neue Tageszeit">
+        <input type="text" id="neueWochentage" placeholder="Neue Wochentage">
+        <button id="edit-med" type="button">Änderungen speichern</button>
+
+        <h2>🗑️ Medikation löschen</h2>
+        <label for="indexLoeschenDropdown">Index auswählen:</label>
+        <select id="indexLoeschenDropdown"></select>
+        <button id="delete-med" type="button">Löschen</button>
+
+        <br>
+        <button id="clear-med" type="button">🧹 Alles löschen</button>
+      </div>
+
+      <div class="tabelle-section animate__animated animate__fadeInRight">
+        <h2>📄 Medikationsplan</h2>
+        <table id="medikationsTabelle">
+          <thead>
+            <tr><th>#</th><th>Medikament</th><th>Anzahl</th><th>Tageszeit</th><th>Wochentage</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="../Scripts/Medikationsplan.js" defer></script>
+</body>
+</html>

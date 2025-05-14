@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Patientendaten</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+
+    input, textarea {
+      margin-bottom: 10px;
+      display: block;
+      width: 300px;
+    }
+
+    button {
+      margin-top: 5px;
+    }
+
+    .container {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+    }
+
+    .form-section {
+      flex: 1;
+    }
+
+    .tabelle-section {
+      flex: 1;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+    <!-- Header -->
+  <header class="header">
+    <!-- Logo klickbar -->
+    <a href="index.html" class="logo">
+      <img src="../Bilder/IT_Projekt/Bild/Logo.png" alt="MediAssist Logo" style="width: 250px; height: auto;">
+    </a>
+
+    <div class="tools">
+      <!-- Sprach-Dropdown -->
+      <div class="language-switcher">
+        <button
+          id="lang-button"
+          type="button"
+          aria-haspopup="true"
+          aria-controls="lang-dropdown"
+          aria-expanded="false"
+        >
+          DE <span class="arrow">▾</span>
+        </button>
+        <ul id="lang-dropdown" class="lang-dropdown" role="menu">
+          <li role="menuitem" tabindex="-1" data-lang="de">DE</li>
+          <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
+        </ul>
+      </div>
+
+      <!-- Login / Registrierung -->
+      <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
+        <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User">
+      </div>
+    </div>
+  </header>
+  <h1 class="animate__animated animate__zoomIn">📄 Patientendaten verwalten</h1>
+
+  <div class="container">
+    <!-- Linke Seite: Formular -->
+    <div class="form-section animate__animated animate__fadeInLeft">
+      <h2>➕ Neuer Patient</h2>
+      <input type="text" id="vorname" placeholder="Vorname">
+      <input type="text" id="nachname" placeholder="Nachname">
+      <input type="text" id="email" placeholder="E-Mail-Adresse">
+      <input type="text" id="geburtsdatum" placeholder="Geburtsdatum (DD.MM.YYYY)">
+      <input type="text" id="adresse" placeholder="Adresse">
+      <input type="text" id="telefon" placeholder="Telefonnummer">
+      <button onclick="patientHinzufuegen(
+        document.getElementById('vorname').value,
+        document.getElementById('nachname').value,
+        document.getElementById('email').value,
+        document.getElementById('telefon').value,
+        document.getElementById('adresse').value,
+        document.getElementById('geburtsdatum').value
+      ); aktualisierePatiententabelle();">Hinzufügen</button>
+
+      <h2>🛠️ Patient bearbeiten</h2>
+      <select id="patientIndex"></select>
+      <input type="text" id="neuerVorname" placeholder="Neuer Vorname">
+      <input type="text" id="neuerNachname" placeholder="Neuer Nachname">
+      <input type="text" id="neueEmail" placeholder="Neue E-Mail-Adresse">
+      <input type="text" id="neuesGeburtsdatum" placeholder="Neues Geburtsdatum">
+      <input type="text" id="neueAdresse" placeholder="Neue Adresse">
+      <input type="text" id="neuesTelefon" placeholder="Neue Telefonnummer">
+      <button onclick="patientBearbeiten(
+        parseInt(document.getElementById('patientIndex').value),
+        {
+          vorname: document.getElementById('neuerVorname').value,
+          nachname: document.getElementById('neuerNachname').value,
+          mail: document.getElementById('neueEmail').value,
+          geburtsdatum: document.getElementById('neuesGeburtsdatum').value,
+          adresse: document.getElementById('neueAdresse').value,
+          telefon: document.getElementById('neuesTelefon').value
+        }
+      ); aktualisierePatiententabelle();">Änderungen speichern</button>
+
+      <h2>🗑️ Patient löschen</h2>
+      <select id="indexLoeschen"></select>
+      <button onclick="patientLoeschen(parseInt(document.getElementById('indexLoeschen').value)); aktualisierePatiententabelle();">Löschen</button>
+
+      <br>
+      <button onclick="if(confirm('⚠️ Wollen Sie wirklich ALLE Patientendaten unwiderruflich löschen? ⚠️')) { localStorage.clear(); location.reload(); }">🪜 Alles löschen</button>
+    </div>
+
+    <!-- Rechte Seite: Tabelle -->
+    <div class="tabelle-section animate__animated animate__fadeInRight">
+      <h2>📃 Patiententabelle</h2>
+      <table id="patientenTabelle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Vorname</th>
+            <th>Nachname</th>
+            <th>E-Mail</th>
+            <th>Geburtsdatum</th>
+            <th>Adresse</th>
+            <th>Telefon</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dynamische Inhalte -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="../Scripts/Patientendaten.js"></script>
+  <script src="../Scripts/Fehlererkennung.js"></script>
+</body>
+</html>

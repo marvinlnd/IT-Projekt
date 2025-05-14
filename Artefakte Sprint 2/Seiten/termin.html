@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Terminübersicht – MediAssist</title>
+  <link rel="icon" type="image/x-icon" href="../Bilder/IT_Projekt/Bild/favicon-32x32.png">
+  
+  <!-- Basis-CSS -->
+  <link rel="stylesheet" href="../css/styles.css"/>
+  <!-- Kalender-Styles -->
+  <link rel="stylesheet" href="../css/termin.css"/>
+  <!-- FullCalendar CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet"/>
+</head>
+<body>
+  <!-- HEADER unverändert -->
+  <header class="header">
+    <a href="../Seiten/index.html" class="logo">
+      <img src="../Bilder/IT_Projekt/Bild/Logo.png" alt="MediAssist Logo"/>
+    </a>
+    <div class="tools">
+      <div class="language-switcher">
+        <button id="lang-button" type="button" aria-haspopup="true" aria-controls="lang-dropdown" aria-expanded="false">
+          DE <span class="arrow">▾</span>
+        </button>
+        <ul id="lang-dropdown" class="lang-dropdown" role="menu">
+          <li role="menuitem" tabindex="-1" data-lang="de">DE</li>
+          <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
+        </ul>
+      </div>
+      <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
+        <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User"/>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Mobile View-Switcher -->
+    <div class="view-switcher" id="view-switcher">
+      <button id="view-button" type="button" aria-haspopup="true" aria-controls="view-dropdown" aria-expanded="false">
+        Monat ▾
+      </button>
+      <ul id="view-dropdown" class="view-dropdown" role="menu">
+        <li role="menuitem" tabindex="-1" data-view="dayGridMonth">Monat</li>
+        <li role="menuitem" tabindex="-1" data-view="timeGridWeek">Woche</li>
+        <li role="menuitem" tabindex="-1" data-view="timeGridDay">Tag</li>
+      </ul>
+    </div>
+
+    <div id="calendar"></div>
+    <div id="event-form-container" class="event-form-container"></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script src="../Scripts/termin.js" defer></script>
+</body>
+</html>

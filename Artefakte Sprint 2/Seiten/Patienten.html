@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MediAssist – Patientenliste</title>
+  <link rel="icon" type="image/x-icon" href="../Bilder/IT_Projekt/Bild/favicon-32x32.png">
+  <!-- globale Styles (Header + Basis) -->
+  <link rel="stylesheet" href="../css/styles.css" />
+  <!-- page‐specific Styles -->
+  <link rel="stylesheet" href="../css/Patienten.css" />
+</head>
+<body>
+  <!-- HEADER (wie auf der Startseite, ohne Suchfeld) -->
+  <header class="header">
+    <a href="../Seiten/index.html" class="logo">
+      <img src="../Bilder/IT_Projekt/Bild/Logo.png" alt="MediAssist Logo" />
+    </a>
+    <div class="tools">
+      <!-- Sprach-Dropdown -->
+      <div class="language-switcher">
+        <button
+          id="lang-button"
+          type="button"
+          aria-haspopup="true"
+          aria-controls="lang-dropdown"
+          aria-expanded="false"
+        >
+          DE <span class="arrow">▾</span>
+        </button>
+        <ul id="lang-dropdown" class="lang-dropdown" role="menu">
+          <li role="menuitem" tabindex="-1" data-lang="de">DE</li>
+          <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
+        </ul>
+      </div>
+      <!-- Login/Registrierung -->
+      <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
+        <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User" />
+      </div>
+    </div>
+  </header>
+
+  <!-- PATIENTEN-LISTE -->
+  <main class="patienten-page">
+    <section class="patienten-list">
+      <h2>Patienten</h2>
+      <div class="list-header">
+        <div class="search">
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Patient suchen…"
+          />
+          <button id="search-button" aria-label="Suche" type="button">
+            <img src="../Bilder/IT_Projekt/Bild/suche-icon.png" alt="Suche" />
+          </button>
+        </div>
+        <button id="add-button" class="btn add" type="button">
+          Neuer Patient anlegen
+        </button>
+      </div>
+      <table id="patient-table">
+        <thead>
+          <tr>
+            <th class="name-header">
+              <span>Name</span>
+              <div class="filter-container">
+                <img
+                  id="filter-toggle"
+                  class="filter-icon"
+                  src="../Bilder/IT_Projekt/Bild/sortieren.png"
+                  alt="sortieren"
+                />
+                <div id="filter-dropdown" class="filter-dropdown">
+                  <button data-sort="az">
+                    <span>Von A bis Z</span>
+                    <img class="tick-icon" src="../Bilder/IT_Projekt/Bild/tick.png" alt="✓" />
+                  </button>
+                  <button data-sort="za">
+                    <span>Von Z bis A</span>
+                    <img class="tick-icon" src="../Bilder/IT_Projekt/Bild/tick.png" alt="✓" />
+                  </button>
+                  <button data-sort="neueste">
+                    <span>Neueste zuerst</span>
+                    <img class="tick-icon" src="../Bilder/IT_Projekt/Bild/tick.png" alt="✓" />
+                  </button>
+                  <button data-sort="aelteste">
+                    <span>Älteste zuerst</span>
+                    <img class="tick-icon" src="../Bilder/IT_Projekt/Bild/tick.png" alt="✓" />
+                  </button>
+                </div>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody><!-- wird per JS befüllt --></tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- ÜBERSICHTS-MODAL -->
+  <div id="overview-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div class="modal-header">
+        <img src="../Bilder/IT_Projekt/Bild/Patient-icon.png" alt="Patient Icon" />
+        <h2 id="modal-name">Patientenübersicht</h2>
+      </div>
+      <div class="modal-body">
+        <button id="btn-personal" class="btn">Persönliche Daten</button>
+        <button id="btn-history" class="btn">Krankenhistorie</button>
+        <button id="btn-medication" class="btn">Medikationsplan</button>
+        <button id="btn-delete" class="btn delete">Patient löschen</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- Page‐specific (Patientenliste) -->
+  <script src="../Scripts/Patientendaten.js" defer></script>
+</body>
+</html>
