@@ -75,15 +75,21 @@
         <label for="indexDropdown">Index auswählen:</label>
         <select id="indexDropdown"></select>
         <input type="text" id="neuesMedikament" placeholder="Neuer Medikamentenname">
-        <input type="text" id="neueAnzahl" placeholder="Neue Anzahl">
-        <select id="neueEinheit">
-          <option value="Tabletten">Tabletten</option>
-          <option value="ml">ml</option>
-          <option value="Tropfen">Tropfen</option>
-          <option value="Kapseln">Kapseln</option>
-          <option value="g">g</option>
-          <option value="IE">IE</option>
-        </select>
+
+        <div class=dosierung-gruppe>
+
+          <input type="text" id="neueAnzahl" placeholder="Neue Anzahl">
+          <select id="neueEinheit">
+            <option value="Tabletten">Tabletten</option>
+            <option value="ml">ml</option>
+            <option value="Tropfen">Tropfen</option>
+            <option value="Kapseln">Kapseln</option>
+            <option value="g">g</option>
+            <option value="IE">IE</option>
+          </select>
+
+        </div>
+
         <select id="neueTageszeit">
           <option value="morgens">morgens</option>
           <option value="mittags">mittags</option>
