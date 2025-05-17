@@ -1,5 +1,3 @@
-// javascript/Medikationsplan.js
-
 class Medikation {
   constructor(medikament, anzahl, tageszeit, wochentage) {
     this.medikament = medikament;
@@ -8,16 +6,24 @@ class Medikation {
     this.wochentage = wochentage;
   }
   aktualisieren(data) {
-    if (data.medikament  !== undefined) this.medikament  = data.medikament;
-    if (data.anzahl      !== undefined) this.anzahl      = data.anzahl;
-    if (data.tageszeit   !== undefined) this.tageszeit   = data.tageszeit;
-    if (data.wochentage  !== undefined) this.wochentage  = data.wochentage;
+    if (data.medikament !== undefined) this.medikament = data.medikament;
+    if (data.anzahl !== undefined) this.anzahl = data.anzahl;
+    if (data.tageszeit !== undefined) this.tageszeit = data.tageszeit;
+    if (data.wochentage !== undefined) this.wochentage = data.wochentage;
   }
 }
 
 const STORAGE_KEY = 'patientListe';
 function ladePatienten() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  data.forEach(patient => {
+    if (Array.isArray(patient.medicationPlan)) {
+      patient.medicationPlan = patient.medicationPlan.map(m =>
+        new Medikation(m.medikament, m.anzahl, m.tageszeit, m.wochentage)
+      );
+    }
+  });
+  return data;
 }
 function speicherePatienten(list) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
@@ -29,18 +35,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const patientListe = ladePatienten();
   const patient = patientListe.find(p => p.id === id);
   if (!patient) return;
-  
-  // Patientenname anzeigen
+
   const nameElem = document.getElementById('patient-name');
   const { vorname = '', nachname = '' } = patient.personalData;
   nameElem.textContent = `Patient: ${vorname} ${nachname}`.trim();
 
   const plan = patient.medicationPlan;
-  
-  // DOM-Referenzen
-  const formSection   = document.querySelector('.form-section');
+
+  const formSection = document.querySelector('.form-section');
   const nameIn       = document.getElementById('medikament');
   const anzahlIn     = document.getElementById('anzahl');
+  const einheitIn    = document.getElementById('einheit');
   const tageszeitIn  = document.getElementById('tageszeit');
   const wochentageIn = document.getElementById('wochentage');
   const addBtn       = document.getElementById('add-med');
@@ -48,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const idxSelect    = document.getElementById('indexDropdown');
   const newNameIn    = document.getElementById('neuesMedikament');
   const newAnzahlIn  = document.getElementById('neueAnzahl');
+  const neueEinheitIn= document.getElementById('neueEinheit');
   const newZeitIn    = document.getElementById('neueTageszeit');
   const newWochIn    = document.getElementById('neueWochentage');
   const editBtn      = document.getElementById('edit-med');
@@ -58,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const tableBody    = document.querySelector('#medikationsTabelle tbody');
 
-  // Fehler-Handling
   function clearErrors() {
     formSection.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
     formSection.querySelectorAll('.error-message').forEach(el => el.remove());
@@ -71,16 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
     elem.insertAdjacentElement('afterend', div);
   }
 
-  // Validierungen
+  function validateAnzahl(val) {
+    return /^\d+(?:[\.,]\d+)?$/.test(val.trim());
+  }
   function validateName(val) {
     return val.trim().length >= 2;
-  }
-  function validateAnzahl(val) {
-    return /^\d+(?:[\.,]\d+)?(?:\s*(mg|ml|tabletten)?)?$/i.test(val.trim());
-  }
-  function validateTageszeit(val) {
-    const allowed = ['morgens','mittags','abends','nachts'];
-    return allowed.includes(val.trim().toLowerCase());
   }
   function validateWochentage(val) {
     const allowed = ['Mo','Di','Mi','Do','Fr','Sa','So'];
@@ -88,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return parts.length > 0 && parts.every(p => allowed.includes(p));
   }
 
-  // Render-Funktion
   function render() {
     tableBody.innerHTML = '';
     plan.forEach((m, i) => {
@@ -111,51 +110,59 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Prefill beim Index auswählen
   idxSelect.addEventListener('change', () => {
     clearErrors();
     const i = parseInt(idxSelect.value,10);
     if (!isNaN(i) && i>=0 && i<plan.length) {
-      newNameIn.value   = plan[i].medikament;
-      newAnzahlIn.value = plan[i].anzahl;
-      newZeitIn.value   = plan[i].tageszeit;
-      newWochIn.value   = plan[i].wochentage;
+      newNameIn.value    = plan[i].medikament;
+      const [anzahl, ...einheit] = plan[i].anzahl.split(' ');
+      newAnzahlIn.value  = anzahl;
+      neueEinheitIn.value= einheit.join(' ');
+      newZeitIn.value    = plan[i].tageszeit;
+      newWochIn.value    = plan[i].wochentage;
     }
   });
 
-  // Hinzufügen
   addBtn.addEventListener('click', () => {
     clearErrors();
     let ok = true;
     if (!validateName(nameIn.value))    { showError(nameIn,'Medikamentname mind. 2 Zeichen'); ok=false; }
-    if (!validateAnzahl(anzahlIn.value)){ showError(anzahlIn,'Ungültige Dosierung, z.B. 1,5 mg'); ok=false; }
-    if (!validateTageszeit(tageszeitIn.value)){ showError(tageszeitIn,'Nur: morgens, mittags, abends oder nachts'); ok=false; }
+    if (!validateAnzahl(anzahlIn.value)){ showError(anzahlIn,'Ungültige Dosierung'); ok=false; }
     if (!validateWochentage(wochentageIn.value)){ showError(wochentageIn,'Wochentage: Mo,Di,Mi,Do,Fr,Sa,So'); ok=false; }
     if (!ok) return;
-    plan.push(new Medikation(nameIn.value.trim(),anzahlIn.value.trim(),tageszeitIn.value.trim(),wochentageIn.value.trim()));
+
+    const dosierung = `${anzahlIn.value.trim()} ${einheitIn.value}`;
+    plan.push(new Medikation(nameIn.value.trim(), dosierung, tageszeitIn.value.trim(), wochentageIn.value.trim()));
     speicherePatienten(patientListe);
     render();
-    nameIn.value=anzahlIn.value=tageszeitIn.value=wochentageIn.value='';
+    nameIn.value = anzahlIn.value = tageszeitIn.value = wochentageIn.value = '';
+    einheitIn.selectedIndex = 0;
   });
 
-  // Bearbeiten
   editBtn.addEventListener('click', () => {
     clearErrors();
     const i = parseInt(idxSelect.value,10);
     if (isNaN(i)||i<0||i>=plan.length) { showError(idxSelect,'Ungültiger Index'); return; }
+
     let ok = true;
-    if (newNameIn.value && !validateName(newNameIn.value))    { showError(newNameIn,'Medikamentname mind. 2 Zeichen'); ok=false; }
-    if (newAnzahlIn.value && !validateAnzahl(newAnzahlIn.value)){ showError(newAnzahlIn,'Ungültige Dosierung'); ok=false; }
-    if (newZeitIn.value && !validateTageszeit(newZeitIn.value)){ showError(newZeitIn,'Nur: morgens, mittags, abends oder nachts'); ok=false; }
-    if (newWochIn.value && !validateWochentage(newWochIn.value)){ showError(newWochIn,'Wochentage: Mo,Di,Mi,Do,Fr,Sa,So'); ok=false; }
+    if (newNameIn.value && !validateName(newNameIn.value))        { showError(newNameIn,'Medikamentname mind. 2 Zeichen'); ok=false; }
+    if (newAnzahlIn.value && !validateAnzahl(newAnzahlIn.value))  { showError(newAnzahlIn,'Ungültige Dosierung'); ok=false; }
+    if (newWochIn.value && !validateWochentage(newWochIn.value))  { showError(newWochIn,'Wochentage: Mo,Di,Mi,Do,Fr,Sa,So'); ok=false; }
     if (!ok) return;
-    plan[i].aktualisieren({medikament:newNameIn.value.trim(),anzahl:newAnzahlIn.value.trim(),tageszeit:newZeitIn.value.trim(),wochentage:newWochIn.value.trim()});
+
+    const neueDosierung = `${newAnzahlIn.value.trim()} ${neueEinheitIn.value}`;
+    plan[i].aktualisieren({
+      medikament: newNameIn.value.trim(),
+      anzahl: neueDosierung,
+      tageszeit: newZeitIn.value.trim(),
+      wochentage: newWochIn.value.trim()
+    });
     speicherePatienten(patientListe);
     render();
-    newNameIn.value=newAnzahlIn.value=newZeitIn.value=newWochIn.value='';
+    newNameIn.value = newAnzahlIn.value = newZeitIn.value = newWochIn.value = '';
+    neueEinheitIn.selectedIndex = 0;
   });
 
-  // Löschen
   deleteBtn.addEventListener('click', () => {
     const i = parseInt(delSelect.value,10);
     if (isNaN(i)||i<0||i>=plan.length) return;
@@ -164,19 +171,15 @@ document.addEventListener('DOMContentLoaded', () => {
     render();
   });
 
-  // Alles löschen
   clearBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  if (confirm('Wirklich alle Einträge löschen?')) {
-    // Das bestehende Array leeren, statt ein neues Array zuzuweisen
-    plan.length = 0;
-    patient.medicationPlan = plan;
-    speicherePatienten(patientListe);
-    render();
-  }
-});
+    e.preventDefault();
+    if (confirm('Wirklich alle Einträge löschen?')) {
+      plan.length = 0;
+      patient.medicationPlan = plan;
+      speicherePatienten(patientListe);
+      render();
+    }
+  });
 
-
-  // Initial
   render();
 });
