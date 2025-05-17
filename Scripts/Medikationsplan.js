@@ -43,26 +43,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const plan = patient.medicationPlan;
 
   const formSection = document.querySelector('.form-section');
-  const nameIn       = document.getElementById('medikament');
-  const anzahlIn     = document.getElementById('anzahl');
-  const einheitIn    = document.getElementById('einheit');
-  const tageszeitIn  = document.getElementById('tageszeit');
+  const nameIn = document.getElementById('medikament');
+  const anzahlIn = document.getElementById('anzahl');
+  const einheitIn = document.getElementById('einheit');
+  const tageszeitIn = document.getElementById('tageszeit');
   const wochentageIn = document.getElementById('wochentage');
-  const addBtn       = document.getElementById('add-med');
+  const addBtn = document.getElementById('add-med');
 
-  const idxSelect    = document.getElementById('indexDropdown');
-  const newNameIn    = document.getElementById('neuesMedikament');
-  const newAnzahlIn  = document.getElementById('neueAnzahl');
-  const neueEinheitIn= document.getElementById('neueEinheit');
-  const newZeitIn    = document.getElementById('neueTageszeit');
-  const newWochIn    = document.getElementById('neueWochentage');
-  const editBtn      = document.getElementById('edit-med');
+  const idxSelect = document.getElementById('indexDropdown');
+  const newNameIn = document.getElementById('neuesMedikament');
+  const newAnzahlIn = document.getElementById('neueAnzahl');
+  const neueEinheitIn = document.getElementById('neueEinheit');
+  const newZeitIn = document.getElementById('neueTageszeit');
+  const newWochIn = document.getElementById('neueWochentage');
+  const editBtn = document.getElementById('edit-med');
 
-  const delSelect    = document.getElementById('indexLoeschenDropdown');
-  const deleteBtn    = document.getElementById('delete-med');
-  const clearBtn     = document.getElementById('clear-med');
+  const delSelect = document.getElementById('indexLoeschenDropdown');
+  const deleteBtn = document.getElementById('delete-med');
+  const clearBtn = document.getElementById('clear-med');
 
-  const tableBody    = document.querySelector('#medikationsTabelle tbody');
+  const tableBody = document.querySelector('#medikationsTabelle tbody');
 
   function clearErrors() {
     formSection.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return val.trim().length >= 2;
   }
   function validateWochentage(val) {
-    const allowed = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+    const allowed = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
     const parts = val.split(',').map(p => p.trim());
     return parts.length > 0 && parts.every(p => allowed.includes(p));
   }
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     idxSelect.innerHTML = '';
     delSelect.innerHTML = '';
-    plan.forEach((m,i) => {
+    plan.forEach((m, i) => {
       const o = document.createElement('option'); o.value = i; o.textContent = `${i}: ${m.medikament}`;
       idxSelect.appendChild(o);
       delSelect.appendChild(o.cloneNode(true));
@@ -112,23 +112,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   idxSelect.addEventListener('change', () => {
     clearErrors();
-    const i = parseInt(idxSelect.value,10);
-    if (!isNaN(i) && i>=0 && i<plan.length) {
-      newNameIn.value    = plan[i].medikament;
+    const i = parseInt(idxSelect.value, 10);
+    if (!isNaN(i) && i >= 0 && i < plan.length) {
+      newNameIn.value = plan[i].medikament;
       const [anzahl, ...einheit] = plan[i].anzahl.split(' ');
-      newAnzahlIn.value  = anzahl;
-      neueEinheitIn.value= einheit.join(' ');
-      newZeitIn.value    = plan[i].tageszeit;
-      newWochIn.value    = plan[i].wochentage;
+      newAnzahlIn.value = anzahl;
+      neueEinheitIn.value = einheit.join(' ');
+      newZeitIn.value = plan[i].tageszeit;
+      newWochIn.value = plan[i].wochentage;
     }
   });
 
   addBtn.addEventListener('click', () => {
     clearErrors();
     let ok = true;
-    if (!validateName(nameIn.value))    { showError(nameIn,'Medikamentname mind. 2 Zeichen'); ok=false; }
-    if (!validateAnzahl(anzahlIn.value)){ showError(anzahlIn,'Ungültige Dosierung'); ok=false; }
-    if (!validateWochentage(wochentageIn.value)){ showError(wochentageIn,'Wochentage: Mo,Di,Mi,Do,Fr,Sa,So'); ok=false; }
+    if (!validateName(nameIn.value)) { showError(nameIn, 'Medikamentname mind. 2 Zeichen'); ok = false; }
+    if (!validateAnzahl(anzahlIn.value)) { showError(anzahlIn, 'Ungültige Dosierung'); ok = false; }
+    if (!validateWochentage(wochentageIn.value)) { showError(wochentageIn, 'Wochentage: Mo,Di,Mi,Do,Fr,Sa,So'); ok = false; }
     if (!ok) return;
 
     const dosierung = `${anzahlIn.value.trim()} ${einheitIn.value}`;
@@ -141,22 +141,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
   editBtn.addEventListener('click', () => {
     clearErrors();
-    const i = parseInt(idxSelect.value,10);
-    if (isNaN(i)||i<0||i>=plan.length) { showError(idxSelect,'Ungültiger Index'); return; }
+    const i = parseInt(idxSelect.value, 10);
+    if (isNaN(i) || i < 0 || i >= plan.length) { showError(idxSelect, 'Ungültiger Index'); return; }
 
     let ok = true;
-    if (newNameIn.value && !validateName(newNameIn.value))        { showError(newNameIn,'Medikamentname mind. 2 Zeichen'); ok=false; }
-    if (newAnzahlIn.value && !validateAnzahl(newAnzahlIn.value))  { showError(newAnzahlIn,'Ungültige Dosierung'); ok=false; }
-    if (newWochIn.value && !validateWochentage(newWochIn.value))  { showError(newWochIn,'Wochentage: Mo,Di,Mi,Do,Fr,Sa,So'); ok=false; }
+    if (newNameIn.value && !validateName(newNameIn.value)) { showError(newNameIn, 'Medikamentname mind. 2 Zeichen'); ok = false; }
+    if (newAnzahlIn.value && !validateAnzahl(newAnzahlIn.value)) { showError(newAnzahlIn, 'Ungültige Dosierung'); ok = false; }
+    if (newWochIn.value && !validateWochentage(newWochIn.value)) { showError(newWochIn, 'Wochentage: Mo,Di,Mi,Do,Fr,Sa,So'); ok = false; }
     if (!ok) return;
 
     const neueDosierung = `${newAnzahlIn.value.trim()} ${neueEinheitIn.value}`;
-    plan[i].aktualisieren({
-      medikament: newNameIn.value.trim(),
-      anzahl: neueDosierung,
-      tageszeit: newZeitIn.value.trim(),
-      wochentage: newWochIn.value.trim()
-    });
+    const updateData = {};
+
+    if (newNameIn.value.trim()) {
+      updateData.medikament = newNameIn.value.trim();
+    }
+    if (newAnzahlIn.value.trim()) {
+      updateData.anzahl = `${newAnzahlIn.value.trim()} ${neueEinheitIn.value}`;
+    }
+    if (newZeitIn.value.trim()) {
+      updateData.tageszeit = newZeitIn.value.trim();
+    }
+    if (newWochIn.value.trim()) {
+      updateData.wochentage = newWochIn.value.trim();
+    }
+
+    plan[i].aktualisieren(updateData);
     speicherePatienten(patientListe);
     render();
     newNameIn.value = newAnzahlIn.value = newZeitIn.value = newWochIn.value = '';
@@ -164,9 +174,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   deleteBtn.addEventListener('click', () => {
-    const i = parseInt(delSelect.value,10);
-    if (isNaN(i)||i<0||i>=plan.length) return;
-    plan.splice(i,1);
+    const i = parseInt(delSelect.value, 10);
+    if (isNaN(i) || i < 0 || i >= plan.length) return;
+    plan.splice(i, 1);
     speicherePatienten(patientListe);
     render();
   });
