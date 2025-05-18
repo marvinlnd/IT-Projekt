@@ -40,6 +40,30 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnMedication = document.getElementById('btn-medication');
   const btnDelete = document.getElementById('btn-delete');
   const searchInput = document.getElementById('search-input');
+    // Email-Autovervollständigung
+  const emailInput = document.getElementById("email");
+  const domains = ["@gmail.com", "@yahoo.com", "@outlook.com", "@web.de", "@gmx.de"];
+
+  if (emailInput) {
+    emailInput.addEventListener("input", () => {
+      const value = emailInput.value;
+      const atIndex = value.indexOf("@");
+
+      const dataList = document.getElementById("email-suggestions");
+      if (!dataList) return;
+
+      dataList.innerHTML = ""; // Alte Vorschläge löschen
+
+      if (atIndex === -1) {
+        domains.forEach(domain => {
+          const option = document.createElement("option");
+          option.value = value + domain;
+          dataList.appendChild(option);
+        });
+      }
+    });
+  }
+
 
   const userId = localStorage.getItem("user-id");
 

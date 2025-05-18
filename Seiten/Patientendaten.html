@@ -98,7 +98,8 @@
       <h2>➕ Neuer Patient</h2>
       <input type="text" id="vorname" placeholder="Vorname">
       <input type="text" id="nachname" placeholder="Nachname">
-      <input type="text" id="email" placeholder="E-Mail-Adresse">
+      <input type="email" id="email" list="email-suggestions" placeholder="E-Mail-Adresse" autocomplete="on">
+      <datalist id="email-suggestions"></datalist>
       <input type="date" id="geburtsdatum">
       <input type="text" id="adresse" placeholder="Adresse">
       <input type="text" id="telefon" placeholder="Telefonnummer">
