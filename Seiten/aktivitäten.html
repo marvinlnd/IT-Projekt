@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <meta charset="UTF-8">
@@ -7,19 +8,54 @@
   <link rel="icon" type="image/x-icon" href="../Bilder/IT_Projekt/Bild/favicon-32x32.png">
   <link rel="stylesheet" href="../css/styles.css">
   <style>
-    body { font-family: sans-serif; margin: 20px; }
-    input, textarea { margin-bottom: 10px; display: block; width: 300px; }
-    button { margin-top: 5px; }
-    .container { display: flex; gap: 40px; align-items: flex-start; }
-    .form-section, .tabelle-section { flex: 1; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f2f2f2; }
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+
+    input,
+    textarea {
+      margin-bottom: 10px;
+      display: block;
+      width: 300px;
+    }
+
+    button {
+      margin-top: 5px;
+    }
+
+    .container {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+    }
+
+    .form-section,
+    .tabelle-section {
+      flex: 1;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th,
+    td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
   </style>
 </head>
+
 <body>
 
-   <!-- Header -->
+  <!-- Header -->
   <header class="header">
     <!-- Logo klickbar -->
     <a href="index.html" class="logo">
@@ -29,13 +65,7 @@
     <div class="tools">
       <!-- Sprach-Dropdown -->
       <div class="language-switcher">
-        <button
-          id="lang-button"
-          type="button"
-          aria-haspopup="true"
-          aria-controls="lang-dropdown"
-          aria-expanded="false"
-        >
+        <button id="lang-button" type="button" aria-haspopup="true" aria-controls="lang-dropdown" aria-expanded="false">
           DE <span class="arrow">▾</span>
         </button>
         <ul id="lang-dropdown" class="lang-dropdown" role="menu">
@@ -57,9 +87,16 @@
     <!-- Linke Seite: Formular -->
     <div class="form-section animate__animated animate__fadeInLeft">
       <h2>➕ Neue Aktivität hinzufügen</h2>
+      <p1>Name der Aktivität</p1>
       <input type="text" id="nameDerAktivität" placeholder="Name der Aktivität">
-      <input type="text" id="beginn" placeholder="Uhrzeit Beginn (HH:MM)">
-      <input type="text" id="ende" placeholder="Uhrzeit Ende (HH:MM)">
+      <p1>Beginn der Aktivität</p1>
+
+      <input type="time" id="beginn" min="4:00" max="23:00" step="900" placeholder="Beginn">
+      <p1>Ende der Aktivität</p1>
+
+      <input type="time" id="ende" min="4:00" max="23:00" step="900">
+            <p1>Notizen</p1>
+
       <input type="text" id="notitz" placeholder="Notiz">
       <button onclick="aktivitätHinzufügen(
         document.getElementById('nameDerAktivität').value, 
@@ -84,10 +121,13 @@
 
       <h2>🗑️ Aktivität löschen</h2>
       <input type="number" id="indexLoeschen" placeholder="Index">
-      <button onclick="aktivität_loeschen(parseInt(document.getElementById('indexLoeschen').value)); this.classList.add('animate__animated', 'animate__bounce'); setTimeout(() => this.classList.remove('animate__animated', 'animate__bounce'), 1000);">Löschen</button>
+      <button
+        onclick="aktivität_loeschen(parseInt(document.getElementById('indexLoeschen').value)); this.classList.add('animate__animated', 'animate__bounce'); setTimeout(() => this.classList.remove('animate__animated', 'animate__bounce'), 1000);">Löschen</button>
 
       <br><br>
-      <button onclick="if(confirm('⚠️ Wollen Sie wirklich ALLE Aktivitäten unwiderruflich löschen? ⚠️')) { localStorage.clear(); location.reload(); }">🪜 Alles löschen</button>
+      <button
+        onclick="if(confirm('⚠️ Wollen Sie wirklich ALLE Aktivitäten unwiderruflich löschen? ⚠️')) { localStorage.clear(); location.reload(); }">🪜
+        Alles löschen</button>
     </div>
 
     <!-- Rechte Seite: Tabelle -->
@@ -113,4 +153,5 @@
   <script src="../Scripts/Fehlererkennung.js"></script>
   <script src="../Scripts/aktivitäten.js"></script>
 </body>
+
 </html>
