@@ -1,4 +1,4 @@
-// javascript/Patientendaten.js
+// javascript/Patientendaten.js 
 
 // Firebase initialisieren 
 const firebaseConfig = {
