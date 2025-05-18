@@ -133,12 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 4) Login / Registrierung
-  const loginIcon = document.getElementById('login-icon');
-  loginIcon?.addEventListener('click', () => {
-    const isLogin = confirm('Bestehender Benutzer? OK = Login, Abbrechen = Registrierung');
-    window.location.href = isLogin ? 'login.html' : 'register.html';
-  });
-});
 
+});
 
