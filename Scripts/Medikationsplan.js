@@ -1,4 +1,4 @@
-// Firebase initialisieren
+// Firebase initialisieren 
 const firebaseConfig = {
   apiKey: "AIzaSyAakpWbT87pJ4Bv1Xr0Mk2lCNhNols7KR4",
   authDomain: "it-projekt-ffc4d.firebaseapp.com",
