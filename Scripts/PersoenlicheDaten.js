@@ -1,4 +1,4 @@
-// javascript/PersoenlicheDaten.js
+// javascript/PersoenlicheDaten.js 
 
 // Firebase initialisieren
 const firebaseConfig = {
