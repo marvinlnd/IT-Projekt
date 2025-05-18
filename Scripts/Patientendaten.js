@@ -1,5 +1,20 @@
 // javascript/Patientendaten.js
 
+// Firebase initialisieren
+const firebaseConfig = {
+  apiKey: "AIzaSyAakpWbT87pJ4Bv1Xr0Mk2lCNhNols7KR4",
+  authDomain: "it-projekt-ffc4d.firebaseapp.com",
+  projectId: "it-projekt-ffc4d",
+  storageBucket: "it-projekt-ffc4d.firebasestorage.app",
+  messagingSenderId: "534546734981",
+  appId: "1:534546734981:web:13bffd7c78893bd0e3aeec"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+console.log("✅ Firebase initialisiert!");
+
+// javascript/Patientendaten.js
+
 class Patient {
   constructor(vorname = '', nachname = '', email = '', telefon = '', adresse = '', geburtsdatum = '') {
     this.id = Date.now().toString();
@@ -34,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentSort = 'az';
 
+  // ------------------------------
+  // Funktion zum Rendern der Tabelle
   function renderTable(liste = patientListe) {
     tableBody.innerHTML = '';
     liste.forEach(p => {
@@ -45,31 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function openModal(id) {
-    const p = patientListe.find(x => x.id === id);
-    if (!p) return;
-    modalName.textContent = (`${p.personalData.vorname} ${p.personalData.nachname}`.trim()) || '— Unbenannt —';
-    modal.style.display = 'block';
-    btnPersonal.onclick   = () => location.href = `PersoenlicheDaten.html?id=${id}`;
-    btnHistory.onclick    = () => location.href = `Krankenhistorie.html?id=${id}`;
-    btnMedication.onclick = () => location.href = `Medikationsplan.html?id=${id}`;
-    btnDelete.onclick     = () => deletePatient(id);
-  }
-
-  function deletePatient(id) {
-  if (!confirm('Möchten Sie diesen Patienten wirklich löschen?')) {
-    return; // Abbruch, wenn der Nutzer „Abbrechen“ klickt
-  }
-  const idx = patientListe.findIndex(p => p.id === id);
-  if (idx !== -1) {
-    patientListe.splice(idx, 1);
-    speicherePatienten();
-    applyFilterAndSort();
-    modal.style.display = 'none';
-  }
-}
-
-
+  // ------------------------------
+  // Funktion zum Anwenden von Filter und Sortierung
   function applyFilterAndSort() {
     const term = searchInput.value.toLowerCase();
     let filtered = patientListe.filter(p => {
@@ -97,19 +91,68 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTable(filtered);
   }
 
-  // Modal schließen
+  // ------------------------------
+  // Modal öffnen mit Patientendetails und Buttonaktionen
+  function openModal(id) {
+    const p = patientListe.find(x => x.id === id);
+    if (!p) return;
+    modalName.textContent = (`${p.personalData.vorname} ${p.personalData.nachname}`.trim()) || '— Unbenannt —';
+    modal.style.display = 'block';
+    btnPersonal.onclick   = () => location.href = `PersoenlicheDaten.html?id=${id}`;
+    btnHistory.onclick    = () => location.href = `Krankenhistorie.html?id=${id}`;
+    btnMedication.onclick = () => location.href = `Medikationsplan.html?id=${id}`;
+    btnDelete.onclick     = () => deletePatient(id);
+  }
+
+  // ------------------------------
+  // Patient löschen (lokal + Firestore)
+  function deletePatient(id) {
+    if (!confirm('Möchten Sie diesen Patienten wirklich löschen?')) {
+      return;
+    }
+    const idx = patientListe.findIndex(p => p.id === id);
+    if (idx !== -1) {
+      const deletedPatient = patientListe.splice(idx, 1)[0];
+      speicherePatienten();
+      // Firestore löschen
+      db.collection('patients').doc(id).delete()
+        .then(() => {
+          console.log(`✅ Patient mit ID ${id} aus Firestore gelöscht.`);
+        })
+        .catch(error => {
+          console.error(`❌ Fehler beim Löschen des Patienten aus Firestore:`, error);
+        });
+      applyFilterAndSort();
+      modal.style.display = 'none';
+    }
+  }
+
+  // ------------------------------
+  // Patienten aus Firestore laden
+  async function ladePatientenAusFirestore() {
+    try {
+      const snapshot = await db.collection('patients').get();
+      patientListe = snapshot.docs.map(doc => doc.data());
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(patientListe));
+      console.log("✅ Patienten aus Firestore geladen.");
+      applyFilterAndSort();
+    } catch (error) {
+      console.error("❌ Fehler beim Laden der Patienten aus Firestore:", error);
+    }
+  }
+
+  // ------------------------------
+  // Initialisierung und Event-Listener
+
   closeBtn.onclick = () => modal.style.display = 'none';
   window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
 
-  // Neuer Patient
   addButton.addEventListener('click', () => {
     location.href = 'PersoenlicheDaten.html';
   });
 
-  // Suche
   searchInput.addEventListener('input', applyFilterAndSort);
 
-  // Sortier-Dropdown
   filterToggle.addEventListener('click', () => {
     const vis = filterDropdown.style.display === 'block';
     filterDropdown.style.display = vis ? 'none' : 'block';
@@ -117,11 +160,13 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.classList.toggle('active', btn.dataset.sort === currentSort);
     });
   });
+
   document.addEventListener('click', e => {
     if (!filterDropdown.contains(e.target) && !filterToggle.contains(e.target)) {
       filterDropdown.style.display = 'none';
     }
   });
+
   sortButtons.forEach(button => {
     button.addEventListener('click', () => {
       currentSort = button.dataset.sort;
@@ -131,6 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // initial render
-  applyFilterAndSort();
+  // Firestore-Daten laden und danach rendern
+  ladePatientenAusFirestore();
 });
