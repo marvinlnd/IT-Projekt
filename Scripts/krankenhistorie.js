@@ -1,5 +1,5 @@
 
-// javascript/krankenhistorie.js
+// javascript/krankenhistorie.js 
 
 // Firebase initialisieren
 const firebaseConfig = {
