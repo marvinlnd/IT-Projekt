@@ -1,5 +1,18 @@
 /* css/termin.css */
 
+.kalender-header {
+  display: flex;
+  justify-content: flex-start;
+  padding: 0 24px;
+  margin-top: 16px;
+}
+
+.kalender-header h2 {
+  font-size: 1.7rem;
+  font-weight: bold;
+  color: var(--text);
+}
+
 /* 1) Wrapper um Kalender + Formular für absolute Positionierung */
 #calendar-wrapper {
   position: relative;
@@ -163,13 +176,17 @@
 }
 
 #calendar .fc-toolbar .fc-toolbar-title {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: bold;
   line-height: 1.2;
 }
 
 /* 7) Mobile-Override */
 @media (max-width: 600px) {
+  .kalender-header {
+    justify-content: center;
+    padding: 0 12px;
+  }
   /* a) FullCalendar View-Buttons ausblenden */
   .fc-toolbar .fc-dayGridMonth-button,
   .fc-toolbar .fc-timeGridWeek-button,
@@ -180,6 +197,7 @@
   /* b) Switcher anzeigen */
   .view-switcher {
     display: block;
+    margin-left: 38px;
   }
 
   /* c) Wochen-Ansicht: Spalten scrollbar machen */
