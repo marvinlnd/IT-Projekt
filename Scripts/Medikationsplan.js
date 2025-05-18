@@ -77,16 +77,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function validateAnzahl(val) {
-    return /^\d+(?:[\.,]\d+)?$/.test(val.trim());
+  return /^\d+([.,]\d+)?$/.test(val.trim());
   }
   function validateName(val) {
     return val.trim().length >= 2;
   }
   function validateWochentage(val) {
-    const allowed = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
-    const parts = val.split(',').map(p => p.trim());
-    return parts.length > 0 && parts.every(p => allowed.includes(p));
-  }
+  const allowed = ['mo', 'di', 'mi', 'do', 'fr', 'sa', 'so',
+                   'montag', 'dienstag', 'mittwoch', 'donnerstag', 'freitag', 'samstag', 'sonntag'];
+  const parts = val.split(',').map(p => p.trim().toLowerCase());
+  return parts.length > 0 && parts.every(p => allowed.includes(p));
+}
+
 
   function render() {
     tableBody.innerHTML = '';
@@ -128,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let ok = true;
     if (!validateName(nameIn.value)) { showError(nameIn, 'Medikamentname mind. 2 Zeichen'); ok = false; }
     if (!validateAnzahl(anzahlIn.value)) { showError(anzahlIn, 'Ungültige Dosierung'); ok = false; }
-    if (!validateWochentage(wochentageIn.value)) { showError(wochentageIn, 'Wochentage: Mo,Di,Mi,Do,Fr,Sa,So'); ok = false; }
+    if (!validateWochentage(wochentageIn.value)) { showError(wochentageIn, 'Wochentage: Montag - Sonntag oder Mo - So'); ok = false; }
     if (!ok) return;
 
     const dosierung = `${anzahlIn.value.trim()} ${einheitIn.value}`;
