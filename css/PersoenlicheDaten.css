@@ -6,99 +6,110 @@
     margin: 16px 24px;
     color: #0078d4;
     text-decoration: none;
-  }
-  .back-link:hover {
+}
+.back-link:hover {
     text-decoration: underline;
-  }
+}
   
-  /* Abschnitts-Header (Icon + Titel) */
-  .section-header {
+/* Abschnitts-Header (Icon + Titel) */
+.section-header {
     display: flex;
     align-items: center;
     gap: 12px;
     margin: 24px;
-  }
-  .section-header img {
+}
+.section-header img {
     width: 40px;
     height: 40px;
-  }
-  .section-header h1 {
+}
+.section-header h1 {
     font-size: 1.5rem;
     color: #004aad;
     margin: 0;
-  }
+}
   
-  /* Formular für persönliche Daten */
-  #personal-form {
+/* Formular für persönliche Daten */
+#personal-form {
     max-width: 600px;
     margin: 0 auto 24px;
     background: #fff;
     padding: 16px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-  }
-  #personal-form label {
+}
+#personal-form label {
     display: block;
     margin-top: 12px;
     color: #333;
-  }
-  #personal-form input {
+}
+#personal-form input {
     width: 100%;
     padding: 8px;
     margin-top: 4px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1rem;
-  }
+}
+
+/* Fehlerdarstellung */
+input.error {
+    border-color: red !important;
+    background-color: #ffe6e6;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
   
-  /* Button-Gruppierung im Formular */
-  .form-actions {
+/* Button-Gruppierung im Formular */
+.form-actions {
     margin-top: 16px;
     display: flex;
     gap: 8px;
-  }
-  .btn.save {
+}
+.btn.save {
     background-color: #0078d4;
     color: #fff;
     border: none;
     padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
-  }
-  .btn.save:hover {
+}
+.btn.save:hover {
     background-color: #005fa3;
-  }
-  .btn.cancel {
+}
+.btn.cancel {
     background-color: #f0f0f0;
     color: #333;
     border: 1px solid #ccc;
     padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
-  }
-  .btn.cancel:hover {
+}
+.btn.cancel:hover {
     background-color: #e0e0e0;
-  }
+}
 
-  @media (max-width: 480px) {
+@media (max-width: 480px) {
     /* Header wieder in einer Zeile halten und Werkzeuge am rechten Rand bündeln */
     .header {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
     }
     .header .tools {
-      margin-top: 0;
-      justify-content: flex-end;
-      gap: 8px; /* optional: Abstand zwischen Icon und Dropdown */
+        margin-top: 0;
+        justify-content: flex-end;
+        gap: 8px; /* optional: Abstand zwischen Icon und Dropdown */
     }
-  
+
     /* Optional: etwas kleinere Icons, damit alles schön nebeneinander passt */
     .header .tools img {
-      width: 22px;
-      height: 22px;
+        width: 22px;
+        height: 22px;
     }
-  }
-  
-  
+}
