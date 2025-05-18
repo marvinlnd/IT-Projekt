@@ -53,6 +53,8 @@
     toast.style.display = "block";
     setTimeout(() => {
     toast.style.display = "none";
+    const user = userCredential.user;
+    localStorage.setItem("user-id", JSON.stringify(user.uid));
 	window.location.href = "index.html";
     }, 500); // verschwindet nach 1/2 Sekunden
 

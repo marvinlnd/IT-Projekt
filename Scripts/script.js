@@ -140,3 +140,5 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = isLogin ? 'login.html' : 'register.html';
   });
 });
+
+

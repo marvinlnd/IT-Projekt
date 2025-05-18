@@ -1,4 +1,4 @@
-// javascript/PersoenlicheDaten.js 
+// javascript/PersoenlicheDaten.js
 
 // Firebase initialisieren
 const firebaseConfig = {
@@ -27,11 +27,10 @@ let patientListe = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(location.search);
-  const id     = params.get('id');        // wenn vorhanden: Bearbeiten, sonst Neuanlage
+  const id     = params.get('id');
   const form   = document.getElementById('personal-form');
   const cancel = document.getElementById('cancel');
 
-  // Fehler-Handling-Funktionen
   function clearErrors() {
     form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
     form.querySelectorAll('.error-message').forEach(el => el.remove());
@@ -55,15 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Validierungen (z.B. Name, Email) können hier bei Bedarf ergänzt werden (wie im Original)
-
   form.addEventListener('submit', async e => {
     e.preventDefault();
     clearErrors();
 
     let ok = true;
 
-    // Beispiel-Validierung für Vorname (kann für weitere Felder ergänzt werden)
     if (form.vorname.value.trim().length < 2) {
       showError(form.vorname, 'Mindestens 2 Zeichen');
       ok = false;
@@ -72,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
       showError(form.nachname, 'Mindestens 2 Zeichen');
       ok = false;
     }
-    // Weitere Validierungen können hier analog ergänzt werden
 
     if (!ok) return;
 
@@ -85,28 +80,38 @@ document.addEventListener('DOMContentLoaded', () => {
       geburtsdatum: form.geburtsdatum.value
     };
 
+    const userId = localStorage.getItem("user-id");
+    if (!userId) {
+      alert("❌ Kein Benutzer angemeldet. Bitte erneut einloggen.");
+      return;
+    }
+
     if (patient) {
-      // Update vorhandener Patient
+      // Patient aktualisieren
       patient.personalData = data;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(patientListe));
       console.log(`✏️ Patientendaten aktualisiert: ${patient.id}`);
 
       try {
-        await db.collection('patients').doc(patient.id).set(JSON.parse(JSON.stringify(patient)));
+        await db.collection('users').doc(userId)
+          .collection('patients').doc(patient.id)
+          .set(JSON.parse(JSON.stringify(patient)));
         console.log(`✅ Patient ${patient.id} in Firestore aktualisiert.`);
       } catch (error) {
         console.error("❌ Fehler beim Aktualisieren in Firestore:", error);
       }
     } else {
-      // Neuen Patient anlegen
+      // Neuer Patient
       const neu = new Patient(...Object.values(data));
       patientListe.push(neu);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(patientListe));
       console.log(`✅ Neuer Patient wird angelegt:`, neu);
 
       try {
-        await db.collection('patients').doc(neu.id).set(JSON.parse(JSON.stringify(neu)));
-        console.log(`✅ Neuer Patient ${neu.id} in Firestore gespeichert.`);
+        await db.collection('users').doc(userId)
+          .collection('patients').doc(neu.id)
+          .set(JSON.parse(JSON.stringify(neu)));
+        console.log(`✅ Neuer Patient ${neu.id} unter User ${userId} gespeichert.`);
       } catch (error) {
         console.error("❌ Fehler beim Speichern in Firestore:", error);
       }
