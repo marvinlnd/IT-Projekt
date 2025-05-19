@@ -7,7 +7,7 @@
   <title>Aktivitäten</title>
   <link rel="icon" type="image/x-icon" href="../Bilder/IT_Projekt/Bild/favicon-32x32.png">
   <!-- Globale Styles -->
-  <link rel="stylesheet" href="../css/styles.css"> 
+  <link rel="stylesheet" href="../css/styles.css">
   <!-- Spezifische Styles -->
   <link rel="stylesheet" href="../css/aktivitäten.css">
 
@@ -90,48 +90,62 @@
   <div class="container">
     <!-- Linke Seite: Formular -->
     <div class="form-section animate__animated animate__fadeInLeft">
-      <h2>➕ Neue Aktivität hinzufügen</h2>
-      <p1>Name der Aktivität</p1>
-      <input type="text" id="nameDerAktivität" placeholder="Name der Aktivität">
-      <p1>Beginn der Aktivität</p1>
+      <details>
+        <summary style="font-size: 1.2em; cursor: pointer;">➕ Neue Aktivität hinzufügen</summary>
+        <div style="margin-top: 10px;">
+          <p>Name der Aktivität</p>
+          <input type="text" id="nameDerAktivität" placeholder="Name der Aktivität">
+          <p>Beginn der Aktivität</p>
+          <input type="time" id="beginn" min="4:00" max="23:00" step="900" placeholder="Beginn">
+          <p>Ende der Aktivität</p>
+          <input type="time" id="ende" min="4:00" max="23:00" step="900">
+          <p>Notizen</p>
+          <input type="text" id="notitz" placeholder="Notiz">
+          <button onclick="aktivitätHinzufügen(
+      document.getElementById('nameDerAktivität').value, 
+      document.getElementById('beginn').value, 
+      document.getElementById('ende').value, 
+      document.getElementById('notitz').value
+    )">Hinzufügen</button>
+        </div>
+      </details>
 
-      <input type="time" id="beginn" min="4:00" max="23:00" step="900" placeholder="Beginn">
-      <p1>Ende der Aktivität</p1>
 
-      <input type="time" id="ende" min="4:00" max="23:00" step="900">
-            <p1>Notizen</p1>
 
-      <input type="text" id="notitz" placeholder="Notiz">
-      <button onclick="aktivitätHinzufügen(
-        document.getElementById('nameDerAktivität').value, 
-        document.getElementById('beginn').value, 
-        document.getElementById('ende').value, 
-        document.getElementById('notitz').value
-      )">Hinzufügen</button>
+      <details>
+        <summary style="font-size: 1.2em; cursor: pointer;">🛠️ Aktivität bearbeiten</summary>
+        <div style="margin-top: 10px;">
+          <input type="number" id="index" placeholder="Index">
+          <p>Neuer Name</p>
+          <input type="text" id="neuerNameDerAktivität" placeholder="Neuer Name">
+          <p>Beginn der Aktivität ändern</p>
+          <input type="time" id="beginnÄndern" min="4:00" max="23:00" step="900">
+          <p>Ende der Aktivität ändern</p>
+          <input type="time" id="endeÄndern" min="4:00" max="23:59" step="900">
+          <p>Notitz ändern</p>
+          <input type="text" id="notitzÄndern" placeholder="Notiz ändern">
+          <button onclick="aktivität_bearbeiten(
+      parseInt(document.getElementById('index').value),
+      document.getElementById('neuerNameDerAktivität').value, 
+      document.getElementById('beginnÄndern').value, 
+      document.getElementById('endeÄndern').value, 
+      document.getElementById('notitzÄndern').value
+    )">Änderungen speichern</button>
+        </div>
+      </details>
 
-      <h2>🛠️ Aktivität bearbeiten</h2>
-      <input type="number" id="index" placeholder="Index">
-      <input type="text" id="neuerNameDerAktivität" placeholder="Neuer Name">
-      <input type="text" id="beginnÄndern" placeholder="Beginn ändern">
-      <input type="text" id="endeÄndern" placeholder="Ende ändern">
-      <input type="text" id="notitzÄndern" placeholder="Notiz ändern">
-      <button onclick="aktivität_bearbeiten(
-        parseInt(document.getElementById('index').value),
-        document.getElementById('neuerNameDerAktivität').value, 
-        document.getElementById('beginnÄndern').value, 
-        document.getElementById('endeÄndern').value, 
-        document.getElementById('notitzÄndern').value
-      )">Änderungen speichern</button>
-
-      <h2>🗑️ Aktivität löschen</h2>
-      <input type="number" id="indexLoeschen" placeholder="Index">
-      <button
-        onclick="aktivität_loeschen(parseInt(document.getElementById('indexLoeschen').value)); this.classList.add('animate__animated', 'animate__bounce'); setTimeout(() => this.classList.remove('animate__animated', 'animate__bounce'), 1000);">Löschen</button>
-
-      <br><br>
-      <button
-        onclick="if(confirm('⚠️ Wollen Sie wirklich ALLE Aktivitäten unwiderruflich löschen? ⚠️')) { localStorage.clear(); location.reload(); }">🪜
-        Alles löschen</button>
+      <details>
+        <summary style="font-size: 1.2em; cursor: pointer;">🗑️ Aktivität löschen</summary>
+        <div style="margin-top: 10px;">
+          <input type="number" id="indexLoeschen" placeholder="Index">
+          <button
+            onclick="aktivität_loeschen(parseInt(document.getElementById('indexLoeschen').value)); this.classList.add('animate__animated', 'animate__bounce'); setTimeout(() => this.classList.remove('animate__animated', 'animate__bounce'), 1000);">Löschen</button>
+          <br><br>
+          <button
+            onclick="if(confirm('⚠️ Wollen Sie wirklich ALLE Aktivitäten unwiderruflich löschen? ⚠️')) { localStorage.clear(); location.reload(); }">🪜
+            Alles löschen</button>
+        </div>
+      </details>
     </div>
 
     <!-- Rechte Seite: Tabelle -->
