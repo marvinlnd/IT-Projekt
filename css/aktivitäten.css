@@ -74,17 +74,17 @@
   margin-bottom: 8px;
   color: #004aad;
 }
-#krankenhistorieTabelle {
+#aktivitätenTabelle {
   width: 100%;
   border-collapse: collapse;
 }
-#krankenhistorieTabelle th,
-#krankenhistorieTabelle td {
+#aktivitätenTabelle th,
+#aktivitätenTabelle td {
   border: 1px solid #ccc;
   padding: 8px;
   text-align: left;
 }
-#krankenhistorieTabelle th {
+#aktivitätenTabelle th {
   background-color: #f2f2f2;
 }
 
