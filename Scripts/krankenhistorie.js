@@ -47,7 +47,7 @@ function speicherePatienten(liste) {
 // Firestore laden
 async function ladePatientVonFirestore(id) {
   try {
-    const doc = await db.collection('users').doc(userId).collection('patients').doc(id).get(); // ✅ FIX: richtige Collection & ID
+    const doc = await db.collection('users').doc(userId).collection('patients').doc(id).get(); 
     if (!doc.exists) {
       console.warn(`⚠️ Patient mit ID ${id} nicht gefunden.`);
       return;
@@ -77,7 +77,7 @@ async function speicherePatientNachFirestore(id, patient) {
         datumDerFeststellung: h.datumDerFeststellung
       }))
     };
-    await db.collection('users').doc(userId).collection('patients').doc(id).set(dataToSave); // ✅ KORRIGIERT
+    await db.collection('users').doc(userId).collection('patients').doc(id).set(dataToSave); 
     console.log("✅ Krankenhistorie in Firestore gespeichert.");
   } catch (err) {
     console.error("❌ Fehler beim Speichern in Firestore:", err.message);
@@ -156,13 +156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return name.length >= 2;
   }
 
-  function validateDate(datum) {
-    const regex = /^\d{2}\.\d{2}\.\d{4}$/;
-    if (!regex.test(datum)) return false;
-    const [tag, monat, jahr] = datum.split('.').map(Number);
-    const date = new Date(jahr, monat - 1, tag);
-    return date <= new Date();
-  }
+
 
   // Prefill bei Eingabe von Index
   idxIn.addEventListener('input', () => {
@@ -189,10 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       valid = false;
     }
 
-    if (datum && !validateDate(datum)) {
-      showError(datumIn, 'Datum muss im Format DD.MM.YYYY sein und nicht in der Zukunft liegen.');
-      valid = false;
-    }
+
 
     if (!valid) return;
 
