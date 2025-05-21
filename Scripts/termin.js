@@ -13,8 +13,10 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 console.log("✅ Firebase initialisiert!");
 
+const userId = localStorage.getItem("user-id");
+
 document.addEventListener('DOMContentLoaded', async () => {
-  const calendarEl    = document.getElementById('calendar');
+  const calendarEl = document.getElementById('calendar');
   const formContainer = document.getElementById('event-form-container');
 
   const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -41,12 +43,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Events aus Firestore laden
   try {
-    const snapshot = await db.collection("appointments").get();
+    const snapshot = await db.collection("users").doc(userId).collection("appointments").get();
     let count = 0;
     snapshot.forEach(doc => {
       const event = doc.data();
       if (event && event.title && event.start) {
-        event.id = doc.id; // <-- ID aus Firestore übernehmen
+        event.id = doc.id;
         calendar.addEvent(event);
         count++;
       } else {
@@ -120,7 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (confirm('Termin wirklich löschen?')) {
           existingEvent.remove();
           try {
-            await db.collection('appointments').doc(existingEvent.id).delete();
+            await db.collection('users').doc(userId).collection('appointments').doc(existingEvent.id).delete();
             console.log(`✅️ Termin erfolgreich gelöscht: ${existingEvent.id}`);
           } catch (error) {
             console.error("❌ Fehler beim Löschen in Firestore:", error);
@@ -134,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       e.preventDefault();
       const title = document.getElementById('evt-title').value.trim();
       const start = document.getElementById('evt-start').value;
-      const end   = document.getElementById('evt-end').value;
+      const end = document.getElementById('evt-end').value;
       const eventData = { title, start, end, allDay: false };
 
       if (existingEvent) {
@@ -142,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         existingEvent.setStart(start);
         existingEvent.setEnd(end);
         try {
-          await db.collection('appointments').doc(existingEvent.id).set({
+          await db.collection('users').doc(userId).collection('appointments').doc(existingEvent.id).set({
             id: existingEvent.id,
             ...eventData
           });
@@ -152,9 +154,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       } else {
         const newId = Date.now().toString();
-        const newEvent = calendar.addEvent({ ...eventData, id: newId });
+        calendar.addEvent({ ...eventData, id: newId });
         try {
-          await db.collection('appointments').doc(newId).set({
+          await db.collection('users').doc(userId).collection('appointments').doc(newId).set({
             id: newId,
             ...eventData
           });
@@ -175,9 +177,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Mobile View-Switcher
-  const viewButton   = document.getElementById('view-button');
+  const viewButton = document.getElementById('view-button');
   const viewDropdown = document.getElementById('view-dropdown');
-  const viewItems    = Array.from(viewDropdown.querySelectorAll('li'));
+  const viewItems = Array.from(viewDropdown.querySelectorAll('li'));
 
   viewButton.addEventListener('click', () => {
     const open = viewDropdown.classList.toggle('open');

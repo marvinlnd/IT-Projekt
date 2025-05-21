@@ -13,7 +13,8 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 console.log("✅ Firebase für Aktivitäten initialisiert!");
 
-// Klasse für Aktivitäten
+const userId = localStorage.getItem("user-id");
+
 class Aktivität {
   constructor(nameDerAktivität, beginn, ende, notitz) {
     this.nameDerAktivität = nameDerAktivität;
@@ -28,7 +29,7 @@ let aktivitäten = [];
 // Daten aus Firestore laden
 async function ladeAktivitäten() {
   try {
-    const snapshot = await db.collection("Activities").get();
+    const snapshot = await db.collection('users').doc(userId).collection('aktivitäten').get();
     aktivitäten = [];
     snapshot.forEach(doc => {
       const eintrag = doc.data();
@@ -47,13 +48,13 @@ async function aktivitätHinzufügen(name, beginn, ende, notitz) {
 
   const neueAktivität = {
     nameDerAktivität: name,
-    beginn: beginn,
-    ende: ende,
-    notitz: notitz
+    beginn,
+    ende,
+    notitz
   };
 
   try {
-    const docRef = await db.collection("Activities").add(neueAktivität);
+    const docRef = await db.collection('users').doc(userId).collection('aktivitäten').add(neueAktivität);
     console.log("✅ Aktivität hinzugefügt:", docRef.id);
     await ladeAktivitäten();
   } catch (error) {
@@ -71,7 +72,7 @@ async function aktivität_loeschen(index) {
 
   if (confirm("❓ Willst du diese Aktivität wirklich löschen?❓")) {
     try {
-      await db.collection("Activities").doc(eintrag.id).delete();
+      await db.collection("users").doc(userId).collection("aktivitäten").doc(eintrag.id).delete();
       console.log("✅ Aktivität aus Firestore gelöscht:", eintrag.id);
       await ladeAktivitäten();
     } catch (error) {
@@ -98,7 +99,7 @@ async function aktivität_bearbeiten(index, neuerName, neuBeginn, neuEnde, neueN
   };
 
   try {
-    await db.collection("Activities").doc(eintrag.id).set(aktualisiert);
+    await db.collection("users").doc(userId).collection("aktivitäten").doc(eintrag.id).set(aktualisiert);
     console.log("✅ Aktivität in Firestore aktualisiert:", eintrag.id);
     await ladeAktivitäten();
   } catch (error) {
@@ -124,7 +125,7 @@ function aktualisiereTabelle() {
   });
 }
 
-// Gültigkeit prüfen (Hilfsfunktion – muss von dir oder separat definiert sein)
+// Validierung
 function validiereAktivitaet(name, beginn, ende, notitz) {
   if (!name || !beginn || !ende) {
     alert("Bitte alle Pflichtfelder ausfüllen!");
@@ -133,5 +134,5 @@ function validiereAktivitaet(name, beginn, ende, notitz) {
   return true;
 }
 
-// Beim Laden initiale Daten holen
+// Initiales Laden
 document.addEventListener("DOMContentLoaded", ladeAktivitäten);
