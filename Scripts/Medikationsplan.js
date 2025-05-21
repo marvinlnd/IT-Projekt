@@ -12,6 +12,9 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 console.log("✅ Firebase initialisiert!");
 
+const userId = localStorage.getItem("user-id");
+
+
 class Medikation {
   constructor(medikament, anzahl, tageszeit, wochentage) {
     this.medikament = medikament;
@@ -46,8 +49,7 @@ function speicherePatienten(list) {
 
 async function ladePatientVonFirestore(id) {
   try {
-    const doc = await db.collection('patients').doc(id).get();
-    if (!doc.exists) {
+    const doc = await db.collection('users').doc(userId).collection('patients').doc(id).get(); if (!doc.exists) {
       console.warn(`⚠️ Patient mit ID ${id} nicht gefunden.`);
       return;
     }

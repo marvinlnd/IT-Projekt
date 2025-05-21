@@ -1,12 +1,9 @@
-
-// javascript/krankenhistorie.js 
-
 // Firebase initialisieren
 const firebaseConfig = {
   apiKey: "AIzaSyAakpWbT87pJ4Bv1Xr0Mk2lCNhNols7KR4",
   authDomain: "it-projekt-ffc4d.firebaseapp.com",
   projectId: "it-projekt-ffc4d",
-  storageBucket: "it-projekt-ffc4d.firebasestorage.app",
+  storageBucket: "it-projekt-ffc4d.appspot.com", // ❗ KORRIGIERT
   messagingSenderId: "534546734981",
   appId: "1:534546734981:web:13bffd7c78893bd0e3aeec"
 };
@@ -14,6 +11,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 console.log("✅ Firebase initialisiert!");
+
+const userId = localStorage.getItem("user-id");
 
 // Klasse für einen History-Eintrag
 class Krankheit {
@@ -30,9 +29,9 @@ class Krankheit {
 
 // LocalStorage-Helfer
 const STORAGE_KEY = 'patientListe';
+
 function ladePatienten() {
   const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  // Krankheit-Objekte wiederherstellen
   data.forEach(p => {
     if (Array.isArray(p.history)) {
       p.history = p.history.map(h => new Krankheit(h.nameDerKrankheit, h.datumDerFeststellung));
@@ -40,6 +39,7 @@ function ladePatienten() {
   });
   return data;
 }
+
 function speicherePatienten(liste) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(liste));
 }
@@ -47,7 +47,7 @@ function speicherePatienten(liste) {
 // Firestore laden
 async function ladePatientVonFirestore(id) {
   try {
-    const doc = await db.collection('patients').doc(id).get();
+    const doc = await db.collection('users').doc(userId).collection('patients').doc(id).get(); // ✅ FIX: richtige Collection & ID
     if (!doc.exists) {
       console.warn(`⚠️ Patient mit ID ${id} nicht gefunden.`);
       return;
@@ -77,26 +77,31 @@ async function speicherePatientNachFirestore(id, patient) {
         datumDerFeststellung: h.datumDerFeststellung
       }))
     };
-    await db.collection('patients').doc(id).set(dataToSave);
+    await db.collection('users').doc(userId).collection('patients').doc(id).set(dataToSave); // ✅ KORRIGIERT
     console.log("✅ Krankenhistorie in Firestore gespeichert.");
   } catch (err) {
     console.error("❌ Fehler beim Speichern in Firestore:", err.message);
   }
 }
 
+// DOM ready
 document.addEventListener('DOMContentLoaded', async () => {
-  // Patientendaten aus URL laden
   const params = new URLSearchParams(location.search);
   const id = params.get('id');
+  if (!id) {
+    console.error("❌ Kein Patient-ID in der URL gefunden.");
+    return;
+  }
 
   await ladePatientVonFirestore(id);
 
   const patientListe = ladePatienten();
   const patient = patientListe.find(p => p.id === id);
   if (!patient) {
-    console.error('Patient nicht gefunden:', id);
+    console.error('❌ Patient nicht gefunden:', id);
     return;
   }
+
   const history = patient.history || [];
 
   // Patientennamen im Header anzeigen
@@ -104,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const { vorname = '', nachname = '' } = patient.personalData || {};
   nameElem.textContent = `Patient: ${vorname} ${nachname}`.trim();
 
-  // DOM-Referenzen
+  // DOM-Elemente
   const tblBody    = document.querySelector('#krankenhistorieTabelle tbody');
   const nameIn     = document.getElementById('nameDerKrankheit');
   const datumIn    = document.getElementById('datumDerFeststellung');
@@ -120,7 +125,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const clearBtn   = document.getElementById('clear-history');
 
-  // Tabelle rendern
+  // Tabelle anzeigen
   function renderTable() {
     tblBody.innerHTML = '';
     history.forEach((eintrag, i) => {
@@ -134,11 +139,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Fehler-Handling
   function clearErrors(section) {
     section.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
     section.querySelectorAll('.error-message').forEach(el => el.remove());
   }
+
   function showError(inputElem, message) {
     inputElem.classList.add('error');
     const msg = document.createElement('div');
@@ -147,20 +152,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     inputElem.insertAdjacentElement('afterend', msg);
   }
 
-  // Validierungen
   function validateName(name) {
     return name.length >= 2;
   }
-  function validateDate(dateStr) {
-    const parts = dateStr.split('.');
-    if (parts.length !== 3) return false;
-    const [d, m, y] = parts.map(p => parseInt(p, 10));
-    const dt = new Date(y, m - 1, d);
-    if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return false;
-    return dt <= new Date();
+
+  function validateDate(datum) {
+    const regex = /^\d{2}\.\d{2}\.\d{4}$/;
+    if (!regex.test(datum)) return false;
+    const [tag, monat, jahr] = datum.split('.').map(Number);
+    const date = new Date(jahr, monat - 1, tag);
+    return date <= new Date();
   }
 
-  // Auto-Prefill beim Index-Eingeben
+  // Prefill bei Eingabe von Index
   idxIn.addEventListener('input', () => {
     clearErrors(document.querySelector('.form-section'));
     const i = parseInt(idxIn.value, 10);
@@ -176,21 +180,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Hinzufügen
   addBtn.addEventListener('click', async () => {
     clearErrors(document.querySelector('.form-section'));
-    const name  = nameIn.value.trim();
+    const name = nameIn.value.trim();
     const datum = datumIn.value.trim();
     let valid = true;
+
     if (!validateName(name)) {
       showError(nameIn, 'Bitte gib einen gültigen Namen (mind. 2 Zeichen) ein.');
       valid = false;
     }
-    if (!validateDate(datum)) {
-      showError(datumIn, 'Bitte gib ein gültiges Datum im Format DD.MM.YYYY ein (kein zukünftiges Datum).');
+
+    if (datum && !validateDate(datum)) {
+      showError(datumIn, 'Datum muss im Format DD.MM.YYYY sein und nicht in der Zukunft liegen.');
       valid = false;
     }
+
     if (!valid) return;
+
     history.push(new Krankheit(name, datum));
     speicherePatienten(patientListe);
-    console.log("✅ Krankheit lokal hinzugefügt.");
     await speicherePatientNachFirestore(id, patient);
     renderTable();
     nameIn.value = '';
@@ -205,22 +212,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       showError(idxIn, 'Ungültiger Index.');
       return;
     }
+
     const name  = newNameIn.value.trim();
     const datum = newDatumIn.value.trim();
     let valid = true;
+
     if (name && !validateName(name)) {
-      showError(newNameIn, 'Neuer Name muss mind. 2 Zeichen lang sein.');
+      showError(newNameIn, 'Name zu kurz.');
       valid = false;
     }
+
     if (datum && !validateDate(datum)) {
-      showError(newDatumIn, 'Datum muss im Format DD.MM.YYYY sein und darf nicht in der Zukunft liegen.');
+      showError(newDatumIn, 'Ungültiges Datum.');
       valid = false;
     }
+
     if (!valid) return;
-    if (name)  history[i].nameDerKrankheit      = name;
+
+    if (name)  history[i].nameDerKrankheit = name;
     if (datum) history[i].datumDerFeststellung = datum;
+
     speicherePatienten(patientListe);
-    console.log(`✅ Krankheit #${i} lokal bearbeitet.`);
     await speicherePatientNachFirestore(id, patient);
     renderTable();
     idxIn.value = newNameIn.value = newDatumIn.value = '';
@@ -234,27 +246,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       showError(delIdxIn, 'Ungültiger Index.');
       return;
     }
+
     const entfernt = history.splice(i, 1);
     speicherePatienten(patientListe);
-    console.log(`✅ Krankheit gelöscht: ${entfernt[0].nameDerKrankheit}`);
     await speicherePatientNachFirestore(id, patient);
     renderTable();
     delIdxIn.value = '';
   });
 
-  // Alles löschen (ohne Reload)
-  clearBtn.addEventListener('click', async (e) => {
+  // Alles löschen
+  clearBtn.addEventListener('click', async e => {
     e.preventDefault();
     if (confirm('Möchtest du wirklich alle Einträge löschen?')) {
       history.length = 0;
       patient.history = history;
       speicherePatienten(patientListe);
-      console.log("✅ Alle Krankheiten lokal gelöscht.");
       await speicherePatientNachFirestore(id, patient);
       renderTable();
     }
   });
 
-  // Initialer Aufruf
+  // Start
   renderTable();
 });
