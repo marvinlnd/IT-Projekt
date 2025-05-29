@@ -104,6 +104,23 @@
 #medikationsTabelle th {
   background-color: #f5f5f5;
 }
+/* Make all rows ready for smooth transitions */
+#medikationsTabelle tbody tr {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* When a row gets the “selected” class, fade in a soft green... */
+#medikationsTabelle tbody tr.selected {
+  background-color: #e0f7e9;  /* very light mint-green */
+  animation: pulse 0.6s ease-out;
+}
+
+/* Define the pulse keyframes */
+@keyframes pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
 
 /* Responsive */
 @media (max-width: 800px) {

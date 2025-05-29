@@ -175,22 +175,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     return ok;
   }
 
-  function render() {
-    tableBody.innerHTML = '';
-    plan.forEach((m, i) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${i}</td><td>${m.medikament}</td><td>${m.anzahl}</td><td>${m.tageszeit}</td><td>${m.wochentage}</td>`;
-      tableBody.appendChild(tr);
+function render() {
+  tableBody.innerHTML = '';
+  idxSelect.innerHTML = '';
+  delSelect.innerHTML = '';
+
+  plan.forEach((m, i) => {
+    // 1) Build row
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i}</td>
+      <td>${m.medikament}</td>
+      <td>${m.anzahl}</td>
+      <td>${m.tageszeit}</td>
+      <td>${m.wochentage}</td>
+    `;
+
+    // 2) Click handler: select & prefill
+    tr.addEventListener('click', () => {
+      // a) Highlight only this row
+      tableBody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
+      tr.classList.add('selected');
+
+      // b) Fill “edit” dropdown & inputs
+      idxSelect.value = i;
+      newNameIn.value   = m.medikament;
+      newAnzahlIn.value = m.anzahl.replace(/\s*\w+$/, '');    // strip unit
+      neueEinheitIn.value = m.anzahl.split(' ').slice(1).join(' ');
+      newZeitIn.value   = m.tageszeit;
+      newWochIn.value   = m.wochentage;
+
+      // c) Fill delete dropdown
+      delSelect.value = i;
     });
 
-    idxSelect.innerHTML = '';
-    delSelect.innerHTML = '';
-    plan.forEach((m, i) => {
-      const opt = new Option(`${i}: ${m.medikament}`, i);
-      idxSelect.add(opt.cloneNode(true));
-      delSelect.add(opt.cloneNode(true));
-    });
+    tableBody.appendChild(tr);
+
+    // 3) Also rebuild the two select-lists
+    const opt = new Option(`${i}: ${m.medikament}`, i);
+    idxSelect.add(opt.cloneNode(true));
+    delSelect.add(opt.cloneNode(true));
+  });
   }
+
 
   addBtn.addEventListener('click', async () => {
     if (!validate()) {

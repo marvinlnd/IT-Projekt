@@ -125,19 +125,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const clearBtn   = document.getElementById('clear-history');
 
-  // Tabelle anzeigen
-  function renderTable() {
-    tblBody.innerHTML = '';
-    history.forEach((eintrag, i) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${i}</td>
-        <td>${eintrag.nameDerKrankheit}</td>
-        <td>${eintrag.datumDerFeststellung}</td>
-      `;
-      tblBody.appendChild(tr);
+function renderTable() {
+  // Clear out old rows
+  tblBody.innerHTML = '';
+
+  history.forEach((eintrag, i) => {
+    // Create the row
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${i}</td>
+      <td>${eintrag.nameDerKrankheit}</td>
+      <td>${eintrag.datumDerFeststellung}</td>
+    `;
+
+    // 1) Klick-Handler fürs Auswählen
+    row.addEventListener("click", () => {
+      // a) Markiere nur diese Zeile als selected
+      tblBody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
+      row.classList.add("selected");
+
+      // b) Befülle Index- und Edit-Inputs mit 'i'
+      idxIn.value      = i;
+      newNameIn.value  = eintrag.nameDerKrankheit;
+      newDatumIn.value = eintrag.datumDerFeststellung;
+      delIdxIn.value   = i;
     });
+
+    // 2) Hänge die mit Handler versehenen row ans tbody
+    tblBody.appendChild(row);
+  });
   }
+
 
   function clearErrors(section) {
     section.querySelectorAll('.error').forEach(el => el.classList.remove('error'));

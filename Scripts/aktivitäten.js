@@ -107,23 +107,40 @@ async function aktivität_bearbeiten(index, neuerName, neuBeginn, neuEnde, neueN
   }
 }
 
-// Tabelle aktualisieren
+// Tabelle aktualisieren & Zeilen klickbar machen
 function aktualisiereTabelle() {
   const tbody = document.querySelector("#aktivitätenTabelle tbody");
   tbody.innerHTML = "";
 
   aktivitäten.forEach((eintrag, index) => {
-    const zeile = document.createElement("tr");
-    zeile.innerHTML = `
+    const row = document.createElement("tr");
+    row.innerHTML = `
       <td>${index}</td>
       <td>${eintrag.nameDerAktivität}</td>
       <td>${eintrag.beginn}</td>
       <td>${eintrag.ende}</td>
       <td>${eintrag.notitz}</td>
     `;
-    tbody.appendChild(zeile);
+
+    // 1) Klick-Handler fürs Auswählen
+    row.addEventListener("click", () => {
+      // a) Markiere die selektierte Zeile
+      tbody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
+      row.classList.add("selected");
+
+      // b) Fülle die Edit- und Delete-Inputs
+      document.getElementById("index").value = index;
+      document.getElementById("neuerNameDerAktivität").value = eintrag.nameDerAktivität;
+      document.getElementById("beginnÄndern").value = eintrag.beginn;
+      document.getElementById("endeÄndern").value = eintrag.ende;
+      document.getElementById("notitzÄndern").value = eintrag.notitz;
+      document.getElementById("indexLoeschen").value = index;
+    });
+
+    tbody.appendChild(row);
   });
 }
+
 
 // Validierung
 function validiereAktivitaet(name, beginn, ende, notitz) {
