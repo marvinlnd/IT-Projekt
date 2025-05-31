@@ -19,6 +19,7 @@ class Patient {
     this.personalData = { vorname, nachname, email, telefon, adresse, geburtsdatum };
     this.history = [];
     this.medicationPlan = [];
+    this.aerzte = [];
   }
 }
 
@@ -38,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnPersonal = document.getElementById('btn-personal');
   const btnHistory = document.getElementById('btn-history');
   const btnMedication = document.getElementById('btn-medication');
+  const btnaerzte = document.getElementById('btn-doctor')
   const btnDelete = document.getElementById('btn-delete');
   const searchInput = document.getElementById('search-input');
 
@@ -99,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnPersonal.onclick = () => location.href = `PersoenlicheDaten.html?id=${id}`;
     btnHistory.onclick = () => location.href = `Krankenhistorie.html?id=${id}`;
     btnMedication.onclick = () => location.href = `Medikationsplan.html?id=${id}`;
+    btnaerzte.onclick = () => location.href = `Ärzte.html?id=${id}`;
     btnDelete.onclick = () => deletePatient(id);
   }
 
