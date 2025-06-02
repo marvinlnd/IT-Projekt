@@ -14,6 +14,8 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+
 
 </head>
 
@@ -62,10 +64,44 @@
           </tr>
         </thead>
         <tbody>
-          <!-- wird später per JS befüllt -->
+          <!-- JavaScript -->
         </tbody>
       </table>
     </section>
   </main>
+  
+  <script src="../Scripts/Dokumente.js" defer></script>
+  
+ <!-- Vorschau-Modal -->
+<div id="preview-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content: center; align-items: center;">
+
+
+  <!-- Button oben rechts über dem Fenster -->
+  <button id="close-preview-btn" style="
+    position: absolute;
+    top: calc(5% - 45px);   
+    right: 5%;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 11px 12px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    z-index: 10000;
+  ">✖️ Schließen</button>
+
+  <!-- Vorschau-Fenster -->
+  <iframe id="preview-frame" style="
+    width: 90%;
+    height: 90%;
+    border: none;
+    border-radius: 8px;
+    background: #fff;
+    display: block;
+  "></iframe>
+</div>
+
+
+
 </body>
 </html>
