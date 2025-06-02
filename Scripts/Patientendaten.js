@@ -3,7 +3,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAakpWbT87pJ4Bv1Xr0Mk2lCNhNols7KR4",
   authDomain: "it-projekt-ffc4d.firebaseapp.com",
   projectId: "it-projekt-ffc4d",
-  storageBucket: "it-projekt-ffc4d.appspot.com", // ✅ Korrigiert!
+  storageBucket: "it-projekt-ffc4d.firebasestorage.app",  
   messagingSenderId: "534546734981",
   appId: "1:534546734981:web:13bffd7c78893bd0e3aeec"
 };
@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnHistory = document.getElementById('btn-history');
   const btnMedication = document.getElementById('btn-medication');
   const btnaerzte = document.getElementById('btn-doctor')
+  const btnDocument = document.getElementById('btn-document');
   const btnDelete = document.getElementById('btn-delete');
   const searchInput = document.getElementById('search-input');
 
@@ -102,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnHistory.onclick = () => location.href = `Krankenhistorie.html?id=${id}`;
     btnMedication.onclick = () => location.href = `Medikationsplan.html?id=${id}`;
     btnaerzte.onclick = () => location.href = `Ärzte.html?id=${id}`;
+	btnDocument.onclick = () => location.href = `Dokumente.html?id=${id}`;
     btnDelete.onclick = () => deletePatient(id);
   }
 
