@@ -82,7 +82,7 @@ async function speicherePatientNachFirestore(id, patient) {
         wochentage: m.wochentage
       }))
     };
-    await db.collection('patients').doc(id).set(dataToSave);
+    await db.collection('users').doc(userId).collection('patients').doc(id).set(dataToSave);
     console.log("✅ Medikationsplan in Firestore gespeichert.");
   } catch (err) {
     console.error("❌ Fehler beim Speichern in Firestore:", err.message);
