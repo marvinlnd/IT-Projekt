@@ -20,14 +20,12 @@ const indexLoeschenDropdown = document.getElementById("indexLoeschenDropdown");
 // Daten abrufen und anzeigen
 function ladeDaten() {
   arztRef.get().then(snapshot => {
-    tabelle.innerHTML = "";
-    indexDropdown.innerHTML = "";
-    indexLoeschenDropdown.innerHTML = "";
+    const tbody = document.querySelector("#arztTabelle tbody");
+    tbody.innerHTML = "";
 
     snapshot.docs.forEach((doc, index) => {
       const daten = doc.data();
 
-      // Tabelle befüllen
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${index}</td>
@@ -37,15 +35,38 @@ function ladeDaten() {
         <td>${daten.telefon}</td>
         <td>${daten.adresse}</td>
       `;
-      tabelle.appendChild(row);
 
-      // Dropdowns befüllen
+      row.addEventListener("click", () => {
+        // Markierung der gewählten Zeile
+        tbody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
+        row.classList.add("selected");
+
+        // Felder zum Bearbeiten füllen
+        document.getElementById("neuerArztname").value = daten.name || "";
+        document.getElementById("neueFach").value = daten.fach || "";
+        document.getElementById("neueEMail").value = daten.email || "";
+        document.getElementById("neueTelefonnummer").value = daten.telefon || "";
+        document.getElementById("neueAdresse").value = daten.adresse || "";
+
+        // Dokument-ID für spätere Bearbeitung/Löschung zwischenspeichern
+        document.getElementById("indexDropdown").value = doc.id;
+        document.getElementById("indexLoeschenDropdown").value = doc.id;
+      });
+
+      tbody.appendChild(row);
+
+      // Dropdowns mit IDs aktualisieren
       const option = new Option(`${daten.name} (${index})`, doc.id);
-      indexDropdown.appendChild(option);
-      indexLoeschenDropdown.appendChild(option.cloneNode(true));
+      document.getElementById("indexDropdown").appendChild(option);
+      document.getElementById("indexLoeschenDropdown").appendChild(option.cloneNode(true));
     });
+
+    console.log(`✅ ${snapshot.size} Ärzte geladen.`);
+  }).catch(error => {
+    console.error("❌ Fehler beim Laden der Daten:", error);
   });
 }
+
 
 // Arzt hinzufügen
 document.getElementById("add-med").addEventListener("click", () => {

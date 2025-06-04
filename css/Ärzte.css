@@ -90,6 +90,17 @@
 #arztTabelle th {
   background-color: #f5f5f5;
 }
+/* Make all rows ready for smooth transitions */
+#arztTabelle tbody tr {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* When a row gets the “selected” class, fade in a soft green...*/
+#arztTabelle tbody tr.selected {
+  background-color: #e0f7e9;  /* very light mint-green */
+  animation: pulse 0.6s ease-out;
+}
+
 
 /* Responsive */
 @media (max-width: 800px) {
