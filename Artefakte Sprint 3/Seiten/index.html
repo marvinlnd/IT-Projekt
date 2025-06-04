@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MediAssist</title>
+  <link rel="icon" type="image/x-icon" href="../Bilder/IT_Projekt/Bild/favicon-32x32.png">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <a href="index.html" class="logo">
+      <img src="../Bilder/IT_Projekt/Bild/logo.png" alt="MediAssist Logo" />
+    </a>
+    <div class="tools">
+      <!-- Sprach-Dropdown -->
+      <div class="language-switcher">
+        <button
+          id="lang-button"
+          type="button"
+          aria-haspopup="true"
+          aria-controls="lang-dropdown"
+          aria-expanded="false"
+        >
+          DE <span class="arrow">▾</span>
+        </button>
+        <ul id="lang-dropdown" class="lang-dropdown" role="menu">
+          <li role="menuitem" tabindex="-1" data-lang="de">DE</li>
+          <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
+        </ul>
+      </div>
+      <!-- Login/Registrierung -->
+      <div class="login-icon" id="login-icon" title="Login/Registrieren">
+      <a href="Login_Registrieren.html">
+       <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User" />
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dashboard-Kacheln -->
+  <main class="dashboard">
+    <a href="../Seiten/Patienten.html" class="card" data-name="Patienten">
+      <div class="icon"><img src="../Bilder/IT_Projekt/Bild/Patient-icon.png" alt=""></div>
+      <h2 data-key="card.patienten">Patienten</h2>
+    </a>
+    <a href="../Seiten/termin.html" class="card" data-name="Termine">
+      <div class="icon"><img src="../Bilder/IT_Projekt/Bild/icon-calendar.png" alt=""></div>
+      <h2 data-key="card.termine">Termine</h2>
+    </a>
+    <a href="../Seiten/aktivitäten.html" class="card" data-name="Begleitprotokoll">
+      <div class="icon"><img src="../Bilder/IT_Projekt/Bild/notiz-icon.png" alt=""></div>
+      <h2 data-key="card.notizen">Begleitprotokoll</h2>
+    </a>
+  </main>
+
+  <!-- Footer-Links -->
+  <footer class="footer-nav">
+    <ul>
+      <li><a href="../Seiten/Datenschutzerklärung.html" data-key="footer.termine">Datenschutzerklärung</a></li>
+      <li><a href="../Seiten/Impressum.html" data-key="footer.zeit">Impressum</a></li>
+    </ul>
+  </footer>
+
+  <script src="../Scripts/script.js"></script>
+</body>
+</html>

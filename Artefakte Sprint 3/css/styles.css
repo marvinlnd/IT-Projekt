@@ -1,0 +1,206 @@
+/* 1) Reset & Basis */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  color: #333;
+  line-height: 1.4;
+}
+
+/* 2) Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+.header .logo img {
+  width: 230px;
+  height: 80px;
+}
+.header .logo {
+  transition: transform 0.3s ease;
+}
+
+.header .logo:hover,
+.header .logo:focus {
+  transform: scale(1.05);
+}
+.header .tools {
+  display: flex;
+  align-items: center;
+}
+
+/* Sprachdropdown */
+.language-switcher {
+  position: relative;
+  font-size: 0.875rem;
+  margin: 0 10px;
+}
+#lang-button {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 5px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+#lang-button .arrow {
+  margin-left: 4px;
+  font-size: 1rem;
+}
+.lang-dropdown {
+  display: none;
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  list-style: none;
+  padding: 4px 0;
+  z-index: 1000;
+  min-width: 100%;
+}
+.lang-dropdown.open {
+  display: block;
+}
+.lang-dropdown li {
+  padding: 8px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.lang-dropdown li:hover,
+.lang-dropdown li:focus {
+  background-color: #f0f0f0;
+  outline: none;
+}
+
+/* Login-Icon */
+.login-icon {
+  margin-left: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.login-icon img {
+  width: 27px;
+  height: 27px;
+}
+
+/* 3) Dashboard-Kacheln */
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  padding: 24px;
+}
+.card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  text-align: center;
+  padding: 24px 16px;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.card .icon img {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 12px;
+}
+.card h2 {
+  font-size: 1rem;
+  color: #004aad;
+}
+.dashboard a.card {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 4) Footer-Links */
+.footer-nav {
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+}
+.footer-nav ul {
+  display: flex;
+  list-style: none;
+  justify-content: center;
+  padding: 8px 16px;
+}
+.footer-nav li + li {
+  margin-left: 40px;
+}
+.footer-nav a {
+  text-decoration: none;
+  color: #0078d4;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 760px) {
+  .dashboard {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 16px;
+  }
+  .footer-nav ul {
+    padding: 6px 12px;
+  }
+}
+/* Responsive für Smartphone (<=480px) */
+@media (max-width: 480px) {
+  /* Header: Logo links, Tools rechts in einer Reihe */
+  .header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+  }
+  .header .tools {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Abstand zwischen Sprachwechsel & Login */
+    margin-top: 0;
+  }
+
+  /* Sprachdropdown und Login nebeneinander */
+  .language-switcher {
+    margin: 0;
+  }
+  .login-icon {
+    margin: 0;
+  }
+
+  /* Kleinere Icons im Tools-Bereich */
+  .header .tools img {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Dashboard einspaltig */
+  .dashboard {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+  /* Footer vertikal */
+  .footer-nav ul {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .footer-nav li + li {
+    margin-top: 8px;
+    margin-left: 0;
+  }
+}

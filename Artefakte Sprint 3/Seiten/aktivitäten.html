@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <meta charset="UTF-8">
+  <title>Aktivitäten</title>
+  <link rel="icon" type="image/x-icon" href="../Bilder/IT_Projekt/Bild/favicon-32x32.png">
+  <!-- Globale Styles -->
+  <link rel="stylesheet" href="../css/styles.css">
+  <!-- Spezifische Styles -->
+  <link rel="stylesheet" href="../css/aktivitäten.css">
+
+  <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <!-- Logo klickbar -->
+    <a href="index.html" class="logo">
+      <img src="../Bilder/IT_Projekt/Bild/Logo.png" alt="MediAssist Logo" style="width: 250px; height: auto;">
+    </a>
+
+    <div class="tools">
+      <!-- Sprach-Dropdown -->
+      <div class="language-switcher">
+        <button id="lang-button" type="button" aria-haspopup="true" aria-controls="lang-dropdown" aria-expanded="false">
+          DE <span class="arrow">▾</span>
+        </button>
+        <ul id="lang-dropdown" class="lang-dropdown" role="menu">
+          <li role="menuitem" tabindex="-1" data-lang="de">DE</li>
+          <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
+        </ul>
+      </div>
+
+      <!-- Login / Registrierung -->
+      <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
+      <a href="Login_Registrieren.html">
+       <img src="../Bilder/IT_Projekt/Bild/login-icon.png" alt="User" />
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <h1 class="animate__animated animate__zoomIn">🗓️ Aktivitäten bearbeiten</h1>
+
+  <div class="container">
+    <!-- Linke Seite: Formular -->
+    <div class="form-section animate__animated animate__fadeInLeft">
+      <details>
+        <summary style="font-size: 1.2em; cursor: pointer;">➕ Neue Aktivität hinzufügen</summary>
+        <div style="margin-top: 10px;">
+          <p>Name der Aktivität</p>
+          <input type="text" id="nameDerAktivität" placeholder="Name der Aktivität">
+          <p>Beginn der Aktivität</p>
+          <input type="time" id="beginn" min="4:00" max="23:00" step="900" placeholder="Beginn">
+          <p>Ende der Aktivität</p>
+          <input type="time" id="ende" min="4:00" max="23:00" step="900">
+          <p>Notizen</p>
+          <input type="text" id="notitz" placeholder="Notiz">
+          <button onclick="aktivitätHinzufügen(
+      document.getElementById('nameDerAktivität').value, 
+      document.getElementById('beginn').value, 
+      document.getElementById('ende').value, 
+      document.getElementById('notitz').value
+    )">Hinzufügen</button>
+        </div>
+      </details>
+
+
+
+      <details>
+        <summary style="font-size: 1.2em; cursor: pointer;">🛠️ Aktivität bearbeiten</summary>
+        <div style="margin-top: 10px;">
+          <input type="number" id="index" placeholder="Index">
+          <p>Neuer Name</p>
+          <input type="text" id="neuerNameDerAktivität" placeholder="Neuer Name">
+          <p>Beginn der Aktivität ändern</p>
+          <input type="time" id="beginnÄndern" min="4:00" max="23:00" step="900">
+          <p>Ende der Aktivität ändern</p>
+          <input type="time" id="endeÄndern" min="4:00" max="23:59" step="900">
+          <p>Notitz ändern</p>
+          <input type="text" id="notitzÄndern" placeholder="Notiz ändern">
+          <button onclick="aktivität_bearbeiten(
+      parseInt(document.getElementById('index').value),
+      document.getElementById('neuerNameDerAktivität').value, 
+      document.getElementById('beginnÄndern').value, 
+      document.getElementById('endeÄndern').value, 
+      document.getElementById('notitzÄndern').value
+    )">Änderungen speichern</button>
+        </div>
+      </details>
+
+      <details>
+        <summary style="font-size: 1.2em; cursor: pointer;">🗑️ Aktivität löschen</summary>
+        <div style="margin-top: 10px;">
+          <input type="number" id="indexLoeschen" placeholder="Index">
+          <button
+            onclick="aktivität_loeschen(parseInt(document.getElementById('indexLoeschen').value)); this.classList.add('animate__animated', 'animate__bounce'); setTimeout(() => this.classList.remove('animate__animated', 'animate__bounce'), 1000);">Löschen</button>
+          <br><br>
+          <button
+            onclick="if(confirm('⚠️ Wollen Sie wirklich ALLE Aktivitäten unwiderruflich löschen? ⚠️')) { localStorage.clear(); location.reload(); }">🪜
+            Alles löschen</button>
+        </div>
+      </details>
+    </div>
+
+    <!-- Rechte Seite: Tabelle -->
+    <div class="tabelle-section animate__animated animate__fadeInRight">
+      <h2>📋 Aktivitäten-Tabelle</h2>
+      <table id="aktivitätenTabelle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Aktivität</th>
+            <th>Beginn</th>
+            <th>Ende</th>
+            <th>Notiz</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dynamisch eingefügt -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="../Scripts/Fehlererkennung.js"></script>
+  <script src="../Scripts/aktivitäten.js"></script>
+</body>
+
+</html>
