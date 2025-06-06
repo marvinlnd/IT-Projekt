@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MediAssist – Persönliche Daten</title>
+  <link rel="icon" type="image/x-icon" href="../Bilder/favicon-32x32.png">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/PersoenlicheDaten.css">
+
+   <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  
+</head>
+<body>
+
+  <!-- HEADER (wie auf der Startseite, ohne Suchfeld) -->
+  <header class="header">
+    <a href="../index.html" class="logo">
+      <img src="../Bilder/Logo.png" alt="MediAssist Logo" />
+    </a>
+    <div class="tools">
+      <!-- Sprach-Dropdown -->
+      <div class="language-switcher">
+        <button
+          id="lang-button"
+          type="button"
+          aria-haspopup="true"
+          aria-controls="lang-dropdown"
+          aria-expanded="false"
+        >
+          DE <span class="arrow">▾</span>
+        </button>
+        <ul id="lang-dropdown" class="lang-dropdown" role="menu">
+          <li role="menuitem" tabindex="-1" data-lang="de">DE</li>
+          <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
+        </ul>
+      </div>
+      <!-- Login/Registrierung -->
+      <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
+      <a href="Login_Registrieren.html">
+       <img src="../Bilder/login-icon.png" alt="User" />
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+  <a href="Patienten.html" class="back-link">&larr; Zurück zur Patientenliste</a>
+  <div class="section-header">
+    <img src="../Bilder/Patient-icon.png" alt="Patient Icon">
+    <h1>Persönliche Daten</h1>
+  </div>
+  <div class="container">
+    <form id="personal-form">
+      <!-- Deine Felder -->
+      <label for="vorname">Vorname:</label>
+      <input type="text" id="vorname" required>
+      <label for="nachname">Nachname:</label>
+      <input type="text" id="nachname" required>
+      <label for="email">E-Mail:</label>
+      <input type="email" id="email" required>
+      <label for="telefon">Telefon:</label>
+      <input type="tel" id="telefon" required>
+      <label for="adresse">Adresse:</label>
+      <input type="text" id="adresse" required>
+      <label for="geburtsdatum">Geburtsdatum:</label>
+      <input type="date" id="geburtsdatum" required>
+
+      <div class="form-actions">
+        <button type="submit" class="btn save">Speichern</button>
+        <button type="button" class="btn cancel" id="cancel">Abbrechen</button>
+      </div>
+    </form>
+  </main>
+
+  <script src="../Scripts/PersoenlicheDaten.js" defer></script>
+</body>
+</html>

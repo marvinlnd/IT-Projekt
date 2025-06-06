@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de"> 
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MediAssist – Ärzte</title>
+  <link rel="icon" type="image/x-icon" href="../Bilder/favicon-32x32.png">
+  <!-- Globale Styles -->
+  <link rel="stylesheet" href="../css/styles.css">
+  <!-- Spezifische Styles -->
+  <link rel="stylesheet" href="../css/Ärzte.css">
+
+   <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <!-- Logo klickbar -->
+    <a href="../index.html" class="logo">
+      <img src="../Bilder/Logo.png" alt="MediAssist Logo" />
+    </a>
+
+    <div class="tools">
+      <!-- Sprach-Dropdown -->
+      <div class="language-switcher">
+        <button id="lang-button" type="button" aria-haspopup="true" aria-controls="lang-dropdown" aria-expanded="false">
+          DE <span class="arrow">▾</span>
+        </button>
+        <ul id="lang-dropdown" class="lang-dropdown" role="menu">
+          <li role="menuitem" tabindex="-1" data-lang="de">DE</li>
+          <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
+        </ul>
+      </div>
+      <!-- Login/Registrierung -->
+      <div class="login-icon" id="login-icon" title="Einloggen / Registrieren">
+      <a href="../html/Login_Registrieren.html">
+       <img src="../Bilder/login-icon.png" alt="User" />
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <a href="../html/Patienten.html" class="back-link">&larr; Zurück zur Patientenliste</a>
+    <h1 class="animate__animated animate__zoomIn"> Ärzte verwalten</h1>
+    <h2 id="patient-name" class="patient-name">Patient: —</h2>
+
+    <div class="container">
+      <div class="form-section animate__animated animate__fadeInLeft">
+        <h2>➕ Neuer Arzt hinzufügen</h2>
+        <input type="text" id="arztname" placeholder="Arztname">
+        <input type="text" id="fach" placeholder="Fach">
+		<input type="text" id="eMail" placeholder="E-Mail">
+		<input type="text" id="Telefonnummer" placeholder="Telefonnummer">
+		<input type="text" id="Adresse" placeholder="Adresse">
+        <button id="add-med" type="button">Hinzufügen</button>
+
+        <h2>🛠️ Arztdaten bearbeiten</h2>
+        <label for="indexDropdown">Index auswählen:</label>
+        <select id="indexDropdown"></select>
+        <input type="text" id="neuerArztname" placeholder="Neuer Arztname"> 
+        <input type="text" id="neueFach" placeholder="Neue Fach">
+		<input type="text" id="neueEMail" placeholder="Neue E-Mail">
+		<input type="text" id="neueTelefonnummer" placeholder="Neue Telefonnummer">
+		<input type="text" id="neueAdresse" placeholder="Neue Adresse">
+        <button id="edit-med" type="button">Änderungen speichern</button>
+		
+
+        <h2>🗑️ Arzt löschen</h2>
+        <label for="indexLoeschenDropdown">Index auswählen:</label>
+        <select id="indexLoeschenDropdown"></select>
+        <button id="delete-arzt" type="button">Löschen</button>
+
+        <br>
+        <button id="clear-med" type="button">🧹 Alles löschen</button>
+      </div>
+
+      <div class="tabelle-section animate__animated animate__fadeInRight">
+        <h2>📄 Ärzte Liste</h2>
+        <table id="arztTabelle">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Fach</th>
+              <th>E-Mail</th>
+              <th>Telefon</th>
+			  <th>Adresse</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="../Scripts/Ärzte.js" defer></script>
+</body>
+
+</html>
