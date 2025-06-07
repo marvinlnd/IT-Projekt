@@ -18,11 +18,13 @@ jobs:
         with:
           node-version: '18'
 
-      - run: npm install
-        if: exists('package.json')
+      - name: Install dependencies (wenn package.json existiert)
+        run: |
+          if [ -f package.json ]; then npm install; fi
 
-      - run: npm run build
-        if: exists('package.json')
+      - name: Build (wenn package.json existiert)
+        run: |
+          if [ -f package.json ]; then npm run build; fi
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
