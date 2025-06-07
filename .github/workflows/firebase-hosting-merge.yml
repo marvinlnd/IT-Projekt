@@ -10,26 +10,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Install Node.js
+      # Hier Node.js 20 aktivieren
+      - name: Set up Node.js 20
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'
 
-      - name: Install dependencies (wenn package.json existiert)
-        run: |
-          if [ -f package.json ]; then npm install; fi
-
-      - name: Build (wenn package.json existiert)
-        run: |
-          if [ -f package.json ]; then npm run build; fi
+      - name: Install dependencies (optional)
+        run: npm install
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_IT_PROJEKT_FFC4D }}"
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_IT_PROJEKT_FFC4D }}'
           channelId: live
           projectId: it-projekt-ffc4d
