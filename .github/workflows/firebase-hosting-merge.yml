@@ -12,14 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Hier Node.js 20 aktivieren
+     
       - name: Set up Node.js 20
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
-      - name: Install dependencies (optional)
-        run: npm install
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
