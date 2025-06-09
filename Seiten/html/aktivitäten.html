@@ -49,6 +49,36 @@
 
   <h1 class="animate__animated animate__zoomIn">🗓️ Aktivitäten bearbeiten</h1>
 
+  <div id="context-menu" class="context-menu" style="display: none; position: absolute;">
+      <button id="edit-button">🛠️ Bearbeiten</button>
+      <button id="delete-button">🗑️ Löschen</button>
+  </div>
+
+    <!-- Modal-Hintergrund -->
+  <div id="edit-modal-overlay" class="modal-overlay" style="display: none;">
+      <!-- Modal-Inhalt -->
+      <div class="modal">
+        <h2>🛠️ Aktivität bearbeiten</h2>
+        
+        <label for="modal-name">Name der Aktivität:</label>
+        <input type="text" id="modal-name" />
+
+        <label for="modal-beginn">Beginn der Aktivität:</label>
+        <input type="time" id="modal-beginn" />
+
+        <label for="modal-ende">Ende der Aktivität:</label>
+        <input type="time" id="modal-ende" />
+
+        <label for="modal-Notiz">Notiz :</label>
+        <input type="text" id="modal-Notiz" />
+
+        <div class="modal-buttons">
+          <button id="modal-save">Fertig</button>
+          <button id="modal-cancel">Abbrechen</button>
+        </div>
+      </div>
+  </div>
+
   <div class="container">
     <!-- Linke Seite: Formular -->
     <div class="form-section animate__animated animate__fadeInLeft">

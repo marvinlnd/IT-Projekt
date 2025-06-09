@@ -60,6 +60,32 @@
     <h1 class="animate__animated animate__zoomIn">🩺 Krankenhistorie bearbeiten</h1>
     <h2 id="patient-name" class="patient-name">Patient: —</h2>
 
+    <div id="context-menu" class="context-menu" style="display: none; position: absolute;">
+      <button id="edit-button">🛠️ Bearbeiten</button>
+      <button id="delete-button">🗑️ Löschen</button>
+      <button id="complete-button">✅ Geheilt markieren</button>
+    </div>
+
+    <!-- Modal-Hintergrund -->
+    <div id="edit-modal-overlay" class="modal-overlay" style="display: none;">
+      <!-- Modal-Inhalt -->
+      <div class="modal">
+        <h2>🛠️ Erkrankung bearbeiten</h2>
+        
+        <label for="modal-name">Krankheit:</label>
+        <input type="text" id="modal-name" />
+
+        <label for="modal-datum">Datum der Feststellung:</label>
+        <input type="date" id="modal-datum" />
+
+        <div class="modal-buttons">
+          <button id="modal-save">Fertig</button>
+          <button id="modal-cancel">Abbrechen</button>
+        </div>
+      </div>
+    </div>
+
+
     <div class="container">
       <!-- Linke Spalte: Formular -->
       <div class="form-section animate__animated animate__fadeInLeft">
@@ -91,6 +117,7 @@
               <th>#</th>
               <th>Krankheit</th>
               <th>Feststellung</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody></tbody>

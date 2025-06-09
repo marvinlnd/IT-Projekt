@@ -98,6 +98,107 @@
   animation: pulse 0.6s ease-out;
 }
 
+/* kontext menu*/
+.context-menu {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  padding: 8px;
+  z-index: 1000;
+}
+
+.context-menu button {
+  color: #fff;
+  display: block;
+  width: 100%;
+  padding: 5px 10px;
+  margin: 3px 0;
+  background: #0078d4;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.context-menu button:hover {
+  background: #005fa3;
+}
+
+/* modal window bearbeiten*/
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* dunkler Hintergrund */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.modal {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  min-width: 300px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.modal h2 {
+  margin-top: 0;
+  color: #004aad;
+}
+
+.modal label {
+  display: block;
+  margin: 10px 0 5px;
+}
+
+.modal input {
+  width: 100%;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  padding: 8px 16px;
+  background: #0078d4;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+
+/* Status  */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.85em;
+  font-weight: bold;
+  display: inline-block;
+  color: white;
+}
+
+.status-active {
+  background-color: #4CAF50; /* Green */
+}
+
+.status-completed {
+  background-color: #ff9800; /* Orange */
+}
+
+
+
 /* Define the pulse keyframes */
 @keyframes pulse {
   0%   { transform: scale(1); }

@@ -36,10 +36,16 @@ function ladeDaten() {
         <td>${daten.adresse}</td>
       `;
 
-      row.addEventListener("click", () => {
+      row.addEventListener("click", (event) => {
         // Markierung der gewählten Zeile
         tbody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
         row.classList.add("selected");
+
+        // Pop-up-Menü positionieren
+        const menu = document.getElementById('context-menu');
+        menu.style.display = 'block';
+        menu.style.left = `${event.pageX + 5}px`;
+        menu.style.top = `${event.pageY + 5}px`;
 
         // Felder zum Bearbeiten füllen
         document.getElementById("neuerArztname").value = daten.name || "";
@@ -51,6 +57,79 @@ function ladeDaten() {
         // Dokument-ID für spätere Bearbeitung/Löschung zwischenspeichern
         document.getElementById("indexDropdown").value = doc.id;
         document.getElementById("indexLoeschenDropdown").value = doc.id;
+
+        // Edit-Button öffnet das große Modal
+        document.getElementById('edit-button').onclick = () => {
+          const modal = document.getElementById('edit-modal-overlay');
+          const nameInput    = document.getElementById('modal-arzt-name');
+          const fachInput    = document.getElementById('modal-arzt-fach');
+          const emailInput   = document.getElementById('modal-arzt-email');
+          const telInput     = document.getElementById('modal-arzt-telefon');
+          const adresseInput = document.getElementById('modal-arzt-adresse');
+          const fertigBtn    = document.getElementById('modal-save');
+          const cancelBtn    = document.getElementById('modal-cancel');
+
+          // Formular mit den aktuellen Werten befüllen
+          nameInput.value    = daten.name    || "";
+          fachInput.value    = daten.fach    || "";
+          emailInput.value   = daten.email   || "";
+          telInput.value     = daten.telefon || "";
+          adresseInput.value = daten.adresse || "";
+
+          // Modal anzeigen und Hintergrund abdunkeln
+          modal.style.display = 'flex';
+
+          // Handler für „Fertig“
+          fertigBtn.onclick = async () => {
+            // Neue Werte auslesen
+            const updates = {
+              name:    nameInput.value.trim(),
+              fach:    fachInput.value.trim(),
+              email:   emailInput.value.trim(),
+              telefon: telInput.value.trim(),
+              adresse: adresseInput.value.trim()
+            };
+
+            // Validierung
+            if (updates.name.length < 2 || updates.fach.length < 2) {
+              alert("Bitte mindestens Name und Fach korrekt ausfüllen.");
+              return;
+            }
+
+            // Firestore-Update
+            await arztRef.doc(doc.id).update(updates);
+
+            // Tabelle neu laden, Modal schließen
+            ladeDaten();
+            modal.style.display = 'none';
+          };
+
+          // Handler für „Abbrechen“
+          cancelBtn.onclick = () => {
+            modal.style.display = 'none';
+          };
+
+          // Kontextmenü ausblenden
+          document.getElementById('context-menu').style.display = 'none';
+        };
+
+        // Delete-Button
+        // Delete-Button im Kontextmenü
+        document.getElementById('delete-button').onclick = async () => {
+          try {
+            // Firestore-Dokument löschen
+            await arztRef.doc(doc.id).delete();
+            // Tabelle neu laden
+            ladeDaten();
+          } catch (err) {
+            console.error("Fehler beim Löschen:", err);
+            alert("Löschen fehlgeschlagen.");
+          } finally {
+            // Kontextmenü ausblenden
+            document.getElementById('context-menu').style.display = 'none';
+          }
+        };
+
       });
 
       tbody.appendChild(row);
@@ -66,6 +145,7 @@ function ladeDaten() {
     console.error("❌ Fehler beim Laden der Daten:", error);
   });
 }
+
 
 
 // Arzt hinzufügen
@@ -116,6 +196,13 @@ document.getElementById("clear-med").addEventListener("click", () => {
     snapshot.docs.forEach(doc => batch.delete(doc.ref));
     return batch.commit();
   }).then(ladeDaten);
+});
+
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('context-menu');
+  if (!menu.contains(e.target) && !e.target.closest('tr')) {
+    menu.style.display = 'none';
+  }
 });
 
 // Nach dem Laden Daten holen

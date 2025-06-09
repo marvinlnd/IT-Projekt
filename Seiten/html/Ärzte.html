@@ -50,6 +50,39 @@
     <h1 class="animate__animated animate__zoomIn"> Ärzte verwalten</h1>
     <h2 id="patient-name" class="patient-name">Patient: —</h2>
 
+    <div id="context-menu" class="context-menu" style="display: none; position: absolute;">
+      <button id="edit-button">🛠️ Bearbeiten</button>
+      <button id="delete-button">🗑️ Löschen</button>
+    </div>
+
+    <!-- Modal-Hintergrund -->
+    <div id="edit-modal-overlay" class="modal-overlay" style="display: none;">
+      <!-- Modal-Inhalt -->
+      <div class="modal">
+        <h2>🛠️ Arztdaten bearbeiten</h2>
+        
+        <label for="modal-arzt-name">arztname:</label>
+        <input type="text" id="modal-arzt-name" />
+
+        <label for="modal-arzt-fach">fach:</label>
+        <input type="text" id="modal-arzt-fach"  />
+
+        <label for="modal-arzt-email">eMail:</label>
+        <input type="text" id="modal-arzt-email" />
+
+        <label for="modal-arzt-telefon">Telefonnummer:</label>
+        <input type="text" id="modal-arzt-telefon" />
+
+        <label for="modal-arzt-adresse">Adresse:</label>
+        <input type="text" id="modal-arzt-adresse" />
+
+        <div class="modal-buttons">
+          <button id="modal-save">Fertig</button>
+          <button id="modal-cancel">Abbrechen</button>
+        </div>
+      </div>
+    </div>
+
     <div class="container">
       <div class="form-section animate__animated animate__fadeInLeft">
         <h2>➕ Neuer Arzt hinzufügen</h2>

@@ -16,16 +16,19 @@ const userId = localStorage.getItem("user-id");
 
 // Klasse für einen History-Eintrag
 class Krankheit {
-  constructor(name, datum) {
+  constructor(name, datum, status = 'active') {
     this.nameDerKrankheit = name;
     this.datumDerFeststellung = datum;
+    this.status = status;
   }
 
   aktualisieren(data) {
     if (data.nameDerKrankheit !== undefined) this.nameDerKrankheit = data.nameDerKrankheit;
     if (data.datumDerFeststellung !== undefined) this.datumDerFeststellung = data.datumDerFeststellung;
+    if (data.status !== undefined) this.status = data.status;
   }
 }
+
 
 // LocalStorage-Helfer
 const STORAGE_KEY = 'patientListe';
@@ -34,7 +37,7 @@ function ladePatienten() {
   const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
   data.forEach(p => {
     if (Array.isArray(p.history)) {
-      p.history = p.history.map(h => new Krankheit(h.nameDerKrankheit, h.datumDerFeststellung));
+      p.history = p.history.map(h => new Krankheit(h.nameDerKrankheit, h.datumDerFeststellung,h.status || 'active'));
     }
   });
   return data;
@@ -54,7 +57,7 @@ async function ladePatientVonFirestore(id) {
     }
     const data = doc.data();
     if (Array.isArray(data.history)) {
-      data.history = data.history.map(h => new Krankheit(h.nameDerKrankheit, h.datumDerFeststellung));
+      data.history = data.history.map(h => new Krankheit(h.nameDerKrankheit, h.datumDerFeststellung, h.status || 'active'));
     }
     const patients = ladePatienten();
     const idx = patients.findIndex(p => p.id === id);
@@ -74,7 +77,8 @@ async function speicherePatientNachFirestore(id, patient) {
       ...patient,
       history: patient.history.map(h => ({
         nameDerKrankheit: h.nameDerKrankheit,
-        datumDerFeststellung: h.datumDerFeststellung
+        datumDerFeststellung: h.datumDerFeststellung,
+        status: h.status || 'active'  // default fallback
       }))
     };
     await db.collection('users').doc(userId).collection('patients').doc(id).set(dataToSave); 
@@ -132,24 +136,103 @@ function renderTable() {
   history.forEach((eintrag, i) => {
     // Create the row
     const row = document.createElement('tr');
+    const statusClass = eintrag.status === 'completed' ? 'status-completed' : 'status-active';
+    const statusLabel = eintrag.status === 'completed' ? 'Geheilt' : 'Aktiv';
+
     row.innerHTML = `
       <td>${i}</td>
       <td>${eintrag.nameDerKrankheit}</td>
       <td>${eintrag.datumDerFeststellung}</td>
+      <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
     `;
 
     // 1) Klick-Handler fürs Auswählen
-    row.addEventListener("click", () => {
-      // a) Markiere nur diese Zeile als selected
+    row.addEventListener("click", (event) => {
+      // Zeile markieren
       tblBody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
       row.classList.add("selected");
 
-      // b) Befülle Index- und Edit-Inputs mit 'i'
+      // Pop-up-Menü vorbereiten
+      const menu = document.getElementById('context-menu');
+      menu.style.display = 'block';
+      menu.style.left = `${event.pageX + 5}px`;
+      menu.style.top = `${event.pageY + 5}px`;
+
+      // ID für Edit/Delete merken
       idxIn.value      = i;
       newNameIn.value  = eintrag.nameDerKrankheit;
       newDatumIn.value = eintrag.datumDerFeststellung;
       delIdxIn.value   = i;
+
+      // Event-Handler setzen
+      document.getElementById('edit-button').onclick = () => {
+        const modal = document.getElementById('edit-modal-overlay');
+        const nameInput = document.getElementById('modal-name');
+        const datumInput = document.getElementById('modal-datum');
+
+        // Werte ausfüllen
+        nameInput.value = history[idxIn.value].nameDerKrankheit;
+        datumInput.value = history[idxIn.value].datumDerFeststellung;
+
+        // Modal anzeigen
+        modal.style.display = 'flex';
+
+        // Modal-Funktionen
+        const fertigBtn = document.getElementById('modal-save');
+        const cancelBtn = document.getElementById('modal-cancel');
+
+        // Fertig gedrückt
+        fertigBtn.onclick = async () => {
+          const neuerName = nameInput.value.trim();
+          const neuesDatum = datumInput.value;
+
+          if (neuerName.length < 2) {
+            alert("Name zu kurz.");
+            return;
+          }
+
+          history[idxIn.value].nameDerKrankheit = neuerName;
+          history[idxIn.value].datumDerFeststellung = neuesDatum;
+
+          speicherePatienten(patientListe);
+          await speicherePatientNachFirestore(id, patient);
+          renderTable();
+
+          modal.style.display = 'none';
+        };
+
+        // Abbrechen gedrückt
+        cancelBtn.onclick = () => {
+          modal.style.display = 'none';
+        };
+
+        // Kontextmenü schließen
+        document.getElementById('context-menu').style.display = 'none';
+      };
+
+
+      document.getElementById('delete-button').onclick = () => {
+        document.getElementById('delete-history').click();
+          menu.style.display = 'none';
+      };
     });
+
+    document.getElementById('complete-button').onclick = async () => {
+      const i = parseInt(idxIn.value, 10);
+      if (isNaN(i) || i < 0 || i >= history.length) {
+        alert('Kein gültiger Eintrag ausgewählt.');
+        return;
+      }
+
+      history[i].status = 'completed';
+      speicherePatienten(patientListe);
+      await speicherePatientNachFirestore(id, patient);
+      renderTable();
+
+      document.getElementById('context-menu').style.display = 'none';
+    };
+
+
 
     // 2) Hänge die mit Handler versehenen row ans tbody
     tblBody.appendChild(row);
@@ -278,3 +361,14 @@ function renderTable() {
   // Start
   renderTable();
 });
+
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('context-menu');
+  if (!menu.contains(e.target) && !e.target.closest('tr')) {
+    menu.style.display = 'none';
+  }
+});
+
+
+
+

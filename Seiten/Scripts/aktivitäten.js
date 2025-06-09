@@ -122,19 +122,57 @@ function aktualisiereTabelle() {
       <td>${eintrag.notitz}</td>
     `;
 
-    // 1) Klick-Handler fürs Auswählen
-    row.addEventListener("click", () => {
-      // a) Markiere die selektierte Zeile
+    row.addEventListener("click", event => {
+      // a) Highlight the selected row
       tbody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
       row.classList.add("selected");
 
-      // b) Fülle die Edit- und Delete-Inputs
-      document.getElementById("index").value = index;
-      document.getElementById("neuerNameDerAktivität").value = eintrag.nameDerAktivität;
-      document.getElementById("beginnÄndern").value = eintrag.beginn;
-      document.getElementById("endeÄndern").value = eintrag.ende;
-      document.getElementById("notitzÄndern").value = eintrag.notitz;
-      document.getElementById("indexLoeschen").value = index;
+      // b) Position and show context menu
+      const menu = document.getElementById("context-menu");
+      menu.style.display = "block";
+      menu.style.left = `${event.pageX + 5}px`;
+      menu.style.top  = `${event.pageY + 5}px`;
+
+      // c) Edit-Button → open modal
+      document.getElementById("edit-button").onclick = () => {
+        const modal     = document.getElementById("edit-modal-overlay");
+        const nameIn    = document.getElementById("modal-name");
+        const beginnIn  = document.getElementById("modal-beginn");
+        const endeIn    = document.getElementById("modal-ende");
+        const noteIn    = document.getElementById("modal-Notiz");
+        const saveBtn   = document.getElementById("modal-save");
+        const cancelBtn = document.getElementById("modal-cancel");
+
+        // fill current values
+        nameIn.value   = eintrag.nameDerAktivität;
+        beginnIn.value = eintrag.beginn;
+        endeIn.value   = eintrag.ende;
+        noteIn.value   = eintrag.notitz;
+
+        modal.style.display = "flex";
+        menu.style.display  = "none";
+
+        saveBtn.onclick = async () => {
+          // call your edit function
+          await aktivität_bearbeiten(
+            index,
+            nameIn.value,
+            beginnIn.value,
+            endeIn.value,
+            noteIn.value
+          );
+          modal.style.display = "none";
+        };
+        cancelBtn.onclick = () => {
+          modal.style.display = "none";
+        };
+      };
+
+      // d) Delete-Button → delete entry
+      document.getElementById("delete-button").onclick = async () => {
+        await aktivität_loeschen(index);
+        menu.style.display = "none";
+      };
     });
 
     tbody.appendChild(row);
@@ -153,3 +191,10 @@ function validiereAktivitaet(name, beginn, ende, notitz) {
 
 // Initiales Laden
 document.addEventListener("DOMContentLoaded", ladeAktivitäten);
+
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('context-menu');
+  if (!menu.contains(e.target) && !e.target.closest('tr')) {
+    menu.style.display = 'none';
+  }
+});

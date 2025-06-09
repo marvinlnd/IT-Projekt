@@ -175,48 +175,103 @@ document.addEventListener('DOMContentLoaded', async () => {
     return ok;
   }
 
-function render() {
-  tableBody.innerHTML = '';
-  idxSelect.innerHTML = '';
-  delSelect.innerHTML = '';
+  function render() {
+    tableBody.innerHTML = '';
+    idxSelect.innerHTML = '';
+    delSelect.innerHTML = '';
 
-  plan.forEach((m, i) => {
-    // 1) Build row
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${i}</td>
-      <td>${m.medikament}</td>
-      <td>${m.anzahl}</td>
-      <td>${m.tageszeit}</td>
-      <td>${m.wochentage}</td>
-    `;
+    plan.forEach((m, i) => {
+      const tr = document.createElement('tr');
+      const [num, ...unitArr] = m.anzahl.split(' ');
+      const dose = unitArr.join(' ');
+      tr.innerHTML = `
+        <td>${i}</td>
+        <td>${m.medikament}</td>
+        <td>${num}</td>
+        <td>${dose}</td>
+        <td>${m.tageszeit}</td>
+        <td>${m.wochentage}</td>
+      `;
 
-    // 2) Click handler: select & prefill
-    tr.addEventListener('click', () => {
-      // a) Highlight only this row
-      tableBody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
-      tr.classList.add('selected');
+      tr.addEventListener('click', event => {
+        // Highlight
+        tableBody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
+        tr.classList.add('selected');
 
-      // b) Fill “edit” dropdown & inputs
-      idxSelect.value = i;
-      newNameIn.value   = m.medikament;
-      newAnzahlIn.value = m.anzahl.replace(/\s*\w+$/, '');    // strip unit
-      neueEinheitIn.value = m.anzahl.split(' ').slice(1).join(' ');
-      newZeitIn.value   = m.tageszeit;
-      newWochIn.value   = m.wochentage;
+        // Show context-menu
+        const menu = document.getElementById('context-menu');
+        menu.style.display = 'block';
+        menu.style.left = `${event.pageX + 5}px`;
+        menu.style.top  = `${event.pageY + 5}px`;
 
-      // c) Fill delete dropdown
-      delSelect.value = i;
+        // Store index in the dropdowns
+        idxSelect.value = i;
+        delSelect.value = i;
+
+        // EDIT button → open modal
+        document.getElementById('edit-button').onclick = () => {
+          const modal     = document.getElementById('edit-modal-overlay');
+          const nameInM   = document.getElementById('modal-medikament');
+          const anzInM    = document.getElementById('modal-anzahl');
+          const unitInM   = document.getElementById('einheit');
+          const timeInM   = document.getElementById('modal-tageszeit');
+          const daysInM   = document.getElementById('modal-wochentage');
+          const saveBtn   = document.getElementById('modal-save');
+          const cancelBtn = document.getElementById('modal-cancel');
+
+          // Prefill
+          nameInM.value  = m.medikament;
+          const [num, ...unit] = m.anzahl.split(' ');
+          anzInM.value   = num;
+          unitInM.value  = unit.join(' ');
+          timeInM.value  = m.tageszeit;
+          daysInM.value  = m.wochentage;
+
+          modal.style.display = 'flex';
+          menu.style.display  = 'none';
+
+          saveBtn.onclick = async () => {
+            // Collect updates
+            const updates = {
+              medikament: nameInM.value.trim(),
+              anzahl:     `${anzInM.value.trim()} ${unitInM.value}`,
+              tageszeit:  timeInM.value,
+              wochentage: daysInM.value.trim()
+            };
+
+            // Apply locally
+            plan[i].aktualisieren(updates);
+            speicherePatienten(patientListe);
+            await speicherePatientNachFirestore(id, patient);
+
+            render();
+            modal.style.display = 'none';
+          };
+
+          cancelBtn.onclick = () => {
+            modal.style.display = 'none';
+          };
+        };
+
+        // DELETE button → remove entry
+        document.getElementById('delete-button').onclick = async () => {
+          plan.splice(i, 1);
+          speicherePatienten(patientListe);
+          await speicherePatientNachFirestore(id, patient);
+          render();
+          menu.style.display = 'none';
+        };
+      });
+
+      tableBody.appendChild(tr);
+
+      // rebuild select lists
+      const opt = new Option(`${i}: ${m.medikament}`, i);
+      idxSelect.add(opt.cloneNode(true));
+      delSelect.add(opt.cloneNode(true));
     });
-
-    tableBody.appendChild(tr);
-
-    // 3) Also rebuild the two select-lists
-    const opt = new Option(`${i}: ${m.medikament}`, i);
-    idxSelect.add(opt.cloneNode(true));
-    delSelect.add(opt.cloneNode(true));
-  });
   }
+
 
 
   addBtn.addEventListener('click', async () => {
@@ -317,4 +372,10 @@ function render() {
   });
 
   render();
+});
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('context-menu');
+  if (!menu.contains(e.target) && !e.target.closest('tr')) {
+    menu.style.display = 'none';
+  }
 });
