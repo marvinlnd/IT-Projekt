@@ -119,15 +119,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const datumIn    = document.getElementById('datumDerFeststellung');
   const addBtn     = document.getElementById('add-history');
 
-  const idxIn      = document.getElementById('index');
-  const newNameIn  = document.getElementById('neuerNameDerKrankheit');
-  const newDatumIn = document.getElementById('neuesDatumDerFeststellung');
-  const editBtn    = document.getElementById('edit-history');
-
-  const delIdxIn   = document.getElementById('indexLoeschen');
-  const delBtn     = document.getElementById('delete-history');
-
-  const clearBtn   = document.getElementById('clear-history');
+  
+ 
 
 function renderTable() {
   // Clear out old rows
@@ -159,10 +152,7 @@ function renderTable() {
       menu.style.top = `${event.pageY + 5}px`;
 
       // ID für Edit/Delete merken
-      idxIn.value      = i;
-      newNameIn.value  = eintrag.nameDerKrankheit;
-      newDatumIn.value = eintrag.datumDerFeststellung;
-      delIdxIn.value   = i;
+      
 
       // Event-Handler setzen
       document.getElementById('edit-button').onclick = () => {
@@ -171,8 +161,8 @@ function renderTable() {
         const datumInput = document.getElementById('modal-datum');
 
         // Werte ausfüllen
-        nameInput.value = history[idxIn.value].nameDerKrankheit;
-        datumInput.value = history[idxIn.value].datumDerFeststellung;
+        nameInput.value = history[i].nameDerKrankheit;
+        datumInput.value = history[i].datumDerFeststellung;
 
         // Modal anzeigen
         modal.style.display = 'flex';
@@ -186,13 +176,14 @@ function renderTable() {
           const neuerName = nameInput.value.trim();
           const neuesDatum = datumInput.value;
 
+
           if (neuerName.length < 2) {
             alert("Name zu kurz.");
             return;
           }
 
-          history[idxIn.value].nameDerKrankheit = neuerName;
-          history[idxIn.value].datumDerFeststellung = neuesDatum;
+          history[i].nameDerKrankheit = neuerName;
+          history[i].datumDerFeststellung = neuesDatum;
 
           speicherePatienten(patientListe);
           await speicherePatientNachFirestore(id, patient);
@@ -211,26 +202,26 @@ function renderTable() {
       };
 
 
-      document.getElementById('delete-button').onclick = () => {
-        document.getElementById('delete-history').click();
-          menu.style.display = 'none';
-      };
-    });
-
-    document.getElementById('complete-button').onclick = async () => {
-      const i = parseInt(idxIn.value, 10);
-      if (isNaN(i) || i < 0 || i >= history.length) {
-        alert('Kein gültiger Eintrag ausgewählt.');
-        return;
+      document.getElementById('delete-button').onclick = async () => {
+      if (confirm("Möchtest du diesen Eintrag wirklich löschen?")) {
+        history.splice(i, 1);
+        speicherePatienten(patientListe);
+        await speicherePatientNachFirestore(id, patient);
+        renderTable();
       }
+      document.getElementById('context-menu').style.display = 'none';
+      };
 
+
+      document.getElementById('complete-button').onclick = async () => {
       history[i].status = 'completed';
       speicherePatienten(patientListe);
       await speicherePatientNachFirestore(id, patient);
       renderTable();
 
       document.getElementById('context-menu').style.display = 'none';
-    };
+     };
+    });
 
 
 
@@ -238,6 +229,8 @@ function renderTable() {
     tblBody.appendChild(row);
   });
   }
+   // Start
+  renderTable();
 
 
   function clearErrors(section) {
@@ -257,20 +250,6 @@ function renderTable() {
     return name.length >= 2;
   }
 
-
-
-  // Prefill bei Eingabe von Index
-  idxIn.addEventListener('input', () => {
-    clearErrors(document.querySelector('.form-section'));
-    const i = parseInt(idxIn.value, 10);
-    if (!isNaN(i) && i >= 0 && i < history.length) {
-      newNameIn.value  = history[i].nameDerKrankheit;
-      newDatumIn.value = history[i].datumDerFeststellung;
-    } else {
-      newNameIn.value = '';
-      newDatumIn.value = '';
-    }
-  });
 
   // Hinzufügen
   addBtn.addEventListener('click', async () => {
@@ -296,70 +275,7 @@ function renderTable() {
     datumIn.value = '';
   });
 
-  // Bearbeiten
-  editBtn.addEventListener('click', async () => {
-    clearErrors(document.querySelector('.form-section'));
-    const i = parseInt(idxIn.value, 10);
-    if (isNaN(i) || i < 0 || i >= history.length) {
-      showError(idxIn, 'Ungültiger Index.');
-      return;
-    }
-
-    const name  = newNameIn.value.trim();
-    const datum = newDatumIn.value.trim();
-    let valid = true;
-
-    if (name && !validateName(name)) {
-      showError(newNameIn, 'Name zu kurz.');
-      valid = false;
-    }
-
-    if (datum && !validateDate(datum)) {
-      showError(newDatumIn, 'Ungültiges Datum.');
-      valid = false;
-    }
-
-    if (!valid) return;
-
-    if (name)  history[i].nameDerKrankheit = name;
-    if (datum) history[i].datumDerFeststellung = datum;
-
-    speicherePatienten(patientListe);
-    await speicherePatientNachFirestore(id, patient);
-    renderTable();
-    idxIn.value = newNameIn.value = newDatumIn.value = '';
-  });
-
-  // Löschen
-  delBtn.addEventListener('click', async () => {
-    clearErrors(document.querySelector('.form-section'));
-    const i = parseInt(delIdxIn.value, 10);
-    if (isNaN(i) || i < 0 || i >= history.length) {
-      showError(delIdxIn, 'Ungültiger Index.');
-      return;
-    }
-
-    const entfernt = history.splice(i, 1);
-    speicherePatienten(patientListe);
-    await speicherePatientNachFirestore(id, patient);
-    renderTable();
-    delIdxIn.value = '';
-  });
-
-  // Alles löschen
-  clearBtn.addEventListener('click', async e => {
-    e.preventDefault();
-    if (confirm('Möchtest du wirklich alle Einträge löschen?')) {
-      history.length = 0;
-      patient.history = history;
-      speicherePatienten(patientListe);
-      await speicherePatientNachFirestore(id, patient);
-      renderTable();
-    }
-  });
-
-  // Start
-  renderTable();
+ 
 });
 
 document.addEventListener('click', (e) => {
