@@ -26,6 +26,78 @@ class Aktivität {
 
 let aktivitäten = [];
 
+// 🧩 Fehleranzeige-Funktionen
+function showError(elem, msg) {
+  elem.style.borderColor = 'red';
+  elem.title = msg;
+
+  if (!elem.nextElementSibling || !elem.nextElementSibling.classList.contains('error-message')) {
+    const errorMsg = document.createElement('div');
+    errorMsg.className = 'error-message';
+    errorMsg.style.color = 'red';
+    errorMsg.style.fontSize = '0.9em';
+    errorMsg.style.marginTop = '5px';
+    errorMsg.textContent = msg;
+    elem.insertAdjacentElement('afterend', errorMsg);
+  }
+}
+
+function clearErrors() {
+  document.querySelectorAll('.error-message').forEach(e => e.remove());
+  [nameIn].forEach(el => {
+    el.style.borderColor = '';
+    el.title = '';
+  });
+}
+
+function clearErrorsModal() {
+  // Entferne alle Fehlermeldungen im Modal
+  document.querySelectorAll('#edit-modal-overlay .error-message').forEach(e => e.remove());
+
+  // Setze die Styles zurück für die Modal Inputs
+  [ 
+    document.getElementById("modal-name"), 
+    document.getElementById("modal-beginn"), 
+    document.getElementById("modal-ende"),
+    document.getElementById("modal-Notiz")
+  ].forEach(el => {
+    el.style.borderColor = '';
+    el.title = '';
+  });
+}
+
+
+function validateName(name) {
+  return typeof name === 'string' && name.trim().length >= 2;
+}
+
+function validateZeitFormat(zeit) {
+  // Einfaches Regex für HH:MM (24h Format)
+  return /^\d{2}:\d{2}$/.test(zeit);
+}
+
+
+function validateInputs(name, beginn, ende) {
+  clearErrors();
+  let ok = true;
+
+  if (!validateName(name)) {
+    showError(nameInput, 'Aktivitätsname mind. 2 Zeichen');
+    ok = false;
+  }
+  if (!validateZeitFormat(beginn)) {
+    showError(beginnInput, 'Zeitformat: HH:MM');
+    ok = false;
+  }
+  if (!validateZeitFormat(ende)) {
+    showError(endeInput, 'Zeitformat: HH:MM');
+    ok = false;
+  }
+
+  return ok;
+}
+
+
 // Daten aus Firestore laden
 async function ladeAktivitäten() {
   try {
@@ -153,16 +225,37 @@ function aktualisiereTabelle() {
         menu.style.display  = "none";
 
         saveBtn.onclick = async () => {
-          // call your edit function
-          await aktivität_bearbeiten(
-            index,
-            nameIn.value,
-            beginnIn.value,
-            endeIn.value,
-            noteIn.value
-          );
-          modal.style.display = "none";
-        };
+        clearErrorsModal(); // Variante für die Inputs im Modal
+
+        let ok = true;
+
+        if (!validateName(nameIn.value)) {
+          showError(nameIn, 'Aktivitätsname mind. 2 Zeichen');
+          ok = false;
+        }
+        if (!validateZeitFormat(beginnIn.value)) {
+          showError(beginnIn, 'Zeitformat: HH:MM');
+          ok = false;
+        }
+        if (!validateZeitFormat(endeIn.value)) {
+          showError(endeIn, 'Zeitformat: HH:MM');
+          ok = false;
+        }
+
+        if (!ok) return; // Stoppe, wenn irgendwas ungültig ist
+
+        // Alles valide → speichere
+        await aktivität_bearbeiten(
+          index,
+          nameIn.value,
+          beginnIn.value,
+          endeIn.value,
+          noteIn.value
+        );
+        modal.style.display = "none";
+      };
+
+
         cancelBtn.onclick = () => {
           modal.style.display = "none";
         };

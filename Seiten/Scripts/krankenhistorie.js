@@ -153,6 +153,12 @@ function renderTable() {
 
       // ID für Edit/Delete merken
       
+      const completeBtn = document.getElementById('complete-button');
+      if (history[i].status === 'completed') {
+        completeBtn.textContent = '❌ Als aktiv markieren';
+      } else {
+        completeBtn.textContent = '✅ Geheilt markieren';
+      }
 
       // Event-Handler setzen
       document.getElementById('edit-button').onclick = () => {
@@ -173,14 +179,17 @@ function renderTable() {
 
         // Fertig gedrückt
         fertigBtn.onclick = async () => {
+          clearErrors();
+          let valid = true;
+
           const neuerName = nameInput.value.trim();
           const neuesDatum = datumInput.value;
 
-
-          if (neuerName.length < 2) {
-            alert("Name zu kurz.");
-            return;
+          if (!validateName(neuerName)) {
+            showError(nameInput, 'Bitte gib einen gültigen Namen (mind. 2 Zeichen) ein.');
+            valid = false;
           }
+          if (!valid) return;
 
           history[i].nameDerKrankheit = neuerName;
           history[i].datumDerFeststellung = neuesDatum;
@@ -214,13 +223,13 @@ function renderTable() {
 
 
       document.getElementById('complete-button').onclick = async () => {
-      history[i].status = 'completed';
+      history[i].status = (history[i].status === 'completed') ? 'active' : 'completed';
       speicherePatienten(patientListe);
       await speicherePatientNachFirestore(id, patient);
       renderTable();
-
       document.getElementById('context-menu').style.display = 'none';
-     };
+      };
+
     });
 
 
@@ -233,17 +242,32 @@ function renderTable() {
   renderTable();
 
 
-  function clearErrors(section) {
-    section.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
-    section.querySelectorAll('.error-message').forEach(el => el.remove());
+  function clearErrors() {
+  // Remove all error messages
+  document.querySelectorAll('.error-message').forEach(e => e.remove());
+
+  // Reset border colors for all inputs and textareas
+  document.querySelectorAll('input, textarea').forEach(el => {
+    el.style.borderColor = '';
+    el.title = '';
+    });
   }
 
-  function showError(inputElem, message) {
-    inputElem.classList.add('error');
-    const msg = document.createElement('div');
-    msg.className = 'error-message';
-    msg.textContent = message;
-    inputElem.insertAdjacentElement('afterend', msg);
+
+  function showError(elem, msg) {
+    elem.style.borderColor = 'red';
+    elem.title = msg;
+
+    // Check if error message already exists
+    if (!elem.nextElementSibling || !elem.nextElementSibling.classList.contains('error-message')) {
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.style.color = 'red';
+        errorMsg.style.fontSize = '0.9em';
+        errorMsg.style.marginTop = '5px';
+        errorMsg.textContent = msg;
+        elem.insertAdjacentElement('afterend', errorMsg);
+    }
   }
 
   function validateName(name) {

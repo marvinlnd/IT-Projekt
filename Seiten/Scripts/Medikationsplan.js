@@ -129,7 +129,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   function showError(elem, msg) {
     elem.style.borderColor = 'red';
     elem.title = msg;
+
+    // Check if error message already exists
+    if (!elem.nextElementSibling || !elem.nextElementSibling.classList.contains('error-message')) {
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.style.color = 'red';
+        errorMsg.style.fontSize = '0.9em';
+        errorMsg.style.marginTop = '5px';
+        errorMsg.textContent = msg;
+        elem.insertAdjacentElement('afterend', errorMsg);
+    }
   }
+
 
   function clearErrors() {
     [nameIn, anzahlIn, einheitIn, tageszeitIn, wochentageIn,
@@ -144,7 +156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function validateName(val) {
-    return val.trim().length > 1;
+    return val.trim().length > 1 ;
   }
 
   function validateAnzahl(val) {
@@ -218,6 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const daysInM   = document.getElementById('modal-wochentage');
           const saveBtn   = document.getElementById('modal-save');
           const cancelBtn = document.getElementById('modal-cancel');
+           
 
           // Prefill
           nameInM.value  = m.medikament;
@@ -231,6 +244,23 @@ document.addEventListener('DOMContentLoaded', async () => {
           menu.style.display  = 'none';
 
           saveBtn.onclick = async () => {
+            clearErrors();
+            let ok = true;
+
+            if (nameInM.value.trim() && !validateName(nameInM.value.trim())) {
+              showError(nameInM, 'Medikamentname mind. 2 Zeichen');
+              ok = false;
+            }
+            if (anzInM.value.trim() && !validateAnzahl(anzInM.value.trim())) {
+              showError(anzInM, 'Ungültige Dosierung');
+              ok = false;
+            }
+            if (daysInM.value.trim() && !validateWochentage(daysInM.value.trim())) {
+              showError(daysInM, 'Wochentage: Mo,Di,... So');
+              ok = false;
+            }
+            if (!ok) return;
+
             // Collect updates
             const updates = {
               medikament: nameInM.value.trim(),
