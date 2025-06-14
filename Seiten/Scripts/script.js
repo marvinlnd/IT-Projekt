@@ -1,4 +1,3 @@
-// javascript/script.js
 document.addEventListener('DOMContentLoaded', () => {
   // 1) Logo: zurück zur Startseite
   const logoLink = document.querySelector('.logo');
@@ -82,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Esc-Taste schließt Dropdown
+  // Tastatursteuerung für Dropdown
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && langDropdown.classList.contains('open')) {
       langDropdown.classList.remove('open');
@@ -90,8 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
       langButton.focus();
     }
   });
-
-  // ArrowDown öffnet Dropdown
   langButton.addEventListener('keydown', e => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -102,8 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
       langItems[0].focus();
     }
   });
-
-  // Navigation & Auswahl
   langItems.forEach((item, idx) => {
     item.addEventListener('keydown', e => {
       let newIdx;
@@ -115,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         newIdx = (idx - 1 + langItems.length) % langItems.length;
         langItems[newIdx].focus();
-      } else if (e.key === 'Enter' || e.key === ' ') {
+      } else if (['Enter', ' '].includes(e.key)) {
         e.preventDefault();
         item.click();
       }
@@ -133,6 +128,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // 4) Login-Pop-up Menü: nur Toggle, Navigation via HTML-Links
+  const loginIcon = document.getElementById('login-icon');
+  const loginMenu = document.getElementById('login-menu');
+
+  loginIcon.addEventListener('click', e => {
+    e.stopPropagation();
+    const isOpen = loginMenu.classList.toggle('open');
+    loginMenu.setAttribute('aria-hidden', !isOpen);
+    loginIcon.setAttribute('aria-expanded', isOpen);
+  });
+
+  document.addEventListener('click', e => {
+    if (!loginIcon.contains(e.target) && !loginMenu.contains(e.target)) {
+      loginMenu.classList.remove('open');
+      loginMenu.setAttribute('aria-hidden', 'true');
+      loginIcon.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Menü schließt sich auch, wenn ein Link angeklickt wird
+  loginMenu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      loginMenu.classList.remove('open');
+      loginMenu.setAttribute('aria-hidden', 'true');
+      loginIcon.setAttribute('aria-expanded', 'false');
+    });
+  });
 
 });
-
