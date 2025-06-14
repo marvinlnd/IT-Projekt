@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rechnungen – MediAssist</title>
+  <link rel="icon" type="image/x-icon" href="../Bilder/favicon-32x32.png" />
+  <!-- globales Stylesheet -->
+  <link rel="stylesheet" href="../css/styles.css" />  
+  <!-- spezifisches Stylesheet für Rechnungen -->
+  <link rel="stylesheet" href="../css/rechnung.css" />
+</head>
+<body>
+  
+  <!-- Header -->
+  <header class="header">
+    <a href="../index.html" class="logo">
+      <img src="../Bilder/Logo.png" alt="MediAssist Logo">
+    </a>
+    <div class="tools">
+      <!-- Sprach-Dropdown -->
+      <div class="language-switcher">
+        <button
+          id="lang-button"
+          type="button"
+          aria-haspopup="true"
+          aria-controls="lang-dropdown"
+          aria-expanded="false"
+        >
+          DE <span class="arrow">▾</span>
+        </button>
+        <ul id="lang-dropdown" class="lang-dropdown" role="menu">
+          <li role="menuitem" tabindex="-1" data-lang="de">DE</li>
+          <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
+        </ul>
+      </div>
+
+      <!-- Login-Pop-up (HTML-Navigation) -->
+      <div class="login-wrapper">
+        <div
+          class="login-icon"
+          id="login-icon"
+          title="Konto"
+          aria-haspopup="true"
+          aria-controls="login-menu"
+          aria-expanded="false"
+        >
+          <img src="../Bilder/login-icon.png" alt="User">
+        </div>
+        <ul id="login-menu" class="login-menu" role="menu" aria-hidden="true">
+          <li role="menuitem">
+            <a href="../html/rechnung.html">Rechnungen</a>
+          </li>
+          <li role="menuitem">
+            <a href="../html/Login_Registrieren.html">Ausloggen</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hauptinhalt: Rechnungen -->
+  <main class="invoice-list">
+    <h1>Rechnungen</h1>
+    <ul class="invoices">
+      <!-- Hier werden dynamisch oder serverseitig die Rechnungs-Einträge eingefügt -->
+    </ul>
+  </main>
+
+  <!-- Footer wie auf der Startseite -->
+  <footer class="footer-nav">
+    <ul>
+      <li>
+        <a href="../html/Datenschutzerklärung.html" data-key="footer.termine"
+          >Datenschutzerklärung</a
+        >
+      </li>
+      <li>
+        <a href="../html/Impressum.html" data-key="footer.zeit">Impressum</a>
+      </li>
+    </ul>
+  </footer>
+
+  <script src="../Scripts/rechnung.js"></script>
+
+</body>
+</html>
