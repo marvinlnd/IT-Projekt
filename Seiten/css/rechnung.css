@@ -1,0 +1,104 @@
+/* Abstand um den Inhalt */
+.invoice-list {
+  padding: 24px;
+  background: #f9f9f9;
+}
+.invoice-list h1 {
+  font-size: 1.5rem;
+  color: black;
+  margin-bottom: 16px;
+}
+
+/* 2) Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+.header .logo img {
+  width: 230px;
+  height: 80px;
+}
+.header .logo {
+  transition: transform 0.3s ease;
+}
+.header .logo:hover,
+.header .logo:focus {
+  transform: scale(1.05);
+}
+.header .tools {
+  display: flex;
+  align-items: center;
+}
+
+/* Liste der Rechnungen */
+.invoices {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Einzelner Eintrag: Link links, Aktionen rechts */
+.invoice-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  transition: box-shadow 0.2s;
+}
+.invoice-row:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Link-Teil */
+.invoice-info a {
+  text-decoration: none;
+  color: #004aad;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+/* Button-Gruppe */
+.invoice-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Gemeinsames Button-Design */
+.invoice-actions .btn {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  text-decoration: none;
+  border: 1px solid #0078d4;
+  border-radius: 4px;
+  background: #fff;
+  color: #0078d4;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.invoice-actions .btn:hover {
+  background: #0078d4;
+  color: #fff;
+}
+
+
+
+/* Responsive Anpassung */
+@media (max-width: 480px) {
+  .invoice-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .invoice-actions {
+    margin-top: 8px;
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
