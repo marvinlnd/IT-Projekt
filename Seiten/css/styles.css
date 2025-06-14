@@ -27,7 +27,6 @@ body {
 .header .logo {
   transition: transform 0.3s ease;
 }
-
 .header .logo:hover,
 .header .logo:focus {
   transform: scale(1.05);
@@ -83,7 +82,11 @@ body {
   outline: none;
 }
 
-/* Login-Icon */
+/* Login-Pop-up Menü */
+.login-wrapper {
+  position: relative;
+  display: inline-block;
+}
 .login-icon {
   margin-left: 12px;
   cursor: pointer;
@@ -93,6 +96,47 @@ body {
 .login-icon img {
   width: 27px;
   height: 27px;
+}
+.login-menu {
+  display: none;
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  list-style: none;
+  padding: 4px 0;
+  z-index: 1000;
+  min-width: 140px;
+}
+.login-menu.open {
+  display: block;
+}
+.login-menu li {
+  padding: 8px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.login-menu li:hover,
+.login-menu li:focus {
+  background-color: #f0f0f0;
+  outline: none;
+}
+
+/* Entfernt Unterstreichung bei Links im Login-Pop-up */
+.login-menu li a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+}
+.login-menu li a:hover,
+.login-menu li a:focus {
+  background-color: #f0f0f0;
+  outline: none;
 }
 
 /* 3) Dashboard-Kacheln */
@@ -161,7 +205,6 @@ body {
 }
 /* Responsive für Smartphone (<=480px) */
 @media (max-width: 480px) {
-  /* Header: Logo links, Tools rechts in einer Reihe */
   .header {
     flex-direction: row;
     justify-content: space-between;
@@ -171,30 +214,23 @@ body {
   .header .tools {
     display: flex;
     align-items: center;
-    gap: 8px; /* Abstand zwischen Sprachwechsel & Login */
+    gap: 8px;
     margin-top: 0;
   }
-
-  /* Sprachdropdown und Login nebeneinander */
   .language-switcher {
     margin: 0;
   }
-  .login-icon {
+  .login-wrapper {
     margin: 0;
   }
-
-  /* Kleinere Icons im Tools-Bereich */
   .header .tools img {
     width: 22px;
     height: 22px;
   }
-
-  /* Dashboard einspaltig */
   .dashboard {
     grid-template-columns: 1fr;
     padding: 12px;
   }
-  /* Footer vertikal */
   .footer-nav ul {
     flex-direction: column;
     align-items: flex-start;
