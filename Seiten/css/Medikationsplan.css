@@ -10,6 +10,31 @@
   text-decoration: underline;
 }
 
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+.header .logo img {
+  width: 230px;
+  height: 80px;
+}
+.header .logo {
+  transition: transform 0.3s ease;
+}
+.header .logo:hover,
+.header .logo:focus {
+  transform: scale(1.05);
+}
+.header .tools {
+  display: flex;
+  align-items: center;
+}
+
 /* Patient-Name direkt unter der Überschrift */
 .patient-name {
   margin: 0 24px 16px;
