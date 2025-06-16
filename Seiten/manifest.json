@@ -1,0 +1,10 @@
+{
+  "name": "MediAssist",
+  "short_name": "MediAssist",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0078d4",
+  "orientation": "portrait"
+  
+}

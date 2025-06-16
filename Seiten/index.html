@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MediAssist</title>
   <link rel="icon" type="image/x-icon" href="Bilder/favicon-32x32.png">
   <link rel="stylesheet" href="css/styles.css">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0078d4">
+
 </head>
+
 <body>
   <!-- Header -->
   <header class="header">
@@ -16,13 +22,7 @@
     <div class="tools">
       <!-- Sprach-Dropdown -->
       <div class="language-switcher">
-        <button
-          id="lang-button"
-          type="button"
-          aria-haspopup="true"
-          aria-controls="lang-dropdown"
-          aria-expanded="false"
-        >
+        <button id="lang-button" type="button" aria-haspopup="true" aria-controls="lang-dropdown" aria-expanded="false">
           DE <span class="arrow">▾</span>
         </button>
         <ul id="lang-dropdown" class="lang-dropdown" role="menu">
@@ -33,14 +33,8 @@
 
       <!-- Login-Pop-up (HTML-Navigation) -->
       <div class="login-wrapper">
-        <div
-          class="login-icon"
-          id="login-icon"
-          title="Konto"
-          aria-haspopup="true"
-          aria-controls="login-menu"
-          aria-expanded="false"
-        >
+        <div class="login-icon" id="login-icon" title="Konto" aria-haspopup="true" aria-controls="login-menu"
+          aria-expanded="false">
           <img src="Bilder/login-icon.png" alt="User">
         </div>
         <ul id="login-menu" class="login-menu" role="menu" aria-hidden="true">
@@ -80,5 +74,15 @@
   </footer>
 
   <script src="Scripts/script.js"></script>
+
+  <script>if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("Scripts/service-worker.js")
+      .then(reg => console.log("Service Worker registriert:", reg.scope))
+      .catch(err => console.error("Service Worker Fehler:", err));
+  });
+}
+</script>
 </body>
+
 </html>
