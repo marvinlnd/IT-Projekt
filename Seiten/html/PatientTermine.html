@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MediAssist – Termine eines Patienten</title>
+  <link rel="icon" type="image/x-icon" href="../Bilder/favicon-32x32.png">
+  <!-- globale Styles (Header + Basis) -->
+  <link rel="stylesheet" href="../css/styles.css" />
+  <!-- PatientTermin-spezifisch -->
+  <link rel="stylesheet" href="../css/PatientTermine.css" />
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+   <!-- Header -->
+  <header class="header">
+    <a href="../html/index.html" class="logo">
+      <img src="../Bilder/Logo.png" alt="MediAssist Logo">
+    </a>
+    <div class="tools">
+      <!-- Sprach-Dropdown -->
+      <div class="language-switcher">
+        <button
+          id="lang-button"
+          type="button"
+          aria-haspopup="true"
+          aria-controls="lang-dropdown"
+          aria-expanded="false"
+        >
+          DE <span class="arrow">▾</span>
+        </button>
+        <ul id="lang-dropdown" class="lang-dropdown" role="menu">
+          <li role="menuitem" tabindex="-1" data-lang="de">DE</li>
+          <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
+        </ul>
+      </div>
+
+      <!-- Login-Pop-up (HTML-Navigation) -->
+      <div class="login-wrapper">
+        <div
+          class="login-icon"
+          id="login-icon"
+          title="Konto"
+          aria-haspopup="true"
+          aria-controls="login-menu"
+          aria-expanded="false"
+        >
+          <img src="../Bilder/login-icon.png" alt="User">
+        </div>
+        <ul id="login-menu" class="login-menu" role="menu" aria-hidden="true">
+          <li role="menuitem">
+            <a href="../html/rechnung.html">Rechnungen</a>
+          </li>
+          <li role="menuitem">
+            <a href="../Login_Registrieren.html">Ausloggen</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <!-- PAGE MAIN -->
+  <main class="patient-termine-page">
+    <section class="termine-list">
+      <h2>Termine von <span id="patient-name">…</span></h2>
+      <div class="list-header">
+        <div class="search">
+          <input id="search-input" type="text" placeholder="Termin suchen…" />
+          <button id="search-button" type="button" aria-label="Suche">
+            <img src="../Bilder/suche-icon.png" alt="Suche">
+          </button>
+        </div>
+        <button id="add-termin" class="btn add" type="button">Neuen Termin hinzufügen</button>
+      </div>
+      <table id="termin-table">
+        <thead>
+          <tr>
+            <th>Titel</th>
+            <th>Datum & Uhrzeit</th>
+            <th>Aktionen</th>
+          </tr>
+        </thead>
+        <tbody><!-- wird per JS befüllt --></tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- MODAL für Termin -->
+  <div id="termin-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3 id="modal-title">Termin</h3>
+      <form id="termin-form">
+        <label for="evt-title">Titel:</label>
+        <input type="text" id="evt-title" required />
+        <label for="evt-start">Datum & Uhrzeit:</label>
+        <input type="datetime-local" id="evt-start" required />
+        
+        <div class="buttons">
+          <button type="button" id="cancel-btn">Abbrechen</button>
+          <button type="submit" class="save">Speichern</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script src="../Scripts/PatientTermine.js" defer></script>
+</body>
+</html>
