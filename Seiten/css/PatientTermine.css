@@ -1,0 +1,255 @@
+/* PatientTermine.css – Styles für patientenspezifische Termin-Liste */
+
+/* Grundlayout */
+.patient-termine-page {
+  padding: 24px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+.header .logo img {
+  width: 230px;
+  height: 80px;
+}
+.header .logo {
+  transition: transform 0.3s ease;
+}
+.header .logo:hover,
+.header .logo:focus {
+  transform: scale(1.05);
+}
+.header .tools {
+  display: flex;
+  align-items: center;
+}
+
+.patienten-list {
+  max-width: 100%;
+  height: 900px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  padding: 16px;
+}
+
+/* Container */
+.termine-list {
+  max-width: 100%;
+  width: 100%;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  padding: 16px;
+}
+
+/* Überschrift */
+.termine-list h2 {
+  margin-bottom: 16px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: black;
+}
+
+/* List-Header mit Suche und Add-Button */
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.list-header .search {
+  position: relative;
+}
+.list-header .search input {
+  width: 200px;
+  padding: 6px 32px 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.list-header .search button {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+}
+.list-header .search button img {
+  width: 20px;
+  height: 20px;
+}
+
+/* "Neuen Termin hinzufügen"-Button */
+.btn.add {
+  background: #0078d4;
+  color: #fff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn.add:hover {
+  background: #005fa3;
+}
+
+/* Tabelle */
+#termin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+#termin-table th,
+#termin-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
+}
+#termin-table tr:hover {
+  background: #f5f5f5;
+}
+#termin-table th {
+  background: var(--bg);
+}
+
+/* Aktions-Buttons in der Tabelle: gleiche Größe */
+.btn.edit,
+.btn.delete {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-right: 4px;
+}
+.btn.edit {
+  color: #0078d4;
+}
+.btn.edit:hover {
+  background: #dad9d9;
+}
+.btn.delete {
+  color: red;
+}
+.btn.delete:hover {
+  background: #dad9d9;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
+}
+.modal-content {
+  background: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+}
+.close {
+  position: absolute;
+  top: 12px; right: 12px;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+}
+.modal-content label {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.modal-content input {
+  padding: 6px;
+  margin-top: 4px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.modal-content .buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+.modal-content .buttons button {
+  margin-left: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--secondary);
+  background: var(--bg);
+  color: var(--secondary);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.modal-content .buttons .save {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--bg);
+}
+.modal-content .buttons .delete {
+  border-color: #d9534f;
+  color: #d9534f;
+}
+.modal-content .buttons .delete:hover {
+  background: #d9534f;
+  color: #fff;
+}
+
+/* Responsive Anpassungen */
+@media (max-width: 600px) {
+  .list-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .list-header .search input {
+    width: 100%;
+  }
+  .btn.add {
+    width: 100%;
+    text-align: center;
+  }
+  #termin-table th,
+  #termin-table td {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Tabelle horizontal scrollen */
+  #termin-table {
+    display: block;
+    overflow-x: auto;
+  }
+  #termin-table th,
+  #termin-table td {
+    white-space: nowrap;
+  }
+}
+
+
+
+
