@@ -35,7 +35,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAakpWbT87pJ4Bv1Xr0Mk2lCNhNols7KR4",
   authDomain: "it-projekt-ffc4d.firebaseapp.com",
   projectId: "it-projekt-ffc4d",
-  storageBucket: "it-projekt-ffc4d.firebasestorage.app",  
+  storageBucket: "it-projekt-ffc4d.firebasestorage.app",
   messagingSenderId: "534546734981",
   appId: "1:534546734981:web:13bffd7c78893bd0e3aeec"
 };
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnHistory.onclick = () => location.href = `Krankenhistorie.html?id=${id}`;
     btnMedication.onclick = () => location.href = `Medikationsplan.html?id=${id}`;
     btnaerzte.onclick = () => location.href = `Ärzte.html?id=${id}`;
-	btnDocument.onclick = () => location.href = `Dokumente.html?id=${id}`;
+    btnDocument.onclick = () => location.href = `Dokumente.html?id=${id}`;
     btnDelete.onclick = () => deletePatient(id);
   }
 
@@ -173,13 +173,30 @@ document.addEventListener('DOMContentLoaded', () => {
         .collection('patients')
         .get();
 
-      patientListe = snapshot.docs.map(doc => doc.data());
+      const firestorePatienten = snapshot.docs.map(doc => doc.data());
+
+      if (firestorePatienten.length > 0) {
+        patientListe = firestorePatienten;
+        speicherePatienten();
+        console.log("✅ Patienten aus Firestore geladen und gespeichert.");
+      } else {
+        console.warn("⚠️ Keine Patienten in Firestore gefunden. Lokale Daten bleiben erhalten.");
+      }
       speicherePatienten();
+
       console.log("✅ Patienten aus Firestore geladen.");
       applyFilterAndSort();
     } catch (error) {
       console.error("❌ Fehler beim Laden der Patienten aus Firestore:", error);
+      if (!patientListe.length) {
+        patientListe = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        alert("Die Verbindung zur Datenbank ist fehlgeschlagen. Lokale Daten werden angezeigt.");
+      } else {
+        console.log("📁 Verwende vorhandene lokale Daten.");
+      }
+      applyFilterAndSort();
     }
+
   }
 
   // ------------------------------
