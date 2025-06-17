@@ -165,39 +165,101 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+
+  function deepEqual(a, b) {
+  if (a === b) return true;
+
+  if (typeof a !== typeof b) return false;
+
+  if (a === null || b === null) return false;
+
+  if (typeof a === 'object') {
+    if (Array.isArray(a) !== Array.isArray(b)) return false;
+
+    if (Array.isArray(a)) {
+      if (a.length !== b.length) return false;
+      return a.every((val, i) => deepEqual(val, b[i]));
+    } else {
+      const keysA = Object.keys(a);
+      const keysB = Object.keys(b);
+      if (keysA.length !== keysB.length) return false;
+      return keysA.every(key => deepEqual(a[key], b[key]));
+    }
+  }
+
+  return false;
+}
+
+
   // ------------------------------
   // Patienten aus Firestore laden
   async function ladePatientenAusFirestore() {
     try {
       const snapshot = await db.collection('users').doc(userId)
-        .collection('patients')
-        .get();
-
+        .collection('patients').get();
       const firestorePatienten = snapshot.docs.map(doc => doc.data());
 
-      if (firestorePatienten.length > 0) {
-        patientListe = firestorePatienten;
-        speicherePatienten();
-        console.log("✅ Patienten aus Firestore geladen und gespeichert.");
-      } else {
-        console.warn("⚠️ Keine Patienten in Firestore gefunden. Lokale Daten bleiben erhalten.");
-      }
-      speicherePatienten();
+      // Vergleich starten
+      const lokaleIDs = new Set(patientListe.map(p => p.id));
+      const firestoreIDs = new Set(firestorePatienten.map(p => p.id));
 
-      console.log("✅ Patienten aus Firestore geladen.");
+      const gibtUnterschiede = (
+        patientListe.length !== firestorePatienten.length ||
+        patientListe.some(localPatient => {
+          const cloudPatient = firestorePatienten.find(p => p.id === localPatient.id);
+          return !cloudPatient || !deepEqual(localPatient, cloudPatient);
+        }) ||
+        firestorePatienten.some(cloudPatient => {
+          const localPatient = patientListe.find(p => p.id === cloudPatient.id);
+          return !localPatient || !deepEqual(cloudPatient, localPatient);
+        })
+      );
+
+
+      if (firestorePatienten.length > 0 && gibtUnterschiede) {
+        const nutzerWahl = confirm(
+          "⚠️ Unterschiede zwischen lokalen und Cloud-Daten festgestellt.\n\n" +
+          "Möchten Sie die **lokalen Daten behalten** und in die Cloud hochladen?\n" +
+          "(Klicken Sie auf „Abbrechen“, um stattdessen die Cloud-Daten zu laden)"
+        );
+
+        if (nutzerWahl) {
+          // Lokale Daten überschreiben Firestore
+          for (const p of patientListe) {
+            await db.collection('users').doc(userId)
+              .collection('patients').doc(p.id).set(p);
+          }
+          alert("✅ Lokale Daten wurden in die Cloud hochgeladen.");
+        } else {
+          // Firestore-Daten übernehmen
+          patientListe = firestorePatienten;
+          speicherePatienten();
+          alert("📥 Firestore-Daten wurden übernommen.");
+        }
+      } else {
+        // Keine Unterschiede → Firestore-Daten übernehmen (nur falls leer lokal)
+        if (firestorePatienten.length > 0) {
+          patientListe = firestorePatienten;
+          speicherePatienten();
+          console.log("✅ Patienten aus Firestore geladen.");
+        }
+      }
+
       applyFilterAndSort();
     } catch (error) {
       console.error("❌ Fehler beim Laden der Patienten aus Firestore:", error);
+
       if (!patientListe.length) {
         patientListe = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        alert("Die Verbindung zur Datenbank ist fehlgeschlagen. Lokale Daten werden angezeigt.");
+        alert("⚠️ Keine Verbindung zur Cloud. Lokale Daten werden angezeigt.");
       } else {
-        console.log("📁 Verwende vorhandene lokale Daten.");
+        console.log("📁 Lokale Daten werden verwendet.");
       }
+
       applyFilterAndSort();
     }
-
   }
+
 
   // ------------------------------
   // Event-Listener
@@ -231,5 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ------------------------------
   // Initialisierung
+  speicherePatienten();
   ladePatientenAusFirestore();
 });
