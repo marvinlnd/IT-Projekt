@@ -73,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnMedication = document.getElementById('btn-medication');
   const btnaerzte = document.getElementById('btn-doctor')
   const btnDocument = document.getElementById('btn-document');
+  const btnTermin = document.getElementById('btn-termin');
   const btnDelete = document.getElementById('btn-delete');
   const searchInput = document.getElementById('search-input');
 
@@ -136,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnMedication.onclick = () => location.href = `Medikationsplan.html?id=${id}`;
     btnaerzte.onclick = () => location.href = `Ärzte.html?id=${id}`;
     btnDocument.onclick = () => location.href = `Dokumente.html?id=${id}`;
+    btnTermin.onclick = () => location.href = `PatientTermine.html?id=${id}`;
     btnDelete.onclick = () => deletePatient(id);
   }
 
