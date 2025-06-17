@@ -5,6 +5,17 @@
   padding: 24px;
 }
 
+/* Zurück-Link */
+.back-link {
+    display: inline-block;
+    margin: 16px 24px;
+    color: #0078d4;
+    text-decoration: none;
+}
+.back-link:hover {
+    text-decoration: underline;
+}
+
 /* Header */
 .header {
   display: flex;
