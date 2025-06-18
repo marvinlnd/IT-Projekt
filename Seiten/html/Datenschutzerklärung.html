@@ -3,28 +3,163 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Datenschutzerklärung</title>
+  <title>MediAssist - Datenschutzerklärung</title>
+  <link rel="icon" type="image/x-icon" href="../Bilder/favicon-32x32.png">
+  
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
+    /* Reset & Basis */
+    * {
+      box-sizing: border-box;
       margin: 0;
-      padding: 2rem;
-      background-color: #f4f6f9;
+      padding: 0;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
       color: #333;
+      line-height: 1.4;
+    }
+
+    /* Header Styles */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .header .logo img {
+      width: 230px;
+      height: 80px;
+    }
+    .header .logo {
+      transition: transform 0.3s ease;
+    }
+    .header .logo:hover,
+    .header .logo:focus {
+      transform: scale(1.05);
+    }
+    .header .tools {
+      display: flex;
+      align-items: center;
+    }
+
+    /* Sprachdropdown */
+    .language-switcher {
+      position: relative;
+      font-size: 0.875rem;
+      margin: 0 10px;
+    }
+    #lang-button {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 5px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #lang-button .arrow {
+      margin-left: 4px;
+      font-size: 1rem;
+    }
+    .lang-dropdown {
+      display: none;
+      position: absolute;
+      top: 110%;
+      left: 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      list-style: none;
+      padding: 4px 0;
+      z-index: 1000;
+      min-width: 100%;
+    }
+    .lang-dropdown.open {
+      display: block;
+    }
+    .lang-dropdown li {
+      padding: 8px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .lang-dropdown li:hover,
+    .lang-dropdown li:focus {
+      background-color: #f0f0f0;
+      outline: none;
+    }
+
+    /* Login-Pop-up Menü */
+    .login-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    .login-icon {
+      margin-left: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    .login-icon img {
+      width: 27px;
+      height: 27px;
+    }
+    .login-menu {
+      display: none;
+      position: absolute;
+      top: 110%;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      list-style: none;
+      padding: 4px 0;
+      z-index: 1000;
+      min-width: 140px;
+    }
+    .login-menu.open {
+      display: block;
+    }
+    .login-menu li {
+      padding: 8px 16px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .login-menu li:hover,
+    .login-menu li:focus {
+      background-color: #f0f0f0;
+      outline: none;
+    }
+    .login-menu li a {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      width: 100%;
+      padding: 8px 16px;
+    }
+    .login-menu li a:hover,
+    .login-menu li a:focus {
+      background-color: #f0f0f0;
+      outline: none;
+    }
+
+    /* Inhalt Styles */
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
     h1 {
       color: gray;
       text-align: center;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
     }
 
     p {
@@ -51,110 +186,200 @@
     a:hover {
       text-decoration: underline;
     }
-	
-	 
-@media (max-width: 768px) {
-  body {
-    padding: 1rem;
-    font-size: 0.95rem;
-  }
 
-  .container {
-    padding: 1.5rem;
-  }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        padding: 12px;
+      }
+      .header .logo img {
+        width: 180px;
+        height: 60px;
+      }
+      .container {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
 
-  h1 {
-    font-size: 1.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  body {
-    padding: 1rem 0.5rem;
-    font-size: 0.9rem;
-  }
-
-  .container {
-    padding: 1rem;
-  }
-
-  h1 {
-    font-size: 1.3rem;
-  }
-}
-
-
+    @media (max-width: 480px) {
+      .header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+      }
+      .header .tools {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .language-switcher {
+        margin: 0;
+      }
+      .login-wrapper {
+        margin: 0;
+      }
+      .header .tools img {
+        width: 22px;
+        height: 22px;
+      }
+      .container {
+        margin: 1rem 0.5rem;
+        padding: 1rem;
+      }
+      h1 {
+        font-size: 1.3rem;
+      }
+    }
   </style>
 </head>
 <body>
 
+  <!-- Header -->
+  <header class="header">
+    <a href="../index.html" class="logo">
+      <img src="../Bilder/Logo.png" alt="MediAssist Logo">
+    </a>
+    <div class="tools">
+      <!-- Sprach-Dropdown -->
+      <div class="language-switcher">
+        <button id="lang-button" type="button" aria-haspopup="true" aria-controls="lang-dropdown" aria-expanded="false">
+          DE <span class="arrow">▾</span>
+        </button>
+        <ul id="lang-dropdown" class="lang-dropdown" role="menu">
+          <li role="menuitem" tabindex="-1" data-lang="de">DE</li>
+          <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
+        </ul>
+      </div>
+
+      <!-- Login-Pop-up (HTML-Navigation) -->
+      <div class="login-wrapper">
+        <div class="login-icon" id="login-icon" title="Konto" aria-haspopup="true" aria-controls="login-menu"
+          aria-expanded="false">
+          <img src="../Bilder/login-icon.png" alt="User">
+        </div>
+        <ul id="login-menu" class="login-menu" role="menu" aria-hidden="true">
+          <li role="menuitem">
+            <a href="rechnung.html">Rechnungen</a>
+          </li>
+          <li role="menuitem">
+            <a href="Login_Registrieren.html">Ausloggen</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hauptinhalt -->
   <div class="container">
     <h1>Datenschutzerklärung</h1>
 
-<p><strong>1. Allgemeine Hinweise</strong></p>
-<p>
-  Der Schutz Ihrer persönlichen Daten ist uns sehr wichtig. Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften sowie dieser Datenschutzerklärung. Diese Erklärung informiert Sie über Art, Umfang und Zweck der Erhebung und Verwendung personenbezogener Daten innerhalb unserer App.
-</p>
+    <p><strong>1. Allgemeine Hinweise</strong></p>
+    <p>
+      Der Schutz Ihrer persönlichen Daten ist uns sehr wichtig. Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften sowie dieser Datenschutzerklärung. Diese Erklärung informiert Sie über Art, Umfang und Zweck der Erhebung und Verwendung personenbezogener Daten innerhalb unserer App.
+    </p>
 
-<p><strong>2. Verantwortliche Stelle</strong></p>
-<p>
-  Jade Hochscule<br>
-  Friedrich-Paffrath-Str. 101<br>
-  26389 Wilhelmshaven<br>
-  Webseite: www.jade-hs.de
-</p>
+    <p><strong>2. Verantwortliche Stelle</strong></p>
+    <p>
+      Jade Hochschule<br>
+      Friedrich-Paffrath-Str. 101<br>
+      26389 Wilhelmshaven<br>
+      Webseite: www.jade-hs.de
+    </p>
 
-<p><strong>3. Datenverarbeitung in der App</strong></p>
-<p>
-  Bei der Nutzung unserer App werden automatisch technische Daten erfasst, wie z. B.:
-</p>
-<ul>
-  <li>IP-Adresse des Geräts</li>
-  <li>Datum und Uhrzeit des Zugriffs</li>
-  <li>Gerätetyp, Betriebssystem und App-Version</li>
-  <li>Verwendete Funktionen innerhalb der App</li>
-</ul>
-<p>
-  Diese Daten dienen ausschließlich der technischen Optimierung und der Sicherheit unserer Dienste. Eine Zusammenführung mit anderen Datenquellen findet nicht statt.
-</p>
+    <p><strong>3. Datenverarbeitung in der App</strong></p>
+    <p>
+      Bei der Nutzung unserer App werden automatisch technische Daten erfasst, wie z. B.:
+    </p>
+    <ul>
+      <li>IP-Adresse des Geräts</li>
+      <li>Datum und Uhrzeit des Zugriffs</li>
+      <li>Gerätetyp, Betriebssystem und App-Version</li>
+      <li>Verwendete Funktionen innerhalb der App</li>
+    </ul>
+    <p>
+      Diese Daten dienen ausschließlich der technischen Optimierung und der Sicherheit unserer Dienste. Eine Zusammenführung mit anderen Datenquellen findet nicht statt.
+    </p>
 
-<p><strong>4. Verarbeitung durch Dritte</strong></p>
-<p>
-  Sofern externe Dienste wie Hosting, Analyse-Tools oder Push-Benachrichtigungen eingebunden sind, erfolgt dies unter Einhaltung der DSGVO. Verträge zur Auftragsverarbeitung (AV-Verträge) bestehen mit allen externen Dienstleistern.
-</p>
+    <p><strong>4. Verarbeitung durch Dritte</strong></p>
+    <p>
+      Sofern externe Dienste wie Hosting, Analyse-Tools oder Push-Benachrichtigungen eingebunden sind, erfolgt dies unter Einhaltung der DSGVO. Verträge zur Auftragsverarbeitung (AV-Verträge) bestehen mit allen externen Dienstleistern.
+    </p>
 
-<p><strong>5. Rechte der betroffenen Personen</strong></p>
-<p>
-  Sie haben das Recht:
-</p>
-<ul>
-  <li>gemäß Art. 15 DSGVO Auskunft über Ihre gespeicherten Daten zu verlangen,</li>
-  <li>gemäß Art. 16 DSGVO Berichtigung unrichtiger Daten zu verlangen,</li>
-  <li>gemäß Art. 17 DSGVO Löschung Ihrer Daten zu verlangen (Recht auf Vergessenwerden),</li>
-  <li>gemäß Art. 18 DSGVO Einschränkung der Verarbeitung zu verlangen,</li>
-  <li>gemäß Art. 20 DSGVO Ihre Daten in einem übertragbaren Format zu erhalten,</li>
-  <li>gemäß Art. 21 DSGVO Widerspruch gegen bestimmte Verarbeitungen einzulegen.</li>
-</ul>
+    <p><strong>5. Rechte der betroffenen Personen</strong></p>
+    <p>
+      Sie haben das Recht:
+    </p>
+    <ul>
+      <li>gemäß Art. 15 DSGVO Auskunft über Ihre gespeicherten Daten zu verlangen,</li>
+      <li>gemäß Art. 16 DSGVO Berichtigung unrichtiger Daten zu verlangen,</li>
+      <li>gemäß Art. 17 DSGVO Löschung Ihrer Daten zu verlangen (Recht auf Vergessenwerden),</li>
+      <li>gemäß Art. 18 DSGVO Einschränkung der Verarbeitung zu verlangen,</li>
+      <li>gemäß Art. 20 DSGVO Ihre Daten in einem übertragbaren Format zu erhalten,</li>
+      <li>gemäß Art. 21 DSGVO Widerspruch gegen bestimmte Verarbeitungen einzulegen.</li>
+    </ul>
 
-<p><strong>6. Speicherung und Löschung</strong></p>
-<p>
-  Personenbezogene Daten werden nur solange gespeichert, wie es für den jeweiligen Zweck erforderlich ist oder gesetzlich vorgeschrieben ist. Danach erfolgt eine automatische Löschung.
-</p>
+    <p><strong>6. Speicherung und Löschung</strong></p>
+    <p>
+      Personenbezogene Daten werden nur solange gespeichert, wie es für den jeweiligen Zweck erforderlich ist oder gesetzlich vorgeschrieben ist. Danach erfolgt eine automatische Löschung.
+    </p>
 
-<p><strong>7. Sicherheit</strong></p>
-<p>
-  Unsere App verwendet moderne Verschlüsselungsverfahren und technische Sicherheitsmaßnahmen, um Ihre Daten bestmöglich zu schützen. Der Zugriff ist auf befugte Personen beschränkt.
-</p>
+    <p><strong>7. Sicherheit</strong></p>
+    <p>
+      Unsere App verwendet moderne Verschlüsselungsverfahren und technische Sicherheitsmaßnahmen, um Ihre Daten bestmöglich zu schützen. Der Zugriff ist auf befugte Personen beschränkt.
+    </p>
 
-<p><strong>8. Änderungen dieser Erklärung</strong></p>
-<p>
-  Diese Datenschutzerklärung kann regelmäßig aktualisiert werden, um rechtlichen Anforderungen oder Änderungen unserer App-Funktionalität gerecht zu werden. Die jeweils aktuelle Version finden Sie jederzeit in der App unter "Datenschutz".
-</p>
+    <p><strong>8. Änderungen dieser Erklärung</strong></p>
+    <p>
+      Diese Datenschutzerklärung kann regelmäßig aktualisiert werden, um rechtlichen Anforderungen oder Änderungen unserer App-Funktionalität gerecht zu werden. Die jeweils aktuelle Version finden Sie jederzeit in der App unter "Datenschutz".
+    </p>
 
-<p><a href="../html/Impressum.html">Zum Impressum</a></p>
+    <p><a href="../index.html">Zur Homepage</a></p>
 
- <footer>
-    &copy; 2025 Jade Hohschule – Datenschutz
-  </footer>
+    <footer>
+      &copy; 2025 Jade Hochschule – Datenschutz
+    </footer>
+  </div>
+
+  <!-- JavaScript für Header-Funktionalität -->
+  <script>
+    // Login-Pop-up Menü
+    const loginIcon = document.getElementById('login-icon');
+    const loginMenu = document.getElementById('login-menu');
+
+    // Klick auf das Icon: Menü ein-/ausblenden
+    loginIcon.addEventListener('click', e => {
+      e.stopPropagation();
+      const isOpen = loginMenu.classList.toggle('open');
+      loginMenu.setAttribute('aria-hidden', !isOpen);
+      loginIcon.setAttribute('aria-expanded', isOpen);
+    });
+
+    // Klick außerhalb: Menü schließen
+    document.addEventListener('click', e => {
+      if (!loginIcon.contains(e.target) && !loginMenu.contains(e.target)) {
+        loginMenu.classList.remove('open');
+        loginMenu.setAttribute('aria-hidden', 'true');
+        loginIcon.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Menü schließt sich auch, wenn ein Link angeklickt wird
+    loginMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        loginMenu.classList.remove('open');
+        loginMenu.setAttribute('aria-hidden', 'true');
+        loginIcon.setAttribute('aria-expanded', 'false');
+      });
+    });
+  </script>
+
+  <!-- Sprachauswahl Script -->
+  <script src="../Scripts/sprachauswahl_Datenschutzerklärung.js"></script>
+
 </body>
 </html>
