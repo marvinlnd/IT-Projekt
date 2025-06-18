@@ -1,7 +1,6 @@
-/**
- * MediAssist Language Switcher für Impressum
- * Sprachauswahl-Funktionalität für die Impressum-Seite
- */
+ 
+//Sprachauswahl-Funktionalität für die Impressum-Seite
+ 
 
 (function() {
   'use strict';
