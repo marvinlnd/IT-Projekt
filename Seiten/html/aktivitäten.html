@@ -67,123 +67,81 @@
     </div>
   </header>
 
+  <main>
+    <a href="../html/Patienten.html" class="back-link">&larr; Zurück zur Patientenliste</a>
+    <h1 class="animate__animated animate__zoomIn">🗓️ Aktivitäten verwalten</h1>
+    <h2 id="patient-name" class="patient-name">Patient: —</h2>
 
+    <div id="context-menu" class="context-menu" style="display: none; position: absolute;">
+        <button id="edit-button">🛠️ Bearbeiten</button>
+        <button id="delete-button">🗑️ Löschen</button>
+    </div>
 
-  <h1 class="animate__animated animate__zoomIn">🗓️ Aktivitäten bearbeiten</h1>
+      <!-- Modal-Hintergrund -->
+    <div id="edit-modal-overlay" class="modal-overlay" style="display: none;">
+        <!-- Modal-Inhalt -->
+        <div class="modal">
+          <h2>🛠️ Aktivität bearbeiten</h2>
+          
+          <label for="modal-name">Name der Aktivität:</label>
+          <input type="text" id="modal-name" />
 
-  <div id="context-menu" class="context-menu" style="display: none; position: absolute;">
-      <button id="edit-button">🛠️ Bearbeiten</button>
-      <button id="delete-button">🗑️ Löschen</button>
-  </div>
+          <label for="modal-beginn">Beginn der Aktivität:</label>
+          <input type="time" id="modal-beginn" />
 
-    <!-- Modal-Hintergrund -->
-  <div id="edit-modal-overlay" class="modal-overlay" style="display: none;">
-      <!-- Modal-Inhalt -->
-      <div class="modal">
-        <h2>🛠️ Aktivität bearbeiten</h2>
-        
-        <label for="modal-name">Name der Aktivität:</label>
-        <input type="text" id="modal-name" />
+          <label for="modal-ende">Ende der Aktivität:</label>
+          <input type="time" id="modal-ende" />
 
-        <label for="modal-beginn">Beginn der Aktivität:</label>
-        <input type="time" id="modal-beginn" />
+          <label for="modal-Notiz">Notiz :</label>
+          <input type="text" id="modal-Notiz" />
 
-        <label for="modal-ende">Ende der Aktivität:</label>
-        <input type="time" id="modal-ende" />
-
-        <label for="modal-Notiz">Notiz :</label>
-        <input type="text" id="modal-Notiz" />
-
-        <div class="modal-buttons">
-          <button id="modal-save">Fertig</button>
-          <button id="modal-cancel">Abbrechen</button>
+          <div class="modal-buttons">
+            <button id="modal-save">Fertig</button>
+            <button id="modal-cancel">Abbrechen</button>
+          </div>
         </div>
+    </div>
+
+    <div class="container">
+      <!-- Linke Seite: Formular -->
+      <div class="form-section animate__animated animate__fadeInLeft">
+          <details>
+          <summary style="font-size: 1.2em; cursor: pointer;">➕ Neue Aktivität hinzufügen</summary>
+          <div style="margin-top: 10px;">
+            <p>Name der Aktivität</p>
+            <input type="text" id="nameDerAktivität" placeholder="Name der Aktivität">
+            <p>Beginn der Aktivität</p>
+            <input type="time" id="beginn" min="4:00" max="23:00" step="900" placeholder="Beginn">
+            <p>Ende der Aktivität</p>
+            <input type="time" id="ende" min="4:00" max="23:00" step="900">
+            <p>Notizen</p>
+            <input type="text" id="notitz" placeholder="Notiz">
+            <button id="add-button">Hinzufügen</button>
+          </div>
+        </details>
       </div>
-  </div>
 
-  <div class="container">
-    <!-- Linke Seite: Formular -->
-    <div class="form-section animate__animated animate__fadeInLeft">
-      <details>
-        <summary style="font-size: 1.2em; cursor: pointer;">➕ Neue Aktivität hinzufügen</summary>
-        <div style="margin-top: 10px;">
-          <p>Name der Aktivität</p>
-          <input type="text" id="nameDerAktivität" placeholder="Name der Aktivität">
-          <p>Beginn der Aktivität</p>
-          <input type="time" id="beginn" min="4:00" max="23:00" step="900" placeholder="Beginn">
-          <p>Ende der Aktivität</p>
-          <input type="time" id="ende" min="4:00" max="23:00" step="900">
-          <p>Notizen</p>
-          <input type="text" id="notitz" placeholder="Notiz">
-          <button onclick="aktivitätHinzufügen(
-      document.getElementById('nameDerAktivität').value, 
-      document.getElementById('beginn').value, 
-      document.getElementById('ende').value, 
-      document.getElementById('notitz').value
-    )">Hinzufügen</button>
-        </div>
-      </details>
-
-
-
-      <details>
-        <summary style="font-size: 1.2em; cursor: pointer;">🛠️ Aktivität bearbeiten</summary>
-        <div style="margin-top: 10px;">
-          <input type="number" id="index" placeholder="Index">
-          <p>Neuer Name</p>
-          <input type="text" id="neuerNameDerAktivität" placeholder="Neuer Name">
-          <p>Beginn der Aktivität ändern</p>
-          <input type="time" id="beginnÄndern" min="4:00" max="23:00" step="900">
-          <p>Ende der Aktivität ändern</p>
-          <input type="time" id="endeÄndern" min="4:00" max="23:59" step="900">
-          <p>Notitz ändern</p>
-          <input type="text" id="notitzÄndern" placeholder="Notiz ändern">
-          <button onclick="aktivität_bearbeiten(
-      parseInt(document.getElementById('index').value),
-      document.getElementById('neuerNameDerAktivität').value, 
-      document.getElementById('beginnÄndern').value, 
-      document.getElementById('endeÄndern').value, 
-      document.getElementById('notitzÄndern').value
-    )">Änderungen speichern</button>
-        </div>
-      </details>
-
-      <details>
-        <summary style="font-size: 1.2em; cursor: pointer;">🗑️ Aktivität löschen</summary>
-        <div style="margin-top: 10px;">
-          <input type="number" id="indexLoeschen" placeholder="Index">
-          <button
-            onclick="aktivität_loeschen(parseInt(document.getElementById('indexLoeschen').value)); this.classList.add('animate__animated', 'animate__bounce'); setTimeout(() => this.classList.remove('animate__animated', 'animate__bounce'), 1000);">Löschen</button>
-          <br><br>
-          <button
-            onclick="if(confirm('⚠️ Wollen Sie wirklich ALLE Aktivitäten unwiderruflich löschen? ⚠️')) { localStorage.clear(); location.reload(); }">🪜
-            Alles löschen</button>
-        </div>
-      </details>
+      <!-- Rechte Seite: Tabelle -->
+      <div class="tabelle-section animate__animated animate__fadeInRight">
+        <h2>📋 Aktivitäten-Tabelle</h2>
+        <table id="aktivitätenTabelle">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Aktivität</th>
+              <th>Beginn</th>
+              <th>Ende</th>
+              <th>Notiz</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Dynamisch eingefügt -->
+          </tbody>
+        </table>
+      </div>
     </div>
-
-    <!-- Rechte Seite: Tabelle -->
-    <div class="tabelle-section animate__animated animate__fadeInRight">
-      <h2>📋 Aktivitäten-Tabelle</h2>
-      <table id="aktivitätenTabelle">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Aktivität</th>
-            <th>Beginn</th>
-            <th>Ende</th>
-            <th>Notiz</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Dynamisch eingefügt -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <script src="../Scripts/Fehlererkennung.js"></script>
-  <script src="../Scripts/aktivitäten.js"></script>
+  </main>
+  <script src="../Scripts/aktivitäten.js" defer></script>
 </body>
 
 </html>

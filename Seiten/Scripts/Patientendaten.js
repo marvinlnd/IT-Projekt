@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeBtn = modal.querySelector('.close');
   const modalName = document.getElementById('modal-name');
   const btnPersonal = document.getElementById('btn-personal');
+  const btnprotokoll = document.getElementById('btn-protokoll');
   const btnHistory = document.getElementById('btn-history');
   const btnMedication = document.getElementById('btn-medication');
   const btnaerzte = document.getElementById('btn-doctor')
@@ -133,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     modalName.textContent = (`${p.personalData.vorname} ${p.personalData.nachname}`.trim()) || '— Unbenannt —';
     modal.style.display = 'block';
     btnPersonal.onclick = () => location.href = `PersoenlicheDaten.html?id=${id}`;
+    btnprotokoll.onclick = () => location.href = `aktivitäten.html?id=${id}`;
     btnHistory.onclick = () => location.href = `Krankenhistorie.html?id=${id}`;
     btnMedication.onclick = () => location.href = `Medikationsplan.html?id=${id}`;
     btnaerzte.onclick = () => location.href = `Ärzte.html?id=${id}`;

@@ -58,6 +58,11 @@ class Aktivität {
 }
 
 let aktivitäten = [];
+const nameInput = document.getElementById("nameDerAktivität");
+const beginnInput = document.getElementById("beginn");
+const endeInput = document.getElementById("ende");
+const notitzInput = document.getElementById("notitz");
+
 
 // 🧩 Fehleranzeige-Funktionen
 function showError(elem, msg) {
@@ -77,11 +82,12 @@ function showError(elem, msg) {
 
 function clearErrors() {
   document.querySelectorAll('.error-message').forEach(e => e.remove());
-  [nameIn].forEach(el => {
+  [nameInput, beginnInput, endeInput].forEach(el => {
     el.style.borderColor = '';
     el.title = '';
   });
 }
+
 
 function clearErrorsModal() {
   // Entferne alle Fehlermeldungen im Modal
@@ -110,7 +116,7 @@ function validateZeitFormat(zeit) {
 }
 
 
-function validateInputs(name, beginn, ende) {
+function validateInputs(name, beginn, ende, nameInput, beginnInput, endeInput) {
   clearErrors();
   let ok = true;
 
@@ -130,9 +136,23 @@ function validateInputs(name, beginn, ende) {
   return ok;
 }
 
+document.getElementById("add-button").addEventListener("click", () => {
+  aktivitätHinzufügen(
+    nameInput.value,
+    beginnInput.value,
+    endeInput.value,
+    notitzInput.value
+  );
+});
+
 
 // Daten aus Firestore laden
 async function ladeAktivitäten() {
+  if (!userId) {
+    console.error("❌ Kein userId gefunden!");
+    return;
+  }
+
   try {
     const snapshot = await db.collection('users').doc(userId).collection('aktivitäten').get();
     aktivitäten = [];
@@ -140,16 +160,22 @@ async function ladeAktivitäten() {
       const eintrag = doc.data();
       aktivitäten.push({ id: doc.id, ...eintrag });
     });
-    console.log(`✅ ${aktivitäten.length} Aktivitäten aus der Datenbank geladen.`);
+
+    console.log(`✅ ${aktivitäten.length} Aktivitäten geladen:`, aktivitäten);
     aktualisiereTabelle();
   } catch (error) {
     console.error("❌ Fehler beim Laden der Aktivitäten:", error);
   }
 }
 
+
 // Neue Aktivität hinzufügen
 async function aktivitätHinzufügen(name, beginn, ende, notitz) {
-  if (!validiereAktivitaet(name, beginn, ende, notitz)) return;
+  const nameInput   = document.getElementById("nameDerAktivität");
+  const beginnInput = document.getElementById("beginn");
+  const endeInput   = document.getElementById("ende");
+
+  if (!validateInputs(name, beginn, ende, nameInput, beginnInput, endeInput)) return;
 
   const neueAktivität = {
     nameDerAktivität: name,
@@ -166,6 +192,7 @@ async function aktivitätHinzufügen(name, beginn, ende, notitz) {
     console.error("❌ Fehler beim Speichern der Aktivität:", error);
   }
 }
+
 
 // Aktivität löschen
 async function aktivität_loeschen(index) {
@@ -317,6 +344,20 @@ function validiereAktivitaet(name, beginn, ende, notitz) {
 
 // Initiales Laden
 document.addEventListener("DOMContentLoaded", ladeAktivitäten);
+document.getElementById("add-button").addEventListener("click", () => {
+  const nameInput   = document.getElementById("name");
+  const beginnInput = document.getElementById("beginn");
+  const endeInput   = document.getElementById("ende");
+  const notizInput  = document.getElementById("notiz");
+
+  const name   = nameInput.value;
+  const beginn = beginnInput.value;
+  const ende   = endeInput.value;
+  const notiz  = notizInput.value;
+
+  aktivitätHinzufügen(name, beginn, ende, notiz);
+});
+
 
 document.addEventListener('click', (e) => {
   const menu = document.getElementById('context-menu');

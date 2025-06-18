@@ -123,6 +123,8 @@ async function speicherePatientNachFirestore(id, patient) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  let selectedIndex = null;
+  
   const params = new URLSearchParams(location.search);
   const id = params.get('id');
   await ladePatientVonFirestore(id);
@@ -145,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const wochentageIn = document.getElementById('wochentage');
   const addBtn = document.getElementById('add-med');
 
-  const idxSelect = document.getElementById('indexDropdown');
+  
   const newNameIn = document.getElementById('neuesMedikament');
   const newAnzahlIn = document.getElementById('neueAnzahl');
   const neueEinheitIn = document.getElementById('neueEinheit');
@@ -153,7 +155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const newWochIn = document.getElementById('neueWochentage');
   const editBtn = document.getElementById('edit-med');
 
-  const delSelect = document.getElementById('indexLoeschenDropdown');
+  
   const deleteBtn = document.getElementById('delete-med');
   const clearBtn = document.getElementById('clear-med');
 
@@ -178,15 +180,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function clearErrors() {
     [nameIn, anzahlIn, einheitIn, tageszeitIn, wochentageIn,
-      newNameIn, newAnzahlIn, neueEinheitIn, newZeitIn, newWochIn,
-      idxSelect, delSelect
+      newNameIn, newAnzahlIn, neueEinheitIn, newZeitIn, newWochIn
     ].forEach(el => {
       if (el) {
         el.style.borderColor = '';
         el.title = '';
+        const next = el.nextElementSibling;
+        if(next && next.classList.contains('error-message')) {
+          next.remove();
+        }
       }
     });
   }
+
 
   function validateName(val) {
     return val.trim().length > 1 ;
@@ -222,8 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function render() {
     tableBody.innerHTML = '';
-    idxSelect.innerHTML = '';
-    delSelect.innerHTML = '';
+    
 
     plan.forEach((m, i) => {
       const tr = document.createElement('tr');
@@ -240,6 +245,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       tr.addEventListener('click', event => {
         // Highlight
+        
         tableBody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
         tr.classList.add('selected');
 
@@ -250,11 +256,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         menu.style.top  = `${event.pageY + 5}px`;
 
         // Store index in the dropdowns
-        idxSelect.value = i;
-        delSelect.value = i;
+        selectedIndex = i;
 
         // EDIT button → open modal
         document.getElementById('edit-button').onclick = () => {
+          const m = plan[selectedIndex]; 
           const modal     = document.getElementById('edit-modal-overlay');
           const nameInM   = document.getElementById('modal-medikament');
           const anzInM    = document.getElementById('modal-anzahl');
@@ -303,7 +309,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             // Apply locally
-            plan[i].aktualisieren(updates);
+            plan[selectedIndex].aktualisieren(updates);
             speicherePatienten(patientListe);
             await speicherePatientNachFirestore(id, patient);
 
@@ -318,20 +324,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // DELETE button → remove entry
         document.getElementById('delete-button').onclick = async () => {
-          plan.splice(i, 1);
-          speicherePatienten(patientListe);
-          await speicherePatientNachFirestore(id, patient);
-          render();
-          menu.style.display = 'none';
+          if (selectedIndex !== null && selectedIndex >= 0 && selectedIndex < plan.length) {
+            const removed = plan.splice(selectedIndex, 1);
+            await speicherePatientNachFirestore(patient.id, patient);
+            speicherePatienten(patientListe);
+            render();
+            console.log(`✅ Medikament gelöscht: ${removed[0].medikament}`);
+            document.getElementById('context-menu').style.display = 'none';
+            selectedIndex = null;
+          }
         };
+
+
+
       });
 
       tableBody.appendChild(tr);
 
-      // rebuild select lists
-      const opt = new Option(`${i}: ${m.medikament}`, i);
-      idxSelect.add(opt.cloneNode(true));
-      delSelect.add(opt.cloneNode(true));
+      
     });
   }
 
@@ -358,7 +368,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     wochentageIn.value = '';
   });
 
-  editBtn.addEventListener('click', async () => {
+  /*editBtn.addEventListener('click', async () => {
     const i = parseInt(idxSelect.value, 10);
     if (isNaN(i) || i < 0 || i >= plan.length) {
       showError(idxSelect, 'Ungültiger Index');
@@ -423,7 +433,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     delSelect.selectedIndex = 0;
   });
-
+*/
   clearBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     if (!confirm("Wirklich alle Medikamente löschen?")) return;
