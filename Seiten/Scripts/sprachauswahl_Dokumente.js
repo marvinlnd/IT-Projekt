@@ -1,7 +1,6 @@
-/**
- * MediAssist Language Switcher
- * Sprachauswahl-Funktionalität für die Dokumente-Seite
- */
+
+//Sprachauswahl-Funktionalität für die Dokumente-Seite
+
 
 (function() {
   'use strict';
