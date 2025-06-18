@@ -1,7 +1,7 @@
-/**
- * Sprachauswahl-Funktionalität für MediAssist Ärzte-Verwaltung
- * Diese Datei implementiert mehrsprachige Unterstützung für die Ärzte-Seite
- */
+ 
+//Sprachauswahl-Funktionalität für MediAssist Ärzte-Verwaltung
+ 
+ 
 
 // Sprachdefinitionen für die Ärzte-Seite
 const arztLanguages = {
