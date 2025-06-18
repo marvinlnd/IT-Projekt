@@ -1,7 +1,7 @@
-/**
- * MediAssist Language Switcher für Datenschutzerklärung
- * Sprachauswahl-Funktionalität für die Datenschutzerklärung-Seite
- */
+
+ 
+ //Sprachauswahl-Funktionalität für die Datenschutzerklärung-Seite
+ 
 
 (function() {
   'use strict';
