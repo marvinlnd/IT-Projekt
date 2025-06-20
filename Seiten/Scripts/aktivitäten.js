@@ -162,7 +162,7 @@ async function ladeAktivitäten() {
     });
 
     console.log(`✅ ${aktivitäten.length} Aktivitäten geladen:`, aktivitäten);
-    aktualisiereTabelle();
+    applyFilterAndSort();
   } catch (error) {
     console.error("❌ Fehler beim Laden der Aktivitäten:", error);
   }
@@ -240,11 +240,11 @@ async function aktivität_bearbeiten(index, neuerName, neuBeginn, neuEnde, neueN
 }
 
 // Tabelle aktualisieren & Zeilen klickbar machen
-function aktualisiereTabelle() {
+function aktualisiereTabelle(liste = aktivitäten) {
   const tbody = document.querySelector("#aktivitätenTabelle tbody");
   tbody.innerHTML = "";
 
-  aktivitäten.forEach((eintrag, index) => {
+  liste.forEach((eintrag, index) => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${index}</td>
@@ -364,4 +364,60 @@ document.addEventListener('click', (e) => {
   if (!menu.contains(e.target) && !e.target.closest('tr')) {
     menu.style.display = 'none';
   }
+});
+
+const filterToggle = document.getElementById("filter-toggle"); // der Button, der das Dropdown zeigt
+const filterDropdown = document.getElementById("filter-dropdown"); // das Dropdown selbst
+const sortButtons = document.querySelectorAll(".sort-button"); // Buttons mit data-sort
+let currentSort = "neueste"; // oder "aelteste", je nach Default
+
+
+  // Filter & Sortierung anwenden
+function applyFilterAndSort() {
+  let sorted = [...aktivitäten];
+
+
+  switch (currentSort) {
+    case 'neueste':
+      sorted.sort((a, b) => parseTime(b.beginn) - parseTime(a.beginn));
+      break;
+    case 'aelteste':
+      sorted.sort((a, b) => parseTime(a.beginn) - parseTime(b.beginn));
+      break;
+  }
+
+  
+  aktualisiereTabelle(sorted);
+}
+
+filterToggle.addEventListener('click', () => {
+  const vis = filterDropdown.style.display === 'block';
+  filterDropdown.style.display = vis ? 'none' : 'block';
+  sortButtons.forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.sort === currentSort);
+  });
+});
+
+document.addEventListener('click', e => {
+  if (!filterDropdown.contains(e.target) && !filterToggle.contains(e.target)) {
+    filterDropdown.style.display = 'none';
+  }
+});
+
+function parseTime(zeitStr) {
+  const [hh, mm] = zeitStr.split(":").map(Number);
+  const now = new Date();
+  now.setHours(hh, mm, 0, 0);
+  return now;
+}
+
+
+sortButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    console.log("Sortierbutton geklickt:", button.dataset.sort);
+    currentSort = button.dataset.sort;
+    sortButtons.forEach(btn => btn.classList.toggle('active', btn === button));
+    filterDropdown.style.display = 'none';
+    applyFilterAndSort();
+  });
 });

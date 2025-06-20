@@ -123,7 +123,16 @@
 
     <!-- Rechte Seite: Tabelle -->
     <div class="tabelle-section animate__animated animate__fadeInRight">
-      <h2>📋 Aktivitäten-Tabelle</h2>
+      <div class="table-header">
+        <h2>📋 Aktivitäten-Tabelle</h2>
+        <div class="filter-container">
+          <img id="filter-toggle" class="filter-icon" src="../Bilder/sortieren.png" alt="sortieren" />
+          <div id="filter-dropdown" class="filter-dropdown">
+            <button class="sort-button" data-sort="neueste"><span>Neueste zuerst</span><img class="tick-icon" src="../Bilder/tick.png" alt="✓" /></button>
+            <button class="sort-button" data-sort="aelteste"><span>Älteste zuerst</span><img class="tick-icon" src="../Bilder/tick.png" alt="✓" /></button>
+          </div>
+        </div>
+      </div>
       <table id="aktivitätenTabelle">
         <thead>
           <tr>
