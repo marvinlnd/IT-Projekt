@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MediAssist</title>
+  <link rel="icon" type="image/x-icon" href="../Bilder/favicon-16x16.png">
+  <link rel="stylesheet" href="../css/styles.css">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0078d4">
+
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <a href="../html/index.html" class="logo">
+      <img src="../Bilder/Logo.png" alt="MediAssist Logo">
+    </a>
+    <div class="tools">
+      <!-- Sprach-Dropdown -->
+      <div class="language-switcher">
+        <button id="lang-button" type="button" aria-haspopup="true" aria-controls="lang-dropdown" aria-expanded="false">
+          DE <span class="arrow">▾</span>
+        </button>
+        <ul id="lang-dropdown" class="lang-dropdown" role="menu">
+          <li role="menuitem" tabindex="-1" data-lang="de">DE</li>
+          <li role="menuitem" tabindex="-1" data-lang="en">EN</li>
+        </ul>
+      </div>
+
+      <!-- Login-Pop-up (HTML-Navigation) -->
+      <div class="login-wrapper">
+        <div class="login-icon" id="login-icon" title="Konto" aria-haspopup="true" aria-controls="login-menu"
+          aria-expanded="false">
+          <img src="../Bilder/login-icon.png" alt="User">
+        </div>
+        <ul id="login-menu" class="login-menu" role="menu" aria-hidden="true">
+          <li role="menuitem">
+            <a href="../html/rechnung.html">Rechnungen</a>
+          </li>
+          <li role="menuitem">
+            <a href="../Login_Registrieren.html">Ausloggen</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dashboard-Kacheln -->
+  <main class="dashboard">
+    <a href="../html/Patienten.html" class="card" data-name="Patienten">
+      <div class="icon"><img src="../Bilder/Patient-icon.png" alt=""></div>
+      <h2 data-key="card.patienten">Patienten</h2>
+    </a>
+    <a href="../html/termin.html" class="card" data-name="Termine">
+      <div class="icon"><img src="../Bilder/icon-calendar.png" alt=""></div>
+      <h2 data-key="card.termine">Termine</h2>
+    </a>
+    <a href="../html/aktivitäten.html" class="card" data-name="Begleitprotokoll">
+      <div class="icon"><img src="../Bilder/notiz-icon.png" alt=""></div>
+      <h2 data-key="card.notizen">Begleitprotokoll</h2>
+    </a>
+  </main>
+
+  <!-- Footer-Links -->
+  <footer class="footer-nav">
+    <ul>
+      <li><a href="../html/Datenschutzerklärung.html" data-key="footer.termine">Datenschutzerklärung</a></li>
+      <li><a href="../html/Impressum.html" data-key="footer.zeit">Impressum</a></li>
+    </ul>
+  </footer>
+
+  <script src="../Scripts/script.js"></script>
+
+  <script>if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("Scripts/service-worker.js")
+      .then(reg => console.log("Service Worker registriert:", reg.scope))
+      .catch(err => console.error("Service Worker Fehler:", err));
+  });
+}
+</script>
+</body>
+
+</html>
