@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MediAssist Login</title>
-  <link rel="icon" type="image/x-icon" href="Seiten/Bilder/favicon-16x16.png">
+  <link rel="icon" type="image/x-icon" href="Bilder/favicon-16x16.png" />
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
@@ -15,7 +15,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <style>
-  
     *, *::before, *::after {
       box-sizing: border-box;
     }
@@ -28,7 +27,7 @@
 
     body {
       font-family: Arial, sans-serif;
-      background: url("Seiten/Bilder/Hintergrundbild.jpg") no-repeat center center/cover;
+      background: url("Bilder/Hintergrundbild.jpg") no-repeat center center/cover;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -80,13 +79,13 @@
       margin: 10px 0;
       text-align: left;
     }
-    
-	.large-checkbox {
-     width: 20px;
-     height: 20px;
-     transform: scale(1.1);
+
+    .large-checkbox {
+      width: 20px;
+      height: 20px;
+      transform: scale(1.1);
     }
-	
+
     .checkbox input {
       margin-right: 8px;
     }
@@ -163,8 +162,8 @@
         max-width: 150px;
       }
     }
-	
-	 .toast {
+
+    .toast {
       display: none;
       position: fixed;
       top: 20px;
@@ -177,19 +176,15 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       z-index: 1000;
     }
-	
-	
-	
   </style>
 </head>
 <body>
 
 <div class="container">
-  <img src="Seiten/Bilder/Logo.png" alt="MediAssist Logo" class="logo" />
+  <img src="Bilder/Logo.png" alt="MediAssist Logo" class="logo" />
   <h1>Willkommen!</h1>
 
   <!-- Login -->
-  
   <div id="login-form">
     <input type="text" id="login-email" placeholder="E-Mail-Adresse" />
     <div class="password-container">
@@ -205,7 +200,6 @@
   </div>
 
   <!-- Registrierung -->
-  
   <div id="register-form" class="hidden">
     <input type="text" id="register-lastname" placeholder="Nachname" />
     <input type="text" id="register-firstname" placeholder="Vorname" />
@@ -218,11 +212,9 @@
     </div>
     <div class="checkbox" id="register-checkbox-container">
       <input type="checkbox" id="privacy-register" class="large-checkbox" />
-	  
-       <label for="privacy-register">
-    Ich habe die <a href="Seiten/html/Datenschutzerklärung.html" style="color: #4da6ff;">Datenschutzerklärung</a> gelesen und akzeptiert.*
-       </label>
-	   
+      <label for="privacy-register">
+        Ich habe die <a href="html/Datenschutzerklärung.html" style="color: #4da6ff;">Datenschutzerklärung</a> gelesen und akzeptiert.*
+      </label>
     </div>
     <div id="register-error" class="error" style="display: none;">Bitte akzeptiere die Datenschutzerklärung!</div>
     <button onclick="handleRegister()">Registrieren</button>
@@ -230,7 +222,6 @@
   </div>
 
   <!-- Passwort zurücksetzen -->
-  
   <div id="reset-form" class="hidden">
     <input type="email" id="reset-email" placeholder="E-Mail-Adresse eingeben" />
     <div id="reset-error" class="error" style="display: none;">Bitte gib deine E-Mail-Adresse ein!</div>
@@ -240,13 +231,12 @@
 </div>
 
 <!-- Erfolgs-Toast -->
-  <div id="login-success-toast" class="toast">  
-    Login erfolgreich!
-  </div>
-  
+<div id="login-success-toast" class="toast">  
+  Login erfolgreich!
+</div>
 
- <script src="Seiten/Scripts/Login_Registrieren.js"></script>
-
+<!-- Skript -->
+<script src="Scripts/Login_Registrieren.js"></script>
 
 </body>
 </html>
