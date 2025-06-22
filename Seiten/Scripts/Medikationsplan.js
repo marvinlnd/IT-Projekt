@@ -323,17 +323,44 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         // DELETE button → remove entry
-        document.getElementById('delete-button').onclick = async () => {
-          if (selectedIndex !== null && selectedIndex >= 0 && selectedIndex < plan.length) {
+        // DELETE button → Confirm first
+        document.getElementById('delete-button').onclick = () => {
+          if (selectedIndex === null || selectedIndex < 0 || selectedIndex >= plan.length) return;
+
+          // Modal anzeigen
+          const confirmModal = document.getElementById('confirm-delete-modal');
+          confirmModal.style.display = 'flex';
+
+          // Ja-Button: löschen
+          const yesBtn = document.getElementById('confirm-delete-yes');
+          const noBtn  = document.getElementById('confirm-delete-no');
+
+          const handleDelete = async () => {
             const removed = plan.splice(selectedIndex, 1);
             await speicherePatientNachFirestore(patient.id, patient);
             speicherePatienten(patientListe);
             render();
             console.log(`✅ Medikament gelöscht: ${removed[0].medikament}`);
             document.getElementById('context-menu').style.display = 'none';
+            confirmModal.style.display = 'none';
             selectedIndex = null;
-          }
+
+            // Eventlistener entfernen nach Aktion
+            yesBtn.removeEventListener('click', handleDelete);
+            noBtn.removeEventListener('click', cancelDelete);
+          };
+
+          const cancelDelete = () => {
+            confirmModal.style.display = 'none';
+            yesBtn.removeEventListener('click', handleDelete);
+            noBtn.removeEventListener('click', cancelDelete);
+          };
+
+          yesBtn.addEventListener('click', handleDelete);
+          noBtn.addEventListener('click', cancelDelete);
         };
+
+       
 
 
 
@@ -368,72 +395,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     wochentageIn.value = '';
   });
 
-  /*editBtn.addEventListener('click', async () => {
-    const i = parseInt(idxSelect.value, 10);
-    if (isNaN(i) || i < 0 || i >= plan.length) {
-      showError(idxSelect, 'Ungültiger Index');
-      return;
-    }
 
-    clearErrors();
-    let ok = true;
-    if (newNameIn.value && !validateName(newNameIn.value)) {
-      showError(newNameIn, 'Medikamentname mind. 2 Zeichen');
-      ok = false;
-    }
-    if (newAnzahlIn.value && !validateAnzahl(newAnzahlIn.value)) {
-      showError(newAnzahlIn, 'Ungültige Dosierung');
-      ok = false;
-    }
-    if (newWochIn.value && !validateWochentage(newWochIn.value)) {
-      showError(newWochIn, 'Wochentage: Mo,Di,... So');
-      ok = false;
-    }
-    if (!ok) return;
-
-    const updateData = {};
-    if (newNameIn.value.trim()) {
-      updateData.medikament = newNameIn.value.trim();
-    }
-    if (newAnzahlIn.value.trim()) {
-      updateData.anzahl = `${newAnzahlIn.value.trim()} ${neueEinheitIn.value}`;
-    }
-    if (newZeitIn.value.trim()) {
-      updateData.tageszeit = newZeitIn.value.trim();
-    }
-    if (newWochIn.value.trim()) {
-      updateData.wochentage = newWochIn.value.trim();
-    }
-
-    plan[i].aktualisieren(updateData);
-    speicherePatienten(patientListe);
-    console.log("✅ Medikament lokal bearbeitet.");
-    await speicherePatientNachFirestore(id, patient);
-    render();
-
-    newNameIn.value = '';
-    newAnzahlIn.value = '';
-    neueEinheitIn.selectedIndex = 0;
-    newZeitIn.value = '';
-    newWochIn.value = '';
-    idxSelect.selectedIndex = 0;
-  });
-
-  deleteBtn.addEventListener('click', async () => {
-    const i = parseInt(delSelect.value, 10);
-    if (isNaN(i) || i < 0 || i >= plan.length) {
-      showError(delSelect, 'Ungültiger Index');
-      return;
-    }
-    const entfernt = plan.splice(i, 1);
-    speicherePatienten(patientListe);
-    console.log(`✅ Medikament gelöscht: ${entfernt[0].medikament}`);
-    await speicherePatientNachFirestore(id, patient);
-    render();
-
-    delSelect.selectedIndex = 0;
-  });
-*/
   clearBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     if (!confirm("Wirklich alle Medikamente löschen?")) return;
