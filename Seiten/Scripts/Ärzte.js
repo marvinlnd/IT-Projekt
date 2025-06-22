@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const arzt = patient.arzt || [];
+ 
    // Patientennamen im Header anzeigen
   const nameElem = document.getElementById('patient-name');
   const { vorname = '', nachname = '' } = patient.personalData || {};
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const tbody = document.querySelector("#arztTabelle tbody");
   // Daten abrufen und anzeigen
   function ladeDaten() {
-    
+      const arzt = patient.arzt || [];
       
       tbody.innerHTML = "";
 
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
 
         row.addEventListener("click", (event) => {
-        aktuelleArztId = doc.id;
+        aktuelleArztId = index;
         tbody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
         row.classList.add("selected");
 
@@ -227,17 +227,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Kontextmenü: Delete-Button
         document.getElementById('delete-button').onclick = async () => {
-          if (confirm("Willst du diesen Arzt wirklich löschen?")) {
-            try {
-              await arztRef.doc(aktuelleArztId).delete();
-              ladeDaten();
-            } catch (err) {
-              console.error("Fehler beim Löschen:", err);
-              alert("Löschen fehlgeschlagen!");
-            }
-            menu.style.display = 'none';
-          }
+        const confirmBox = document.getElementById("confirm-delete-modal");
+        confirmBox.style.display = "flex";
+
+        document.getElementById('confirm-delete-yes').onclick = async () => {
+          arzt.splice(aktuelleArztId, 1); // remove from array
+          speicherePatienten(patientListe);
+          await speicherePatientNachFirestore(id, patient);
+          ladeDaten();
+          confirmBox.style.display = "none";
+          document.getElementById('context-menu').style.display = 'none';
         };
+
+        document.getElementById('confirm-delete-no').onclick = () => {
+          confirmBox.style.display = "none";
+        };
+      };
+
       });
 
 
@@ -247,29 +253,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     
   }
+  ladeDaten();
 
 
 
   // Arzt hinzufügen
-  document.getElementById("add-med").addEventListener("click", () => {
-    const name = document.getElementById("arztname").value;
-    const fach = document.getElementById("fach").value;
-    const email = document.getElementById("eMail").value;
-    const telefon = document.getElementById("Telefonnummer").value;
-    const adresse = document.getElementById("Adresse").value;
+  document.getElementById("add-med").addEventListener("click", async () => {
+  const name = document.getElementById("arztname").value.trim();
+  const fach = document.getElementById("fach").value.trim();
+  const email = document.getElementById("eMail").value.trim();
+  const telefon = document.getElementById("Telefonnummer").value.trim();
+  const adresse = document.getElementById("Adresse").value.trim();
 
-    if (name && fach) {
-      arztRef.add({ name, fach, email, telefon, adresse }).then(ladeDaten);
-    }
+  if (!name || !fach) {
+    alert("Name und Fach müssen ausgefüllt sein!");
+    return;
+  }
+
+  const neuerArzt = new Arzt(name, fach, email, telefon, adresse);
+  if (!Array.isArray(patient.arzt)) {
+    patient.arzt = [];
+  }
+  patient.arzt.push(neuerArzt);
+  // zum lokalen Patienten hinzufügen
+  speicherePatienten(patientListe); // im localStorage speichern
+  await speicherePatientNachFirestore(id, patient); // in Firestore speichern
+  ladeDaten(); // Tabelle neu laden
+
+  // Eingabefelder leeren
+  document.getElementById("arztname").value = "";
+  document.getElementById("fach").value = "";
+  document.getElementById("eMail").value = "";
+  document.getElementById("Telefonnummer").value = "";
+  document.getElementById("Adresse").value = "";
   });
 
-  document.addEventListener('click', (e) => {
-    const menu = document.getElementById('context-menu');
-    if (!menu.contains(e.target) && !e.target.closest('tr')) {
-      menu.style.display = 'none';
-    }
-  });
 
+
+});
+
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('context-menu');
+  if (!menu.contains(e.target) && !e.target.closest('tr')) {
+    menu.style.display = 'none';
+  }
 });
 
 /* Nach dem Laden Daten holen

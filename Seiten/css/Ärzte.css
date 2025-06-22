@@ -207,6 +207,20 @@
   border-radius: 4px;
 }
 
+.confirm-button {
+  padding: 8px 16px;
+  background: #0078d4;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.confirm-button:hover {
+  background: #005fa3;
+}
+
+
 /* Responsive */
 @media (max-width: 800px) {
   .container {

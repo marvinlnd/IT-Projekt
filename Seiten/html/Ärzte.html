@@ -135,6 +135,16 @@
         </table>
       </div>
     </div>
+    <!-- Bestätigungs-Modal für einzelne Medikament-Löschung -->
+    <div id="confirm-delete-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); justify-content: center; align-items: center;">
+      <div style="background: white; padding: 20px; border-radius: 8px; max-width: 300px; text-align: center;">
+        <p>Möchtest du diese arzt wirklich löschen?</p>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button id="confirm-delete-yes" class="confirm-button">Ja</button>
+          <button id="confirm-delete-no" class="confirm-button">Nein</button>
+        </div>
+      </div>
+    </div>
   </main>
 
   <script src="../Scripts/Ärzte.js" defer></script>
