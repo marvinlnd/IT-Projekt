@@ -42,176 +42,235 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+console.log("✅ Firebase initialisiert!");
+
 const arztRef = db.collection("ärzte");
+const userId = localStorage.getItem("user-id");
 let aktuelleArztId = null;
 
+class Arzt {
+  constructor(name, fach, email, telefon, adresse) {
+    this.name = name;
+    this.fach = fach;
+    this.email = email;
+    this.telefon = telefon;
+    this.adresse = adresse;
+  }
+
+  aktualisieren(data) {
+    if (data.name !== undefined) this.name = data.name;
+    if (data.fach !== undefined) this.fach = data.fach;
+    if (data.email !== undefined) this.email = data.email;
+    if (data.telefon !== undefined) this.telefon  = data.telefon;
+    if (data.adresse !== undefined) this.adresse = data.adresse;
+  }
+}
+
+const STORAGE_KEY = 'patientListe';
+
+function ladePatienten() {
+  const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  data.forEach(p => {
+    if (Array.isArray(p.arzt)) {
+      p.arzt = p.arzt.map(a => new Arzt(a.name, a.fach, a.email, a.telefon, a.adresse ));
+    }
+  });
+  return data;
+}
+
+function speicherePatienten(liste) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(liste));
+}
+
+// Firestore laden
+async function ladePatientVonFirestore(id) {
+  try {
+    const doc = await db.collection('users').doc(userId).collection('patients').doc(id).get(); 
+    if (!doc.exists) {
+      console.warn(`⚠️ Patient mit ID ${id} nicht gefunden.`);
+      return;
+    }
+    const data = doc.data();
+    if (Array.isArray(data.arzt)) {
+      data.arzt = data.arzt.map(a => new Arzt(a.name, a.fach, a.email, a.telefon, a.adresse));
+    }
+    const patients = ladePatienten();
+    const idx = patients.findIndex(p => p.id === id);
+    if (idx >= 0) patients[idx] = data;
+    else patients.push(data);
+    speicherePatienten(patients);
+    console.log("✅ Ärzte aus Firestore geladen.");
+  } catch (err) {
+    console.error("❌ Fehler beim Laden aus Firestore:", err.message);
+  }
+}
+
+async function speicherePatientNachFirestore(id, patient) {
+  try {
+    const dataToSave = {
+      ...patient,
+      arzt: patient.arzt.map(a => ({
+        name: a.name,
+        fach: a.fach,
+        email: a.email,
+        telefon: a.telefon,
+        adresse: a.adresse
+      }))
+    };
+    await db.collection('users').doc(userId).collection('patients').doc(id).set(dataToSave);
+    console.log("✅ Ärzte in Firestore gespeichert.");
+  } catch (err) {
+    console.error("❌ Fehler beim Speichern in Firestore:", err.message);
+  }
+}
 
 // DOM-Elemente
 const tabelle = document.querySelector("#arztTabelle tbody");
-//const indexDropdown = document.getElementById("indexDropdown");
-//const indexLoeschenDropdown = document.getElementById("indexLoeschenDropdown");
 
-// Daten abrufen und anzeigen
-function ladeDaten() {
-  arztRef.get().then(snapshot => {
-    const tbody = document.querySelector("#arztTabelle tbody");
-    tbody.innerHTML = "";
+// DOM ready
+document.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  if (!id) {
+    console.error("❌ Kein Patient-ID in der URL gefunden.");
+    return;
+  }
 
-    snapshot.docs.forEach((doc, index) => {
-      const daten = doc.data();
+  await ladePatientVonFirestore(id);
 
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${index}</td>
-        <td>${daten.name}</td>
-        <td>${daten.fach}</td>
-        <td>${daten.email}</td>
-        <td>${daten.telefon}</td>
-        <td>${daten.adresse}</td>
-      `;
+  const patientListe = ladePatienten();
+  const patient = patientListe.find(p => p.id === id);
+  if (!patient) {
+    console.error('❌ Patient nicht gefunden:', id);
+    return;
+  }
 
-      row.addEventListener("click", (event) => {
-      aktuelleArztId = doc.id;
-      tbody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
-      row.classList.add("selected");
+  const arzt = patient.arzt || [];
+   // Patientennamen im Header anzeigen
+  const nameElem = document.getElementById('patient-name');
+  const { vorname = '', nachname = '' } = patient.personalData || {};
+  nameElem.textContent = `Patient: ${vorname} ${nachname}`.trim();
 
-      const menu = document.getElementById('context-menu');
-      menu.style.display = 'block';
-      menu.style.left = `${event.pageX + 5}px`;
-      menu.style.top = `${event.pageY + 5}px`;
+  const tbody = document.querySelector("#arztTabelle tbody");
+  // Daten abrufen und anzeigen
+  function ladeDaten() {
+    
+      
+      tbody.innerHTML = "";
 
-      // Kontextmenü: Edit-Button
-      document.getElementById('edit-button').onclick = () => {
-        const modal = document.getElementById('edit-modal-overlay');
-        const nameInput    = document.getElementById('modal-arzt-name');
-        const fachInput    = document.getElementById('modal-arzt-fach');
-        const emailInput   = document.getElementById('modal-arzt-email');
-        const telInput     = document.getElementById('modal-arzt-telefon');
-        const adresseInput = document.getElementById('modal-arzt-adresse');
-        const fertigBtn    = document.getElementById('modal-save');
-        const cancelBtn    = document.getElementById('modal-cancel');
+      arzt.forEach((daten, index) => {
 
-        nameInput.value    = daten.name    || "";
-        fachInput.value    = daten.fach    || "";
-        emailInput.value   = daten.email   || "";
-        telInput.value     = daten.telefon || "";
-        adresseInput.value = daten.adresse || "";
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${index}</td>
+          <td>${daten.name}</td>
+          <td>${daten.fach}</td>
+          <td>${daten.email}</td>
+          <td>${daten.telefon}</td>
+          <td>${daten.adresse}</td>
+        `;
 
-        modal.style.display = 'flex';
-        menu.style.display  = 'none';
+        row.addEventListener("click", (event) => {
+        aktuelleArztId = doc.id;
+        tbody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
+        row.classList.add("selected");
 
-        fertigBtn.onclick = async () => {
-          const updates = {
-            name:    nameInput.value.trim(),
-            fach:    fachInput.value.trim(),
-            email:   emailInput.value.trim(),
-            telefon: telInput.value.trim(),
-            adresse: adresseInput.value.trim()
+        const menu = document.getElementById('context-menu');
+        menu.style.display = 'block';
+        menu.style.left = `${event.pageX + 5}px`;
+        menu.style.top = `${event.pageY + 5}px`;
+
+        // Kontextmenü: Edit-Button
+        document.getElementById('edit-button').onclick = () => {
+          const modal = document.getElementById('edit-modal-overlay');
+          const nameInput    = document.getElementById('modal-arzt-name');
+          const fachInput    = document.getElementById('modal-arzt-fach');
+          const emailInput   = document.getElementById('modal-arzt-email');
+          const telInput     = document.getElementById('modal-arzt-telefon');
+          const adresseInput = document.getElementById('modal-arzt-adresse');
+          const fertigBtn    = document.getElementById('modal-save');
+          const cancelBtn    = document.getElementById('modal-cancel');
+
+          nameInput.value    = daten.name    || "";
+          fachInput.value    = daten.fach    || "";
+          emailInput.value   = daten.email   || "";
+          telInput.value     = daten.telefon || "";
+          adresseInput.value = daten.adresse || "";
+
+          modal.style.display = 'flex';
+          menu.style.display  = 'none';
+
+          fertigBtn.onclick = async () => {
+            const updates = {
+              name:    nameInput.value.trim(),
+              fach:    fachInput.value.trim(),
+              email:   emailInput.value.trim(),
+              telefon: telInput.value.trim(),
+              adresse: adresseInput.value.trim()
+            };
+
+            if (updates.name.length < 2 || updates.fach.length < 2) {
+              alert("Bitte mindestens Name und Fach korrekt ausfüllen.");
+              return;
+            }
+            
+            speicherePatienten(patientListe)
+            await speicherePatientNachFirestore(id, patient);
+            ladeDaten();
+            modal.style.display = 'none';
           };
 
-          if (updates.name.length < 2 || updates.fach.length < 2) {
-            alert("Bitte mindestens Name und Fach korrekt ausfüllen.");
-            return;
-          }
-
-          await arztRef.doc(aktuelleArztId).update(updates);
-          ladeDaten();
-          modal.style.display = 'none';
+          cancelBtn.onclick = () => {
+            modal.style.display = 'none';
+          };
         };
 
-        cancelBtn.onclick = () => {
-          modal.style.display = 'none';
-        };
-      };
-
-      // Kontextmenü: Delete-Button
-      document.getElementById('delete-button').onclick = async () => {
-        if (confirm("Willst du diesen Arzt wirklich löschen?")) {
-          try {
-            await arztRef.doc(aktuelleArztId).delete();
-            ladeDaten();
-          } catch (err) {
-            console.error("Fehler beim Löschen:", err);
-            alert("Löschen fehlgeschlagen!");
+        // Kontextmenü: Delete-Button
+        document.getElementById('delete-button').onclick = async () => {
+          if (confirm("Willst du diesen Arzt wirklich löschen?")) {
+            try {
+              await arztRef.doc(aktuelleArztId).delete();
+              ladeDaten();
+            } catch (err) {
+              console.error("Fehler beim Löschen:", err);
+              alert("Löschen fehlgeschlagen!");
+            }
+            menu.style.display = 'none';
           }
-          menu.style.display = 'none';
-        }
-      };
-    });
+        };
+      });
 
 
-      tbody.appendChild(row);
+        tbody.appendChild(row);
 
-      /* Dropdowns mit IDs aktualisieren
-      const option = new Option(`${daten.name} (${index})`, index);
-      document.getElementById("indexDropdown").appendChild(option);
-      document.getElementById("indexLoeschenDropdown").appendChild(option.cloneNode(true));*/
-    });
+      });
 
-    console.log(`✅ ${snapshot.size} Ärzte geladen.`);
-  }).catch(error => {
-    console.error("❌ Fehler beim Laden der Daten:", error);
+    
+  }
+
+
+
+  // Arzt hinzufügen
+  document.getElementById("add-med").addEventListener("click", () => {
+    const name = document.getElementById("arztname").value;
+    const fach = document.getElementById("fach").value;
+    const email = document.getElementById("eMail").value;
+    const telefon = document.getElementById("Telefonnummer").value;
+    const adresse = document.getElementById("Adresse").value;
+
+    if (name && fach) {
+      arztRef.add({ name, fach, email, telefon, adresse }).then(ladeDaten);
+    }
   });
-}
 
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('context-menu');
+    if (!menu.contains(e.target) && !e.target.closest('tr')) {
+      menu.style.display = 'none';
+    }
+  });
 
-
-// Arzt hinzufügen
-document.getElementById("add-med").addEventListener("click", () => {
-  const name = document.getElementById("arztname").value;
-  const fach = document.getElementById("fach").value;
-  const email = document.getElementById("eMail").value;
-  const telefon = document.getElementById("Telefonnummer").value;
-  const adresse = document.getElementById("Adresse").value;
-
-  if (name && fach) {
-    arztRef.add({ name, fach, email, telefon, adresse }).then(ladeDaten);
-  }
 });
 
-/* Arzt bearbeiten
-document.getElementById("edit-med").addEventListener("click", () => {
-  const docId = indexDropdown.value;
-  const name = document.getElementById("neuerArztname").value;
-  const fach = document.getElementById("neueFach").value;
-  const email = document.getElementById("neueEMail").value;
-  const telefon = document.getElementById("neueTelefonnummer").value;
-  const adresse = document.getElementById("neueAdresse").value;
-
-  if (docId) {
-    arztRef.doc(docId).update({
-      ...(name && { name }),
-      ...(fach && { fach }),
-      ...(email && { email }),
-      ...(telefon && { telefon }),
-      ...(adresse && { adresse })
-    }).then(ladeDaten);
-  }
-});
-
-// Arzt löschen
-document.getElementById("delete-arzt").addEventListener("click", () => {
-  const docId = indexLoeschenDropdown.value;
-  if (docId) {
-    arztRef.doc(docId).delete().then(ladeDaten);
-  }
-});
-
-// Alle löschen
-document.getElementById("clear-med").addEventListener("click", () => {
-  arztRef.get().then(snapshot => {
-    const batch = db.batch();
-    snapshot.docs.forEach(doc => batch.delete(doc.ref));
-    return batch.commit();
-  }).then(ladeDaten);
-});*/
-
-document.addEventListener('click', (e) => {
-  const menu = document.getElementById('context-menu');
-  if (!menu.contains(e.target) && !e.target.closest('tr')) {
-    menu.style.display = 'none';
-  }
-});
-
-// Nach dem Laden Daten holen
-document.addEventListener("DOMContentLoaded", ladeDaten);
+/* Nach dem Laden Daten holen
+document.addEventListener("DOMContentLoaded", ladeDaten);*/

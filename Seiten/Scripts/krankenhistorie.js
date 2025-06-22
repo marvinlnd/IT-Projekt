@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
  
 
-function renderTable() {
+  function renderTable() {
   // Clear out old rows
   tblBody.innerHTML = '';
 
@@ -171,8 +171,8 @@ function renderTable() {
       <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
     `;
 
-    // 1) Klick-Handler fürs Auswählen
-    row.addEventListener("click", (event) => {
+      // 1) Klick-Handler fürs Auswählen
+      row.addEventListener("click", (event) => {
       // Zeile markieren
       tblBody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
       row.classList.add("selected");
