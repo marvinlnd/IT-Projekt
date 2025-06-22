@@ -55,7 +55,7 @@
     toast.style.display = "none";
     const user = userCredential.user;
     localStorage.setItem("user-id", JSON.stringify(user.uid));
-	window.location.href = "../html/Homepage.html";
+	window.location.href = "html/Homepage.html";
     }, 500); // verschwindet nach 1/2 Sekunden
 
       })
