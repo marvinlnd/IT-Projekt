@@ -234,3 +234,24 @@
     flex-direction: column;
   }
 }
+
+@media (max-width: 480px) {
+    /* Header wieder in einer Zeile halten und Werkzeuge am rechten Rand bündeln */
+    .header {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+    }
+    .header .tools {
+      margin-top: 0;
+      justify-content: flex-end;
+      gap: 8px; /*Abstand zwischen Icon und Dropdown */
+    }
+  
+    /*etwas kleinere Icons, damit alles schön nebeneinander passt */
+    .header .tools img {
+      width: 22px;
+      height: 22px;
+    }
+  }
