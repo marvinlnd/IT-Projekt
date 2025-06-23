@@ -119,8 +119,8 @@ const translations = {
     'dialog.payment_error': 'Payment error',
     
     // Footer
-    'footer.privacy': 'Privacy Policy',
-    'footer.imprint': 'Legal Notice',
+    'footer.privacy': 'Privacy & Security',
+    'footer.imprint': 'Imprint',
     
     // Monate
     'month.january': 'January', 'month.february': 'February', 'month.march': 'March',
