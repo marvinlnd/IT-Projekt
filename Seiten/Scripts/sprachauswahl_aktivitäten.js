@@ -9,32 +9,32 @@ const aktivitaetenLanguages = {
         account: "Konto",
         
         // Main Title
-        editActivities: "🗓️ Aktivitäten bearbeiten",
+        editActivities: "Begleitprotokoll",
         
         // Context Menu
         edit: "🛠️ Bearbeiten",
         delete: "🗑️ Löschen",
         
         // Modal
-        editActivity: "🛠️ Aktivität bearbeiten",
-        activityName: "Name der Aktivität:",
-        activityStart: "Beginn der Aktivität:",
-        activityEnd: "Ende der Aktivität:",
+        editActivity: "Begleitprotokoll",
+        activityName: "Name des Protokolls: ",
+        activityStart: "Beginn des Termins:",
+        activityEnd: "Ende des Termins: ",
         note: "Notiz :",
         done: "Fertig",
         cancel: "Abbrechen",
         
         // Form Sections - Details Summaries
-        addNewActivity: "➕ Neue Aktivität hinzufügen",
-        editActivitySection: "🛠️ Aktivität bearbeiten",
-        deleteActivitySection: "🗑️ Aktivität löschen",
+        addNewActivity: "Neues Protokoll hinzufügen",
+        editActivitySection: "🛠️ Protokoll bearbeiten",
+        deleteActivitySection: "🗑️ Protokoll löschen",
         
         // Add Activity Form
-        activityNameLabel: "Name der Aktivität",
-        activityNamePlaceholder: "Name der Aktivität",
-        activityStartLabel: "Beginn der Aktivität",
+        activityNameLabel: "Name",
+        activityNamePlaceholder: "Name",
+        activityStartLabel: "Begin",
         startPlaceholder: "Beginn",
-        activityEndLabel: "Ende der Aktivität",
+        activityEndLabel: "Ende",
         notesLabel: "Notizen",
         notePlaceholder: "Notiz",
         addButton: "Hinzufügen",
@@ -43,8 +43,8 @@ const aktivitaetenLanguages = {
         indexPlaceholder: "Index",
         newNameLabel: "Neuer Name",
         newNamePlaceholder: "Neuer Name",
-        changeStartLabel: "Beginn der Aktivität ändern",
-        changeEndLabel: "Ende der Aktivität ändern",
+        changeStartLabel: "Beginn des Protokolls ändern",
+        changeEndLabel: "Ende des Protokolls ändern",
         changeNoteLabel: "Notitz ändern",
         changeNotePlaceholder: "Notiz ändern",
         saveChanges: "Änderungen speichern",
@@ -55,17 +55,17 @@ const aktivitaetenLanguages = {
         clearAllButton: "🪜 Alles löschen",
         
         // Table Section
-        activitiesTable: "📋 Aktivitäten-Tabelle",
+        activitiesTable: "📋 Begleitprotokolle",
         tableHeaders: {
-            index: "#",
-            activity: "Aktivität",
+            index: "Datum",
+            activity: "Name des Protokolls",
             start: "Beginn",
             end: "Ende",
             note: "Notiz"
         },
         
         // Confirmation Dialog
-        confirmDeleteAll: "⚠️ Wollen Sie wirklich ALLE Aktivitäten unwiderruflich löschen? ⚠️"
+        confirmDeleteAll: "⚠️ Wollen Sie wirklich ALLE Begleitprotokolle unwiderruflich löschen? ⚠️"
     },
     
     en: {
@@ -75,7 +75,7 @@ const aktivitaetenLanguages = {
         account: "Account",
         
         // Main Title
-        editActivities: "🗓️ Edit Activities",
+        editActivities: "🗓️ Edit",
         
         // Context Menu
         edit: "🛠️ Edit",

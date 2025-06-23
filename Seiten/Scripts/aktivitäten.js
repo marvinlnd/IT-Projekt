@@ -1,12 +1,7 @@
-// aktivitäten.js
-
-// Login-Pop-up Menü: nur die erforderlichen Zeilen
-
-// Elemente selektieren
+// Login-Pop-up Menü
 const loginIcon = document.getElementById('login-icon');
 const loginMenu = document.getElementById('login-menu');
 
-// Klick auf das Icon: Menü ein-/ausblenden
 loginIcon.addEventListener('click', e => {
   e.stopPropagation();
   const isOpen = loginMenu.classList.toggle('open');
@@ -14,7 +9,6 @@ loginIcon.addEventListener('click', e => {
   loginIcon.setAttribute('aria-expanded', isOpen);
 });
 
-// Klick außerhalb: Menü schließen
 document.addEventListener('click', e => {
   if (!loginIcon.contains(e.target) && !loginMenu.contains(e.target)) {
     loginMenu.classList.remove('open');
@@ -23,7 +17,6 @@ document.addEventListener('click', e => {
   }
 });
 
-// Menü schließt sich auch, wenn ein Link angeklickt wird
 loginMenu.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => {
     loginMenu.classList.remove('open');
@@ -32,8 +25,7 @@ loginMenu.querySelectorAll('a').forEach(link => {
   });
 });
 
-
-// Firebase initialisieren
+// Firebase Initialisierung
 const firebaseConfig = {
   apiKey: "AIzaSyAakpWbT87pJ4Bv1Xr0Mk2lCNhNols7KR4",
   authDomain: "it-projekt-ffc4d.firebaseapp.com",
@@ -47,9 +39,25 @@ const db = firebase.firestore();
 console.log("✅ Firebase für Aktivitäten initialisiert!");
 
 const userId = localStorage.getItem("user-id");
+const params = new URLSearchParams(location.search);
+const patientId = params.get('id');
+if (!patientId) {
+  console.error("❌ Kein Patient-ID in der URL gefunden.");
+}
+
+const STORAGE_KEY = 'patientListe';
+
+function ladePatienten() {
+  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+}
+
+function speicherePatienten(liste) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(liste));
+}
 
 class Aktivität {
-  constructor(nameDerAktivität, beginn, ende, notitz) {
+  constructor(datum, nameDerAktivität, beginn, ende, notitz) {
+    this.datum = datum;
     this.nameDerAktivität = nameDerAktivität;
     this.beginn = beginn;
     this.ende = ende;
@@ -58,13 +66,13 @@ class Aktivität {
 }
 
 let aktivitäten = [];
+const datumInput = document.getElementById("date");
 const nameInput = document.getElementById("nameDerAktivität");
 const beginnInput = document.getElementById("beginn");
 const endeInput = document.getElementById("ende");
 const notitzInput = document.getElementById("notitz");
 
-
-// 🧩 Fehleranzeige-Funktionen
+// Fehleranzeigen
 function showError(elem, msg) {
   elem.style.borderColor = 'red';
   elem.title = msg;
@@ -82,44 +90,28 @@ function showError(elem, msg) {
 
 function clearErrors() {
   document.querySelectorAll('.error-message').forEach(e => e.remove());
-  [nameInput, beginnInput, endeInput].forEach(el => {
+  [datumInput, nameInput, beginnInput, endeInput].forEach(el => {
     el.style.borderColor = '';
     el.title = '';
   });
 }
-
-
-function clearErrorsModal() {
-  // Entferne alle Fehlermeldungen im Modal
-  document.querySelectorAll('#edit-modal-overlay .error-message').forEach(e => e.remove());
-
-  // Setze die Styles zurück für die Modal Inputs
-  [ 
-    document.getElementById("modal-name"), 
-    document.getElementById("modal-beginn"), 
-    document.getElementById("modal-ende"),
-    document.getElementById("modal-Notiz")
-  ].forEach(el => {
-    el.style.borderColor = '';
-    el.title = '';
-  });
-}
-
 
 function validateName(name) {
   return typeof name === 'string' && name.trim().length >= 2;
 }
 
 function validateZeitFormat(zeit) {
-  // Einfaches Regex für HH:MM (24h Format)
   return /^\d{2}:\d{2}$/.test(zeit);
 }
 
-
-function validateInputs(name, beginn, ende, nameInput, beginnInput, endeInput) {
+function validateInputs(datum, name, beginn, ende, datumInput, nameInput, beginnInput, endeInput) {
   clearErrors();
   let ok = true;
 
+  if (!datum) {
+    showError(datumInput, 'Datum erforderlich');
+    ok = false;
+  }
   if (!validateName(name)) {
     showError(nameInput, 'Aktivitätsname mind. 2 Zeichen');
     ok = false;
@@ -132,12 +124,12 @@ function validateInputs(name, beginn, ende, nameInput, beginnInput, endeInput) {
     showError(endeInput, 'Zeitformat: HH:MM');
     ok = false;
   }
-
   return ok;
 }
 
 document.getElementById("add-button").addEventListener("click", () => {
   aktivitätHinzufügen(
+    datumInput.value,
     nameInput.value,
     beginnInput.value,
     endeInput.value,
@@ -145,85 +137,64 @@ document.getElementById("add-button").addEventListener("click", () => {
   );
 });
 
-
-// Daten aus Firestore laden
-async function ladeAktivitäten() {
-  if (!userId) {
-    console.error("❌ Kein userId gefunden!");
-    return;
-  }
+// Firestore Laden
+async function ladeAktivitätenVonFirestore() {
+  if (!userId || !patientId) return console.error("❌ Benutzer- oder Patient-ID fehlt!");
 
   try {
-    const snapshot = await db.collection('users').doc(userId).collection('aktivitäten').get();
-    aktivitäten = [];
-    snapshot.forEach(doc => {
-      const eintrag = doc.data();
-      aktivitäten.push({ id: doc.id, ...eintrag });
-    });
+    const snapshot = await db.collection('users').doc(userId)
+      .collection('patients').doc(patientId)
+      .collection('aktivitäten').get();
+    const geladen = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    console.log(`✅ ${aktivitäten.length} Aktivitäten geladen:`, aktivitäten);
+    const patienten = ladePatienten();
+    const patient = patienten.find(p => p.id === patientId);
+    if (patient) {
+      patient.aktivitäten = geladen;
+      speicherePatienten(patienten);
+    }
+
+    aktivitäten = geladen;
+    applyFilterAndSort();
+    console.log("✅ Aktivitäten von Firestore geladen.");
+  } catch (err) {
+    console.error("❌ Fehler beim Laden aus Firestore:", err.message);
+  }
+}
+
+// Hinzufügen
+async function aktivitätHinzufügen(datum, name, beginn, ende, notitz) {
+  if (!validateInputs(datum, name, beginn, ende, datumInput, nameInput, beginnInput, endeInput)) return;
+
+  const neueAktivität = { datum, nameDerAktivität: name, beginn, ende, notitz };
+  try {
+    const docRef = await db.collection('users').doc(userId)
+      .collection('patients').doc(patientId)
+      .collection('aktivitäten').add(neueAktivität);
+    neueAktivität.id = docRef.id;
+    aktivitäten.push(neueAktivität);
+
+    const patienten = ladePatienten();
+    const patient = patienten.find(p => p.id === patientId);
+    if (patient) {
+      if (!Array.isArray(patient.aktivitäten)) patient.aktivitäten = [];
+      patient.aktivitäten.push(neueAktivität);
+      speicherePatienten(patienten);
+    }
+
     applyFilterAndSort();
   } catch (error) {
-    console.error("❌ Fehler beim Laden der Aktivitäten:", error);
+    console.error("❌ Fehler beim Hinzufügen:", error);
   }
 }
 
-
-// Neue Aktivität hinzufügen
-async function aktivitätHinzufügen(name, beginn, ende, notitz) {
-  const nameInput   = document.getElementById("nameDerAktivität");
-  const beginnInput = document.getElementById("beginn");
-  const endeInput   = document.getElementById("ende");
-
-  if (!validateInputs(name, beginn, ende, nameInput, beginnInput, endeInput)) return;
-
-  const neueAktivität = {
-    nameDerAktivität: name,
-    beginn,
-    ende,
-    notitz
-  };
-
-  try {
-    const docRef = await db.collection('users').doc(userId).collection('aktivitäten').add(neueAktivität);
-    console.log("✅ Aktivität hinzugefügt:", docRef.id);
-    await ladeAktivitäten();
-  } catch (error) {
-    console.error("❌ Fehler beim Speichern der Aktivität:", error);
-  }
-}
-
-
-// Aktivität löschen
-async function aktivität_loeschen(index) {
+// Bearbeiten
+async function aktivität_bearbeiten(index, datum, neuerName, neuBeginn, neuEnde, neueNotitz) {
   const eintrag = aktivitäten[index];
-  if (!eintrag || !eintrag.id) {
-    alert("❗ Ungültiger Index oder fehlende ID beim Löschen!");
-    return;
-  }
-
-  if (confirm("❓ Willst du diese Aktivität wirklich löschen?❓")) {
-    try {
-      await db.collection("users").doc(userId).collection("aktivitäten").doc(eintrag.id).delete();
-      console.log("✅ Aktivität aus Firestore gelöscht:", eintrag.id);
-      await ladeAktivitäten();
-    } catch (error) {
-      console.error("❌ Fehler beim Löschen:", error);
-    }
-  }
-}
-
-// Aktivität bearbeiten
-async function aktivität_bearbeiten(index, neuerName, neuBeginn, neuEnde, neueNotitz) {
-  if (!validiereAktivitaet(neuerName, neuBeginn, neuEnde, neueNotitz)) return;
-
-  const eintrag = aktivitäten[index];
-  if (!eintrag || !eintrag.id) {
-    console.warn("❗ Keine gültige Aktivität zum Bearbeiten gefunden.");
-    return;
-  }
+  if (!eintrag?.id) return console.warn("❗ Keine gültige Aktivität!");
 
   const aktualisiert = {
+    datum,
     nameDerAktivität: neuerName,
     beginn: neuBeginn,
     ende: neuEnde,
@@ -231,15 +202,53 @@ async function aktivität_bearbeiten(index, neuerName, neuBeginn, neuEnde, neueN
   };
 
   try {
-    await db.collection("users").doc(userId).collection("aktivitäten").doc(eintrag.id).set(aktualisiert);
-    console.log("✅ Aktivität in Firestore aktualisiert:", eintrag.id);
-    await ladeAktivitäten();
+    await db.collection('users').doc(userId)
+      .collection('patients').doc(patientId)
+      .collection('aktivitäten').doc(eintrag.id).set(aktualisiert);
+    Object.assign(eintrag, aktualisiert);
+
+    const patienten = ladePatienten();
+    const patient = patienten.find(p => p.id === patientId);
+    if (patient && Array.isArray(patient.aktivitäten)) {
+      const idx = patient.aktivitäten.findIndex(a => a.id === eintrag.id);
+      if (idx >= 0) patient.aktivitäten[idx] = eintrag;
+      speicherePatienten(patienten);
+    }
+
+    applyFilterAndSort();
   } catch (error) {
-    console.error("❌ Fehler beim Aktualisieren:", error);
+    console.error("❌ Fehler beim Bearbeiten:", error);
   }
 }
 
-// Tabelle aktualisieren & Zeilen klickbar machen
+// Löschen
+async function aktivität_loeschen(index) {
+  const eintrag = aktivitäten[index];
+  if (!eintrag?.id) return alert("❗ Ungültiger Index oder ID!");
+
+  if (confirm("❓ Willst du diese Aktivität wirklich löschen?")) {
+    try {
+      await db.collection("users").doc(userId)
+        .collection("patients").doc(patientId)
+        .collection("aktivitäten").doc(eintrag.id).delete();
+      aktivitäten.splice(index, 1);
+
+      const patienten = ladePatienten();
+      const patient = patienten.find(p => p.id === patientId);
+      if (patient && Array.isArray(patient.aktivitäten)) {
+        const idx = patient.aktivitäten.findIndex(a => a.id === eintrag.id);
+        if (idx >= 0) patient.aktivitäten.splice(idx, 1);
+        speicherePatienten(patienten);
+      }
+
+      applyFilterAndSort();
+    } catch (error) {
+      console.error("❌ Fehler beim Löschen:", error);
+    }
+  }
+}
+
+// Tabelle aktualisieren
 function aktualisiereTabelle(liste = aktivitäten) {
   const tbody = document.querySelector("#aktivitätenTabelle tbody");
   tbody.innerHTML = "";
@@ -247,7 +256,7 @@ function aktualisiereTabelle(liste = aktivitäten) {
   liste.forEach((eintrag, index) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${index}</td>
+      <td>${eintrag.datum || ''}</td>
       <td>${eintrag.nameDerAktivität}</td>
       <td>${eintrag.beginn}</td>
       <td>${eintrag.ende}</td>
@@ -255,73 +264,47 @@ function aktualisiereTabelle(liste = aktivitäten) {
     `;
 
     row.addEventListener("click", event => {
-      // a) Highlight the selected row
       tbody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
       row.classList.add("selected");
 
-      // b) Position and show context menu
       const menu = document.getElementById("context-menu");
       menu.style.display = "block";
       menu.style.left = `${event.pageX + 5}px`;
-      menu.style.top  = `${event.pageY + 5}px`;
+      menu.style.top = `${event.pageY + 5}px`;
 
-      // c) Edit-Button → open modal
       document.getElementById("edit-button").onclick = () => {
-        const modal     = document.getElementById("edit-modal-overlay");
-        const nameIn    = document.getElementById("modal-name");
-        const beginnIn  = document.getElementById("modal-beginn");
-        const endeIn    = document.getElementById("modal-ende");
-        const noteIn    = document.getElementById("modal-Notiz");
-        const saveBtn   = document.getElementById("modal-save");
+        const modal = document.getElementById("edit-modal-overlay");
+        const dateIn = document.getElementById("modal-datum");
+        const nameIn = document.getElementById("modal-name");
+        const beginnIn = document.getElementById("modal-beginn");
+        const endeIn = document.getElementById("modal-ende");
+        const noteIn = document.getElementById("modal-Notiz");
+        const saveBtn = document.getElementById("modal-save");
         const cancelBtn = document.getElementById("modal-cancel");
 
-        // fill current values
-        nameIn.value   = eintrag.nameDerAktivität;
+        dateIn.value = eintrag.datum || "";
+        nameIn.value = eintrag.nameDerAktivität;
         beginnIn.value = eintrag.beginn;
-        endeIn.value   = eintrag.ende;
-        noteIn.value   = eintrag.notitz;
+        endeIn.value = eintrag.ende;
+        noteIn.value = eintrag.notitz;
 
         modal.style.display = "flex";
-        menu.style.display  = "none";
+        menu.style.display = "none";
 
         saveBtn.onclick = async () => {
-        clearErrorsModal(); // Variante für die Inputs im Modal
-
-        let ok = true;
-
-        if (!validateName(nameIn.value)) {
-          showError(nameIn, 'Aktivitätsname mind. 2 Zeichen');
-          ok = false;
-        }
-        if (!validateZeitFormat(beginnIn.value)) {
-          showError(beginnIn, 'Zeitformat: HH:MM');
-          ok = false;
-        }
-        if (!validateZeitFormat(endeIn.value)) {
-          showError(endeIn, 'Zeitformat: HH:MM');
-          ok = false;
-        }
-
-        if (!ok) return; // Stoppe, wenn irgendwas ungültig ist
-
-        // Alles valide → speichere
-        await aktivität_bearbeiten(
-          index,
-          nameIn.value,
-          beginnIn.value,
-          endeIn.value,
-          noteIn.value
-        );
-        modal.style.display = "none";
-      };
-
-
-        cancelBtn.onclick = () => {
+          let ok = true;
+          if (!dateIn.value) { showError(dateIn, 'Datum erforderlich'); ok = false; }
+          if (!validateName(nameIn.value)) { showError(nameIn, 'mind. 2 Zeichen'); ok = false; }
+          if (!validateZeitFormat(beginnIn.value)) { showError(beginnIn, 'HH:MM'); ok = false; }
+          if (!validateZeitFormat(endeIn.value)) { showError(endeIn, 'HH:MM'); ok = false; }
+          if (!ok) return;
+          await aktivität_bearbeiten(index, dateIn.value, nameIn.value, beginnIn.value, endeIn.value, noteIn.value);
           modal.style.display = "none";
         };
+
+        cancelBtn.onclick = () => modal.style.display = "none";
       };
 
-      // d) Delete-Button → delete entry
       document.getElementById("delete-button").onclick = async () => {
         await aktivität_loeschen(index);
         menu.style.display = "none";
@@ -332,70 +315,41 @@ function aktualisiereTabelle(liste = aktivitäten) {
   });
 }
 
+// Initial Laden
+document.addEventListener("DOMContentLoaded", async () => {
+  const patienten = ladePatienten();
+  const patient = patienten.find(p => p.id === patientId);
+  aktivitäten = (patient && Array.isArray(patient.aktivitäten)) ? patient.aktivitäten : [];
+  applyFilterAndSort();
+    const nameElem = document.getElementById('patient-name');
+  const { vorname = '', nachname = '' } = patient.personalData || {};
+  nameElem.textContent = `Patient: ${vorname} ${nachname}`.trim();
 
-// Validierung
-function validiereAktivitaet(name, beginn, ende, notitz) {
-  if (!name || !beginn || !ende) {
-    alert("Bitte alle Pflichtfelder ausfüllen!");
-    return false;
-  }
-  return true;
-}
-
-// Initiales Laden
-document.addEventListener("DOMContentLoaded", ladeAktivitäten);
-document.getElementById("add-button").addEventListener("click", () => {
-  const nameInput   = document.getElementById("name");
-  const beginnInput = document.getElementById("beginn");
-  const endeInput   = document.getElementById("ende");
-  const notizInput  = document.getElementById("notiz");
-
-  const name   = nameInput.value;
-  const beginn = beginnInput.value;
-  const ende   = endeInput.value;
-  const notiz  = notizInput.value;
-
-  aktivitätHinzufügen(name, beginn, ende, notiz);
+  await ladeAktivitätenVonFirestore();
 });
-
 
 document.addEventListener('click', (e) => {
   const menu = document.getElementById('context-menu');
   if (!menu.contains(e.target) && !e.target.closest('tr')) {
     menu.style.display = 'none';
   }
+
 });
 
-const filterToggle = document.getElementById("filter-toggle"); // der Button, der das Dropdown zeigt
-const filterDropdown = document.getElementById("filter-dropdown"); // das Dropdown selbst
-const sortButtons = document.querySelectorAll(".sort-button"); // Buttons mit data-sort
-let currentSort = "neueste"; // oder "aelteste", je nach Default
+// Filter & Sortierung
+const filterToggle = document.getElementById("filter-toggle");
+const filterDropdown = document.getElementById("filter-dropdown");
+const sortButtons = document.querySelectorAll(".sort-button");
+let currentSort = "neueste";
 
-
-  // Filter & Sortierung anwenden
 function applyFilterAndSort() {
-  let sorted = [...aktivitäten];
-
-
-  switch (currentSort) {
-    case 'neueste':
-      sorted.sort((a, b) => parseTime(b.beginn) - parseTime(a.beginn));
-      break;
-    case 'aelteste':
-      sorted.sort((a, b) => parseTime(a.beginn) - parseTime(b.beginn));
-      break;
-  }
-
-  
+  const sorted = [...aktivitäten].sort((a, b) => new Date(b.datum) - new Date(a.datum));
   aktualisiereTabelle(sorted);
 }
 
 filterToggle.addEventListener('click', () => {
-  const vis = filterDropdown.style.display === 'block';
-  filterDropdown.style.display = vis ? 'none' : 'block';
-  sortButtons.forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.sort === currentSort);
-  });
+  filterDropdown.style.display = filterDropdown.style.display === 'block' ? 'none' : 'block';
+  sortButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.sort === currentSort));
 });
 
 document.addEventListener('click', e => {
@@ -404,17 +358,10 @@ document.addEventListener('click', e => {
   }
 });
 
-function parseTime(zeitStr) {
-  const [hh, mm] = zeitStr.split(":").map(Number);
-  const now = new Date();
-  now.setHours(hh, mm, 0, 0);
-  return now;
-}
 
 
 sortButtons.forEach(button => {
   button.addEventListener('click', () => {
-    console.log("Sortierbutton geklickt:", button.dataset.sort);
     currentSort = button.dataset.sort;
     sortButtons.forEach(btn => btn.classList.toggle('active', btn === button));
     filterDropdown.style.display = 'none';
