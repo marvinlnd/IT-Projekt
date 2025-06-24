@@ -1,6 +1,6 @@
-  
+ // ============================
 // Automatische Rechnungserstellung für alle Activities
- 
+// ============================
 
 // Login Menu
 const loginIcon = document.getElementById('login-icon');
@@ -54,43 +54,65 @@ const statusConfig = {
 // Utility Functions
 const formatCurrency = amount => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(amount);
 const formatDate = dateString => dateString ? new Date(dateString).toLocaleDateString('de-DE') : 'Nicht verfügbar';
+
+// Sichere Alert/Confirm Funktionen
+const safeAlert = (message) => {
+  try {
+    if (window.alert && typeof window.alert === 'function') {
+      window.alert(message);
+    }
+  } catch (e) {
+    // Fehler ignorieren
+  }
+};
+
+const safeConfirm = (message) => {
+  try {
+    if (window.confirm && typeof window.confirm === 'function') {
+      return window.confirm(message);
+    } else {
+      return true;
+    }
+  } catch (e) {
+    return true;
+  }
+};
+
 const parseFirestoreDate = date => {
   if (!date) return new Date();
-  if (typeof date.toDate === 'function') return date.toDate();
-  return new Date(date);
+  
+  if (typeof date.toDate === 'function') {
+    try {
+      return date.toDate();
+    } catch (e) {
+      return new Date();
+    }
+  }
+  
+  try {
+    const parsed = new Date(date);
+    if (isNaN(parsed.getTime())) {
+      return new Date();
+    }
+    return parsed;
+  } catch (e) {
+    return new Date();
+  }
 };
 
 // Automatische Rechnungserstellung
 function starteActivitiesUeberwachung(userId) {
   if (activitiesListener) activitiesListener();
   
-  activitiesListener = db.collection("Activities").onSnapshot(async snapshot => {
+  activitiesListener = db.collection("users").doc(userId).collection("aktivitäten").onSnapshot(async snapshot => {
     const changes = snapshot.docChanges();
+    const newActivities = changes.filter(change => change.type === "added");
+    const deletedActivities = changes.filter(change => change.type === "removed");
     
-    // Neue Activities
-    const newActivities = changes.filter(change => {
-      const isAdded = change.type === "added";
-      const data = change.doc.data();
-      const activityUserId = data.userId;
-      const isCorrectUser = activityUserId === userId || !activityUserId;
-      return isAdded && isCorrectUser;
-    });
-    
-    // Gelöschte Activities  
-    const deletedActivities = changes.filter(change => {
-      const isRemoved = change.type === "removed";
-      const data = change.doc.data();
-      const activityUserId = data.userId;
-      const isCorrectUser = activityUserId === userId || !activityUserId;
-      return isRemoved && isCorrectUser;
-    });
-    
-    // Neue Activities verarbeiten
     for (const change of newActivities) {
       await verarbeiteActivity(change.doc.id, change.doc.data(), userId);
     }
     
-    // Gelöschte Activities aus Rechnungen entfernen
     for (const change of deletedActivities) {
       await entferneActivityAusRechnungen(change.doc.id, userId);
     }
@@ -98,8 +120,6 @@ function starteActivitiesUeberwachung(userId) {
     if (newActivities.length > 0 || deletedActivities.length > 0) {
       await displayInvoices();
     }
-  }, (error) => {
-    console.error("❌ Fehler bei Activities-Überwachung:", error);
   });
 }
 
@@ -136,9 +156,8 @@ async function entferneActivityAusRechnungen(activityId, userId) {
         break;
       }
     }
-    
   } catch (error) {
-    console.error('❌ Fehler beim Entfernen der Activity aus Rechnungen:', error);
+    // Fehler ignorieren
   }
 }
 
@@ -178,9 +197,8 @@ async function bereinigeVerwaiseRechnungen(userId, existingActivityIds) {
     if (bereinigtCount > 0 || geloeschtCount > 0) {
       await displayInvoices();
     }
-    
   } catch (error) {
-    console.error('❌ Fehler beim Bereinigen verwaister Rechnungen:', error);
+    // Fehler ignorieren
   }
 }
 
@@ -192,7 +210,7 @@ async function verarbeiteActivity(activityId, data, userId) {
   
   processedActivities.add(activityId);
   
-  const datum = parseFirestoreDate(data.begin || data.startDate);
+  const datum = parseFirestoreDate(data.beginn || data.startDate);
   const year = datum.getFullYear();
   const month = datum.getMonth();
   const monthName = datum.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
@@ -209,13 +227,11 @@ async function verarbeiteActivity(activityId, data, userId) {
     if (doc.exists) {
       rechnungsDaten = doc.data();
       
-      // Prüfen ob Activity bereits in dieser Rechnung vorhanden ist
       const existingVisit = rechnungsDaten.visits?.find(v => v.activityId === activityId);
       if (existingVisit) {
-        return; // Activity bereits vorhanden, nichts zu tun
+        return;
       }
       
-      // Wenn Rechnung bezahlt ist, neue offene Rechnung für den gleichen Monat erstellen
       if (rechnungsDaten.status === 'bezahlt') {
         const newInvoiceId = `${invoiceId}-NEU`;
         const newDocId = `${newInvoiceId}_${userId}`;
@@ -231,17 +247,16 @@ async function verarbeiteActivity(activityId, data, userId) {
           totalAmount: 0,
           pricePerVisit: standardPreis,
           status: 'offen',
-          dueDate: new Date(year, month + 1, 10).toISOString().split('T')[0],
+          dueDate: new Date(year, month + 1, 6).toISOString().split('T')[0],
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           visits: []
         };
         
-        // Neue Rechnung verwenden
         await verarbeiteActivityInRechnung(newInvoiceRef, rechnungsDaten, activityId, data);
+        console.log(`✅ Rechnung ${newInvoiceId} erstellt`);
         return;
       }
     } else {
-      // Neue Rechnung erstellen
       rechnungsDaten = {
         invoiceId,
         month: monthName,
@@ -252,50 +267,134 @@ async function verarbeiteActivity(activityId, data, userId) {
         totalAmount: 0,
         pricePerVisit: standardPreis,
         status: 'offen',
-        dueDate: new Date(year, month + 1, 10).toISOString().split('T')[0],
+        dueDate: new Date(year, month + 1, 6).toISOString().split('T')[0],
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         visits: []
       };
     }
     
     await verarbeiteActivityInRechnung(invoiceRef, rechnungsDaten, activityId, data);
-    
+    console.log(`✅ Rechnung ${invoiceId} erstellt`);
   } catch (error) {
-    console.error('❌ Fehler beim Erstellen der Rechnung:', error);
+    // Fehler ignorieren
   }
 }
 
 async function verarbeiteActivityInRechnung(invoiceRef, rechnungsDaten, activityId, data) {
   if (!rechnungsDaten.visits) rechnungsDaten.visits = [];
   
-  const datum = parseFirestoreDate(data.begin || data.startDate);
+  const datum = parseFirestoreDate(data.beginn || data.startDate);
   const now = new Date().toISOString();
   
   const newVisit = {
     activityId,
     date: datum.toISOString().split('T')[0],
-    patient: data.patient || "Unbekannt",
-    doctor: data.notiz || "Keine Notiz",
+    patient: data.patient || data.patients || "Unbekannt",
+    doctor: data.notitz || data.notiz || "Keine Notiz",
     type: data.nameDerAktivität || data.name || '',
-    cost: parseFloat(data.kosten || standardPreis),
+    cost: parseFloat(data.kosten || data.cost || standardPreis),
     addedAt: now
   };
   
-  // Activity zur Rechnung hinzufügen
   rechnungsDaten.visits.push(newVisit);
   rechnungsDaten.visitCount = rechnungsDaten.visits.length;
   rechnungsDaten.totalAmount = rechnungsDaten.visits.reduce((sum, visit) => sum + (visit.cost || standardPreis), 0);
   rechnungsDaten.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
   
-  // Neue Activities sind immer offen
   rechnungsDaten.status = 'offen';
   
-  // Überfälligkeitsprüfung
   if (new Date() > new Date(rechnungsDaten.dueDate)) {
     rechnungsDaten.status = 'überfällig';
   }
   
   await invoiceRef.set(rechnungsDaten, { merge: true });
+}
+
+// Manuelle Aktualisierung - kann im Browser aufgerufen werden
+window.updateDueDates = async function() {
+  if (auth.currentUser) {
+    await aktualisiereAlleFaelligkeitsdaten(auth.currentUser.uid);
+  }
+};
+
+async function aktualisiereAlleFaelligkeitsdaten(userId) {
+  try {
+    const invoicesSnapshot = await db.collection("Invoices")
+      .where("einrichtungsId", "==", userId)
+      .get();
+    
+    if (invoicesSnapshot.empty) return;
+    
+    let aktualisiert = 0;
+    
+    for (const invoiceDoc of invoicesSnapshot.docs) {
+      const invoiceData = invoiceDoc.data();
+      const year = invoiceData.year;
+      const month = invoiceData.monthNumber - 1;
+      const neuesFaelligkeitsdatum = new Date(year, month + 1, 6).toISOString().split('T')[0];
+      
+      if (invoiceData.dueDate !== neuesFaelligkeitsdatum) {
+        await invoiceDoc.ref.update({
+          dueDate: neuesFaelligkeitsdatum,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        aktualisiert++;
+      }
+    }
+    
+    if (aktualisiert > 0) {
+      await displayInvoices();
+    }
+  } catch (error) {
+    // Fehler ignorieren
+  }
+}
+
+// Hilfsfunktion: Verarbeite gefundene Activities
+async function verarbeiteGefundeneActivities(activitiesSnapshot, userId) {
+  const existingActivityIds = new Set();
+  let bearbeitet = 0;
+  
+  let invoicesSnapshot;
+  try {
+    invoicesSnapshot = await db.collection("Invoices")
+      .where("einrichtungsId", "==", userId)
+      .get();
+  } catch (invoiceError) {
+    invoicesSnapshot = { docs: [] };
+  }
+  
+  const alreadyProcessedActivities = new Set();
+  invoicesSnapshot.docs.forEach(invoiceDoc => {
+    const invoiceData = invoiceDoc.data();
+    if (invoiceData.visits) {
+      invoiceData.visits.forEach(visit => {
+        alreadyProcessedActivities.add(visit.activityId);
+      });
+    }
+  });
+  
+  for (const doc of activitiesSnapshot.docs) {
+    const data = doc.data();
+    
+    existingActivityIds.add(doc.id);
+    const name = data.nameDerAktivität || data.name || '';
+    
+    if (name.trim() && !alreadyProcessedActivities.has(doc.id)) {
+      await verarbeiteActivity(doc.id, data, userId);
+      bearbeitet++;
+    }
+    
+    processedActivities.add(doc.id);
+  }
+  
+  console.log(`✅ ${bearbeitet} Activities verarbeitet`);
+  
+  await bereinigeVerwaiseRechnungen(userId, existingActivityIds);
+  
+  if (bearbeitet > 0) {
+    await displayInvoices();
+  }
 }
 
 // Rechnungsanzeige
@@ -332,7 +431,6 @@ async function displayInvoices() {
     
     invoiceData.sort((a, b) => b.year - a.year || b.monthNumber - a.monthNumber);
     
-    // Summary entfernen
     const existingSummary = document.querySelector('.invoice-summary');
     if (existingSummary) existingSummary.remove();
     
@@ -343,7 +441,6 @@ async function displayInvoices() {
       return;
     }
     
-    // Tabelle erstellen
     const table = document.createElement('table');
     table.className = 'invoices-table';
     table.innerHTML = `
@@ -366,7 +463,6 @@ async function displayInvoices() {
     addSummary();
     
   } catch (error) {
-    console.error('Fehler beim Laden der Rechnungen:', error);
     if (error.message.includes('index')) {
       const indexLink = error.message.match(/https:\/\/[^\s]+/)?.[0];
       invoicesList.innerHTML = `
@@ -401,6 +497,54 @@ function createInvoiceRow(invoice) {
   `;
 }
 
+function createInvoiceCard(invoice) {
+  const statusInfo = statusConfig[invoice.status];
+  
+  return `
+    <div class="invoice-card">
+      <div class="invoice-card-header">
+        <div>
+          <div class="invoice-card-title">${invoice.month}</div>
+          <div class="invoice-card-id">${invoice.id}</div>
+        </div>
+        <span class="status-badge ${statusInfo.class}" style="color: ${statusInfo.color};">
+          ${statusInfo.icon} ${statusInfo.text}
+        </span>
+      </div>
+      
+      <div class="invoice-card-details">
+        <div class="invoice-card-row">
+          <span class="invoice-card-label">Aktivitäten:</span>
+          <span class="invoice-card-value">${invoice.visitCount}</span>
+        </div>
+        <div class="invoice-card-row">
+          <span class="invoice-card-label">Gesamtbetrag:</span>
+          <span class="invoice-card-value"><strong>${formatCurrency(invoice.totalAmount)}</strong></span>
+        </div>
+        <div class="invoice-card-row">
+          <span class="invoice-card-label">Pro Aktivität:</span>
+          <span class="invoice-card-value">${formatCurrency(invoice.pricePerVisit)}</span>
+        </div>
+        <div class="invoice-card-row">
+          <span class="invoice-card-label">Fällig am:</span>
+          <span class="invoice-card-value">${formatDate(invoice.dueDate)}</span>
+        </div>
+        ${invoice.paymentDate ? `
+          <div class="invoice-card-row">
+            <span class="invoice-card-label">Bezahlt am:</span>
+            <span class="invoice-card-value">${formatDate(invoice.paymentDate)}</span>
+          </div>
+        ` : ''}
+      </div>
+      
+      <div class="invoice-card-actions">
+        <button class="btn-secondary" onclick="showInvoiceDetails('${invoice.id}')">Details</button>
+        ${invoice.status !== 'bezahlt' ? `<button class="btn-primary" onclick="processPayment('${invoice.id}')">Bezahlen</button>` : ''}
+      </div>
+    </div>
+  `;
+}
+
 function addSummary() {
   const totalVisits = invoiceData.reduce((sum, inv) => sum + inv.visitCount, 0);
   const totalAmount = invoiceData.reduce((sum, inv) => sum + inv.totalAmount, 0);
@@ -423,22 +567,114 @@ function addSummary() {
 // Event Handler
 function showInvoiceDetails(invoiceId) {
   const invoice = invoiceData.find(inv => inv.id === invoiceId);
-  if (!invoice) return alert("Rechnung nicht gefunden.");
+  if (!invoice) return safeAlert("Rechnung nicht gefunden.");
   
-  let details = `RECHNUNG ${invoice.month}\n\nAktivitäten: ${invoice.visitCount}\nBetrag: ${formatCurrency(invoice.totalAmount)}\nStatus: ${statusConfig[invoice.status].text}\n\nAKTIVITÄTEN:\n`;
+  const modalHTML = `
+    <div id="invoice-modal" class="invoice-modal-overlay">
+      <div class="invoice-modal">
+        <div class="invoice-modal-header">
+          <h2>📄 RECHNUNG ${invoice.month}</h2>
+          <button class="invoice-modal-close" onclick="closeInvoiceModal()">&times;</button>
+        </div>
+        <div class="invoice-modal-content">
+          <div class="invoice-summary-section">
+            <div class="invoice-info-grid">
+              <div class="info-item">
+                <strong>Rechnungs-ID:</strong> ${invoice.id}
+              </div>
+              <div class="info-item">
+                <strong>Aktivitäten:</strong> ${invoice.visitCount}
+              </div>
+              <div class="info-item">
+                <strong>Gesamtbetrag:</strong> ${formatCurrency(invoice.totalAmount)}
+              </div>
+              <div class="info-item">
+                <strong>Status:</strong> 
+                <span class="status-badge ${statusConfig[invoice.status].class}" style="color: ${statusConfig[invoice.status].color};">
+                  ${statusConfig[invoice.status].icon} ${statusConfig[invoice.status].text}
+                </span>
+              </div>
+              <div class="info-item">
+                <strong>Fällig am:</strong> ${formatDate(invoice.dueDate)}
+              </div>
+              ${invoice.paymentDate ? `<div class="info-item"><strong>Bezahlt am:</strong> ${formatDate(invoice.paymentDate)}</div>` : ''}
+            </div>
+          </div>
+          
+          <div class="activities-section">
+            <h3>🏥 AKTIVITÄTEN</h3>
+            <div class="activities-list">
+              ${invoice.visits.map((visit, i) => `
+                <div class="activity-item">
+                  <div class="activity-number">${i + 1}</div>
+                  <div class="activity-details">
+                    <div class="activity-date">${formatDate(visit.date)}</div>
+                    <div class="activity-patient"><strong>Patient:</strong> ${visit.patient}</div>
+                    <div class="activity-type"><strong>Typ:</strong> ${visit.type}</div>
+                    <div class="activity-doctor"><strong>Notizen:</strong> ${visit.doctor}</div>
+                    <div class="activity-cost"><strong>Kosten:</strong> ${formatCurrency(visit.cost)}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="invoice-modal-footer">
+          ${invoice.status !== 'bezahlt' ? 
+            `<button class="btn-primary" onclick="processPayment('${invoice.id}'); closeInvoiceModal();">
+              💳 Zahlung bestätigen (${formatCurrency(invoice.totalAmount)})
+             </button>` : 
+            '<div class="paid-indicator">✅ Diese Rechnung ist bereits bezahlt</div>'
+          }
+          <button class="btn-secondary" onclick="closeInvoiceModal()">Schließen</button>
+        </div>
+      </div>
+    </div>
+  `;
   
-  invoice.visits.forEach((visit, i) => {
-    details += `${i + 1}. ${formatDate(visit.date)} - ${visit.patient} (${visit.type})\n`;
+  const existingModal = document.getElementById('invoice-modal');
+  if (existingModal) existingModal.remove();
+  
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  
+  const modal = document.getElementById('invoice-modal');
+  
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeInvoiceModal();
+    }
   });
   
-  alert(details);
+  const escapeHandler = (e) => {
+    if (e.key === 'Escape') {
+      closeInvoiceModal();
+      document.removeEventListener('keydown', escapeHandler);
+    }
+  };
+  document.addEventListener('keydown', escapeHandler);
+  
+  modal._escapeHandler = escapeHandler;
+  
+  setTimeout(() => {
+    modal.focus();
+  }, 10);
+}
+
+function closeInvoiceModal() {
+  const modal = document.getElementById('invoice-modal');
+  if (modal) {
+    if (modal._escapeHandler) {
+      document.removeEventListener('keydown', modal._escapeHandler);
+    }
+    modal.remove();
+  }
 }
 
 async function processPayment(invoiceId) {
   const invoice = invoiceData.find(inv => inv.id === invoiceId);
   if (!invoice || invoice.status === 'bezahlt') return;
   
-  if (!confirm(`Zahlung bestätigen?\nBetrag: ${formatCurrency(invoice.totalAmount)}`)) return;
+  if (!safeConfirm(`Zahlung bestätigen?\nBetrag: ${formatCurrency(invoice.totalAmount)}`)) return;
   
   try {
     const einrichtungsId = auth.currentUser.uid;
@@ -450,128 +686,81 @@ async function processPayment(invoiceId) {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
     
-    alert("Zahlung erfolgreich!");
+    safeAlert("Zahlung erfolgreich!");
     displayInvoices();
   } catch (error) {
-    console.error('Fehler bei Zahlung:', error);
-    alert('Fehler bei der Zahlung');
+    safeAlert('Fehler bei der Zahlung');
   }
 }
 
 // Initialisierung
 function initApp() {
-  // CSS für Tabelle hinzufügen
-  if (!document.getElementById('invoice-table-styles')) {
-    const style = document.createElement('style');
-    style.id = 'invoice-table-styles';
-    style.textContent = `
-      .invoices-section {
-        margin: 20px 0;
-      }
-      .invoices-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 10px 0 30px 0;
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      }
-      .invoices-table th {
-        background: #f8f9fa;
-        padding: 12px;
-        text-align: left;
-        font-weight: 600;
-        border-bottom: 2px solid #dee2e6;
-      }
-      .invoices-table td {
-        padding: 12px;
-        border-bottom: 1px solid #dee2e6;
-        vertical-align: top;
-      }
-      .invoices-table tr:hover {
-        background: #f8f9fa;
-      }
-      .status-badge {
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 0.9em;
-        font-weight: 500;
-		margin-left: -15px;
-      }
-      .status-paid { background: #d4edda; }
-      .status-open { background: #fff3cd; }
-      .status-overdue { background: #f8d7da; }
-      .amount-due { font-weight: bold; }
-    `;
-    document.head.appendChild(style);
+  // CSS-Datei verlinken (falls noch nicht vorhanden)
+  if (!document.getElementById('invoice-responsive-styles')) {
+    const link = document.createElement('link');
+    link.id = 'invoice-responsive-styles';
+    link.rel = 'stylesheet';
+    link.href = 'invoice-responsive.css'; // Pfad zur CSS-Datei anpassen
+    document.head.appendChild(link);
   }
 
   auth.onAuthStateChanged(async user => {
     if (user) {
       currentUserId = user.uid;
-      console.log(`Benutzer angemeldet: ${currentUserId}`);
+      console.log(`✅ Benutzer angemeldet: ${currentUserId}`);
       
-      // Bestehende Rechnungen laden
       await displayInvoices();
-      
-      // Überwachung für neue Activities starten
+      await aktualisiereAlleFaelligkeitsdaten(currentUserId);
       starteActivitiesUeberwachung(currentUserId);
       
-      // Bestehende Activities synchronisieren (einmalig beim Start)
+      // Suche nach Activities
       setTimeout(async () => {
         try {
-          const snapshot = await db.collection("Activities").get();
-          const existingActivityIds = new Set();
-          let bearbeitet = 0;
+          let foundActivities = null;
           
-          // Erstmal alle bestehenden Rechnungen laden um zu wissen welche Activities bereits verarbeitet wurden
-          const invoicesSnapshot = await db.collection("Invoices")
-            .where("einrichtungsId", "==", currentUserId)
-            .get();
+          // Test direkte Collections zuerst (da diese funktionieren)
+          const directCollections = [
+            { name: "Activities", func: () => db.collection("Activities").get() },
+            { name: "activities", func: () => db.collection("activities").get() },
+            { name: "aktivitäten", func: () => db.collection("aktivitäten").get() }
+          ];
           
-          const alreadyProcessedActivities = new Set();
-          invoicesSnapshot.forEach(invoiceDoc => {
-            const invoiceData = invoiceDoc.data();
-            if (invoiceData.visits) {
-              invoiceData.visits.forEach(visit => {
-                alreadyProcessedActivities.add(visit.activityId);
-              });
-            }
-          });
-          
-          // Alle vorhandenen Activities sammeln und nur neue verarbeiten
-          for (const doc of snapshot.docs) {
-            const data = doc.data();
-            const activityUserId = data.userId;
-            
-            // Activities ohne userId dem aktuellen Benutzer zuordnen
-            if (activityUserId === currentUserId || !activityUserId) {
-              existingActivityIds.add(doc.id);
-              const name = data.nameDerAktivität || data.name || '';
-              
-              // Nur verarbeiten wenn Activity einen Namen hat UND noch nicht in einer Rechnung ist
-              if (name.trim() && !alreadyProcessedActivities.has(doc.id)) {
-                await verarbeiteActivity(doc.id, data, currentUserId);
-                bearbeitet++;
+          for (const collection of directCollections) {
+            try {
+              const snapshot = await collection.func();
+              if (!snapshot.empty) {
+                foundActivities = snapshot;
+                console.log(`✅ ${snapshot.docs.length} Activities gefunden in Collection: ${collection.name}`);
+                break;
               }
-              
-              // Als verarbeitet markieren (auch wenn bereits in Rechnung vorhanden)
-              processedActivities.add(doc.id);
+            } catch (error) {
+              // Collection nicht verfügbar
             }
           }
           
-          console.log(`✅ ${bearbeitet} bestehende Activities synchronisiert`);
+          // Fallback: users/{userId}/aktivitäten falls direkte Collections leer sind
+          if (!foundActivities) {
+            console.log(`🔍 Teste UserID: ${currentUserId}`);
+            try {
+              const snapshot = await db.collection("users").doc(currentUserId).collection("aktivitäten").get();
+              if (!snapshot.empty) {
+                foundActivities = snapshot;
+                console.log(`✅ ${snapshot.docs.length} Activities gefunden unter UserID: ${currentUserId}`);
+              }
+            } catch (error) {
+              // User-spezifische Collection nicht verfügbar
+            }
+          }
           
-          // Verwaiste Rechnungseinträge bereinigen
-          await bereinigeVerwaiseRechnungen(currentUserId, existingActivityIds);
-          
-          if (bearbeitet > 0) {
-            await displayInvoices();
+          if (foundActivities) {
+            console.log(`✅ ${foundActivities.docs.length} Activities gefunden`);
+            await verarbeiteGefundeneActivities(foundActivities, currentUserId);
+          } else {
+            console.log(`❌ Keine Activities gefunden`);
           }
           
         } catch (error) {
-          console.error('❌ Fehler beim Synchronisieren bestehender Activities:', error);
+          console.log(`❌ Unerwarteter Fehler: ${error.message}`);
         }
       }, 2000);
       
