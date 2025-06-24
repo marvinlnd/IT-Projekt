@@ -1,29 +1,31 @@
-// ============================
-// Automatische Rechnungserstellung für alle Activities
-// ============================
-
-// Login Menu
+// Login-Pop-up Menü
 const loginIcon = document.getElementById('login-icon');
 const loginMenu = document.getElementById('login-menu');
 
-if (loginIcon && loginMenu) {
-  loginIcon.addEventListener('click', e => {
-    e.stopPropagation();
-    const isOpen = loginMenu.classList.toggle('open');
-    loginMenu.setAttribute('aria-hidden', !isOpen);
-    loginIcon.setAttribute('aria-expanded', isOpen);
-  });
+loginIcon.addEventListener('click', e => {
+  e.stopPropagation();
+  const isOpen = loginMenu.classList.toggle('open');
+  loginMenu.setAttribute('aria-hidden', !isOpen);
+  loginIcon.setAttribute('aria-expanded', isOpen);
+});
 
-  document.addEventListener('click', e => {
-    if (!loginIcon.contains(e.target) && !loginMenu.contains(e.target)) {
-      loginMenu.classList.remove('open');
-      loginMenu.setAttribute('aria-hidden', 'true');
-      loginIcon.setAttribute('aria-expanded', 'false');
-    }
-  });
-}
+document.addEventListener('click', e => {
+  if (!loginIcon.contains(e.target) && !loginMenu.contains(e.target)) {
+    loginMenu.classList.remove('open');
+    loginMenu.setAttribute('aria-hidden', 'true');
+    loginIcon.setAttribute('aria-expanded', 'false');
+  }
+});
 
-// Firebase Config
+loginMenu.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    loginMenu.classList.remove('open');
+    loginMenu.setAttribute('aria-hidden', 'true');
+    loginIcon.setAttribute('aria-expanded', 'false');
+  });
+});
+
+// Firebase Initialisierung
 const firebaseConfig = {
   apiKey: "AIzaSyAakpWbT87pJ4Bv1Xr0Mk2lCNhNols7KR4",
   authDomain: "it-projekt-ffc4d.firebaseapp.com",
@@ -32,762 +34,337 @@ const firebaseConfig = {
   messagingSenderId: "534546734981",
   appId: "1:534546734981:web:13bffd7c78893bd0e3aeec"
 };
-
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
+firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+console.log("✅ Firebase für Aktivitäten initialisiert!");
 
-// Globale Variablen
-let invoiceData = [];
-let activitiesListener = null;
-let currentUserId = null;
-let processedActivities = new Set();
-const invoicesList = document.querySelector('.invoices');
-const standardPreis = 1.00;
+const userId = localStorage.getItem("user-id");
+const params = new URLSearchParams(location.search);
+const patientId = params.get('id');
+if (!patientId) {
+  console.error("❌ Kein Patient-ID in der URL gefunden.");
+}
 
-const statusConfig = {
-  'bezahlt': { class: 'status-paid', icon: '✓', text: 'Bezahlt', color: '#28a745' },
-  'offen': { class: 'status-open', icon: '○', text: 'Offen', color: '#ffc107' },
-  'überfällig': { class: 'status-overdue', icon: '!', text: 'Überfällig', color: '#dc3545' }
-};
+const STORAGE_KEY = 'patientListe';
 
-// Utility Functions
-const formatCurrency = amount => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(amount);
-const formatDate = dateString => dateString ? new Date(dateString).toLocaleDateString('de-DE') : 'Nicht verfügbar';
+function ladePatienten() {
+  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+}
 
-// Sichere Alert/Confirm Funktionen
-const safeAlert = (message) => {
-  try {
-    if (window.alert && typeof window.alert === 'function') {
-      window.alert(message);
-    }
-  } catch (e) {
-    // Fehler ignorieren
+function speicherePatienten(liste) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(liste));
+}
+
+class Aktivität {
+  constructor(datum, nameDerAktivität, beginn, ende, notitz) {
+    this.datum = datum;
+    this.nameDerAktivität = nameDerAktivität;
+    this.beginn = beginn;
+    this.ende = ende;
+    this.notitz = notitz;
   }
-};
+}
 
-const safeConfirm = (message) => {
-  try {
-    if (window.confirm && typeof window.confirm === 'function') {
-      return window.confirm(message);
-    } else {
-      return true;
-    }
-  } catch (e) {
-    return true;
+let aktivitäten = [];
+const datumInput = document.getElementById("date");
+const nameInput = document.getElementById("nameDerAktivität");
+const beginnInput = document.getElementById("beginn");
+const endeInput = document.getElementById("ende");
+const notitzInput = document.getElementById("notitz");
+
+// Fehleranzeigen
+function showError(elem, msg) {
+  elem.style.borderColor = 'red';
+  elem.title = msg;
+
+  if (!elem.nextElementSibling || !elem.nextElementSibling.classList.contains('error-message')) {
+    const errorMsg = document.createElement('div');
+    errorMsg.className = 'error-message';
+    errorMsg.style.color = 'red';
+    errorMsg.style.fontSize = '0.9em';
+    errorMsg.style.marginTop = '5px';
+    errorMsg.textContent = msg;
+    elem.insertAdjacentElement('afterend', errorMsg);
   }
-};
+}
 
-const parseFirestoreDate = date => {
-  if (!date) return new Date();
-  
-  if (typeof date.toDate === 'function') {
+function clearErrors() {
+  document.querySelectorAll('.error-message').forEach(e => e.remove());
+  [datumInput, nameInput, beginnInput, endeInput].forEach(el => {
+    el.style.borderColor = '';
+    el.title = '';
+  });
+}
+
+function validateName(name) {
+  return typeof name === 'string' && name.trim().length >= 2;
+}
+
+function validateZeitFormat(zeit) {
+  return /^\d{2}:\d{2}$/.test(zeit);
+}
+
+function validateInputs(datum, name, beginn, ende, datumInput, nameInput, beginnInput, endeInput) {
+  clearErrors();
+  let ok = true;
+
+  if (!datum) {
+    showError(datumInput, 'Datum erforderlich');
+    ok = false;
+  }
+  if (!validateName(name)) {
+    showError(nameInput, 'Aktivitätsname mind. 2 Zeichen');
+    ok = false;
+  }
+  if (!validateZeitFormat(beginn)) {
+    showError(beginnInput, 'Zeitformat: HH:MM');
+    ok = false;
+  }
+  if (!validateZeitFormat(ende)) {
+    showError(endeInput, 'Zeitformat: HH:MM');
+    ok = false;
+  }
+  return ok;
+}
+
+document.getElementById("add-button").addEventListener("click", () => {
+  aktivitätHinzufügen(
+    datumInput.value,
+    nameInput.value,
+    beginnInput.value,
+    endeInput.value,
+    notitzInput.value
+  );
+});
+
+// Firestore Laden
+async function ladeAktivitätenVonFirestore() {
+  if (!userId || !patientId) return console.error("❌ Benutzer- oder Patient-ID fehlt!");
+
+  try {
+    const snapshot = await db.collection('users').doc(userId)
+      .collection('patients').doc(patientId)
+      .collection('aktivitäten').get();
+    const geladen = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    const patienten = ladePatienten();
+    const patient = patienten.find(p => p.id === patientId);
+    if (patient) {
+      patient.aktivitäten = geladen;
+      speicherePatienten(patienten);
+    }
+
+    aktivitäten = geladen;
+    applyFilterAndSort();
+    console.log("✅ Aktivitäten von Firestore geladen.");
+  } catch (err) {
+    console.error("❌ Fehler beim Laden aus Firestore:", err.message);
+  }
+}
+
+// Hinzufügen
+async function aktivitätHinzufügen(datum, name, beginn, ende, notitz) {
+  if (!validateInputs(datum, name, beginn, ende, datumInput, nameInput, beginnInput, endeInput)) return;
+
+  const neueAktivität = { datum, nameDerAktivität: name, beginn, ende, notitz };
+  try {
+    const docRef = await db.collection('users').doc(userId)
+      .collection('patients').doc(patientId)
+      .collection('aktivitäten').add(neueAktivität);
+    neueAktivität.id = docRef.id;
+    aktivitäten.push(neueAktivität);
+
+    const patienten = ladePatienten();
+    const patient = patienten.find(p => p.id === patientId);
+    if (patient) {
+      if (!Array.isArray(patient.aktivitäten)) patient.aktivitäten = [];
+      patient.aktivitäten.push(neueAktivität);
+      speicherePatienten(patienten);
+    }
+
+    applyFilterAndSort();
+  } catch (error) {
+    console.error("❌ Fehler beim Hinzufügen:", error);
+  }
+}
+
+// Bearbeiten
+async function aktivität_bearbeiten(index, datum, neuerName, neuBeginn, neuEnde, neueNotitz) {
+  const eintrag = aktivitäten[index];
+  if (!eintrag?.id) return console.warn("❗ Keine gültige Aktivität!");
+
+  const aktualisiert = {
+    datum,
+    nameDerAktivität: neuerName,
+    beginn: neuBeginn,
+    ende: neuEnde,
+    notitz: neueNotitz
+  };
+
+  try {
+    await db.collection('users').doc(userId)
+      .collection('patients').doc(patientId)
+      .collection('aktivitäten').doc(eintrag.id).set(aktualisiert);
+    Object.assign(eintrag, aktualisiert);
+
+    const patienten = ladePatienten();
+    const patient = patienten.find(p => p.id === patientId);
+    if (patient && Array.isArray(patient.aktivitäten)) {
+      const idx = patient.aktivitäten.findIndex(a => a.id === eintrag.id);
+      if (idx >= 0) patient.aktivitäten[idx] = eintrag;
+      speicherePatienten(patienten);
+    }
+
+    applyFilterAndSort();
+  } catch (error) {
+    console.error("❌ Fehler beim Bearbeiten:", error);
+  }
+}
+
+// Löschen
+async function aktivität_loeschen(index) {
+  const eintrag = aktivitäten[index];
+  if (!eintrag?.id) return alert("❗ Ungültiger Index oder ID!");
+
+  if (confirm("❓ Willst du diese Aktivität wirklich löschen?")) {
     try {
-      return date.toDate();
-    } catch (e) {
-      return new Date();
-    }
-  }
-  
-  try {
-    const parsed = new Date(date);
-    if (isNaN(parsed.getTime())) {
-      return new Date();
-    }
-    return parsed;
-  } catch (e) {
-    return new Date();
-  }
-};
+      await db.collection("users").doc(userId)
+        .collection("patients").doc(patientId)
+        .collection("aktivitäten").doc(eintrag.id).delete();
+      aktivitäten.splice(index, 1);
 
-// Automatische Rechnungserstellung
-function starteActivitiesUeberwachung(userId) {
-  if (activitiesListener) activitiesListener();
-  
-  activitiesListener = db.collection("users").doc(userId).collection("aktivitäten").onSnapshot(async snapshot => {
-    const changes = snapshot.docChanges();
-    const newActivities = changes.filter(change => change.type === "added");
-    const deletedActivities = changes.filter(change => change.type === "removed");
-    
-    for (const change of newActivities) {
-      await verarbeiteActivity(change.doc.id, change.doc.data(), userId);
-    }
-    
-    for (const change of deletedActivities) {
-      await entferneActivityAusRechnungen(change.doc.id, userId);
-    }
-    
-    if (newActivities.length > 0 || deletedActivities.length > 0) {
-      await displayInvoices();
-    }
-  });
-}
-
-// Entfernt eine gelöschte Activity aus allen Rechnungen
-async function entferneActivityAusRechnungen(activityId, userId) {
-  try {
-    const invoicesSnapshot = await db.collection("Invoices")
-      .where("einrichtungsId", "==", userId)
-      .get();
-    
-    for (const invoiceDoc of invoicesSnapshot.docs) {
-      const invoiceData = invoiceDoc.data();
-      const visits = invoiceData.visits || [];
-      
-      const visitIndex = visits.findIndex(visit => visit.activityId === activityId);
-      
-      if (visitIndex !== -1) {
-        visits.splice(visitIndex, 1);
-        
-        if (visits.length === 0) {
-          await invoiceDoc.ref.delete();
-        } else {
-          const newTotalAmount = visits.reduce((sum, visit) => sum + (visit.cost || standardPreis), 0);
-          
-          await invoiceDoc.ref.update({
-            visits: visits,
-            visitCount: visits.length,
-            totalAmount: newTotalAmount,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-        }
-        
-        processedActivities.delete(activityId);
-        break;
+      const patienten = ladePatienten();
+      const patient = patienten.find(p => p.id === patientId);
+      if (patient && Array.isArray(patient.aktivitäten)) {
+        const idx = patient.aktivitäten.findIndex(a => a.id === eintrag.id);
+        if (idx >= 0) patient.aktivitäten.splice(idx, 1);
+        speicherePatienten(patienten);
       }
+
+      applyFilterAndSort();
+    } catch (error) {
+      console.error("❌ Fehler beim Löschen:", error);
     }
-  } catch (error) {
-    // Fehler ignorieren
   }
 }
 
-// Bereinigt verwaiste Rechnungseinträge beim Start
-async function bereinigeVerwaiseRechnungen(userId, existingActivityIds) {
-  try {
-    const invoicesSnapshot = await db.collection("Invoices")
-      .where("einrichtungsId", "==", userId)
-      .get();
-    
-    let bereinigtCount = 0;
-    let geloeschtCount = 0;
-    
-    for (const invoiceDoc of invoicesSnapshot.docs) {
-      const invoiceData = invoiceDoc.data();
-      const visits = invoiceData.visits || [];
-      
-      const validVisits = visits.filter(visit => existingActivityIds.has(visit.activityId));
-      
-      if (validVisits.length === 0 && visits.length > 0) {
-        await invoiceDoc.ref.delete();
-        geloeschtCount++;
-      } else if (validVisits.length !== visits.length) {
-        const newTotalAmount = validVisits.reduce((sum, visit) => sum + (visit.cost || standardPreis), 0);
-        
-        await invoiceDoc.ref.update({
-          visits: validVisits,
-          visitCount: validVisits.length,
-          totalAmount: newTotalAmount,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        bereinigtCount++;
-      }
-    }
-    
-    if (bereinigtCount > 0 || geloeschtCount > 0) {
-      await displayInvoices();
-    }
-  } catch (error) {
-    // Fehler ignorieren
-  }
-}
+// Tabelle aktualisieren
+function aktualisiereTabelle(liste = aktivitäten) {
+  const tbody = document.querySelector("#aktivitätenTabelle tbody");
+  tbody.innerHTML = "";
 
-async function verarbeiteActivity(activityId, data, userId) {
-  if (processedActivities.has(activityId)) return;
-  
-  const name = data.nameDerAktivität || data.name || '';
-  if (!name.trim()) return;
-  
-  processedActivities.add(activityId);
-  
-  const datum = parseFirestoreDate(data.beginn || data.startDate);
-  const year = datum.getFullYear();
-  const month = datum.getMonth();
-  const monthName = datum.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
-  
-  const invoiceId = `R-${year}-${String(month + 1).padStart(2, '0')}`;
-  const docId = `${invoiceId}_${userId}`;
-  
-  try {
-    const invoiceRef = db.collection("Invoices").doc(docId);
-    const doc = await invoiceRef.get();
-    
-    let rechnungsDaten;
-    
-    if (doc.exists) {
-      rechnungsDaten = doc.data();
-      
-      const existingVisit = rechnungsDaten.visits?.find(v => v.activityId === activityId);
-      if (existingVisit) {
-        return;
-      }
-      
-      if (rechnungsDaten.status === 'bezahlt') {
-        const newInvoiceId = `${invoiceId}-NEU`;
-        const newDocId = `${newInvoiceId}_${userId}`;
-        const newInvoiceRef = db.collection("Invoices").doc(newDocId);
-        
-        rechnungsDaten = {
-          invoiceId: newInvoiceId,
-          month: monthName,
-          year,
-          monthNumber: month + 1,
-          einrichtungsId: userId,
-          visitCount: 0,
-          totalAmount: 0,
-          pricePerVisit: standardPreis,
-          status: 'offen',
-          dueDate: new Date(year, month + 1, 6).toISOString().split('T')[0],
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          visits: []
-        };
-        
-        await verarbeiteActivityInRechnung(newInvoiceRef, rechnungsDaten, activityId, data);
-        console.log(`✅ Rechnung ${newInvoiceId} erstellt`);
-        return;
-      }
-    } else {
-      rechnungsDaten = {
-        invoiceId,
-        month: monthName,
-        year,
-        monthNumber: month + 1,
-        einrichtungsId: userId,
-        visitCount: 0,
-        totalAmount: 0,
-        pricePerVisit: standardPreis,
-        status: 'offen',
-        dueDate: new Date(year, month + 1, 6).toISOString().split('T')[0],
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        visits: []
-      };
-    }
-    
-    await verarbeiteActivityInRechnung(invoiceRef, rechnungsDaten, activityId, data);
-    console.log(`✅ Rechnung ${invoiceId} erstellt`);
-  } catch (error) {
-    // Fehler ignorieren
-  }
-}
-
-async function verarbeiteActivityInRechnung(invoiceRef, rechnungsDaten, activityId, data) {
-  if (!rechnungsDaten.visits) rechnungsDaten.visits = [];
-  
-  const datum = parseFirestoreDate(data.beginn || data.startDate);
-  const now = new Date().toISOString();
-  
-  const newVisit = {
-    activityId,
-    date: datum.toISOString().split('T')[0],
-    patient: data.patient || data.patients || "Unbekannt",
-    doctor: data.notitz || data.notiz || "Keine Notiz",
-    type: data.nameDerAktivität || data.name || '',
-    cost: parseFloat(data.kosten || data.cost || standardPreis),
-    addedAt: now
-  };
-  
-  rechnungsDaten.visits.push(newVisit);
-  rechnungsDaten.visitCount = rechnungsDaten.visits.length;
-  rechnungsDaten.totalAmount = rechnungsDaten.visits.reduce((sum, visit) => sum + (visit.cost || standardPreis), 0);
-  rechnungsDaten.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-  
-  rechnungsDaten.status = 'offen';
-  
-  if (new Date() > new Date(rechnungsDaten.dueDate)) {
-    rechnungsDaten.status = 'überfällig';
-  }
-  
-  await invoiceRef.set(rechnungsDaten, { merge: true });
-}
-
-// Manuelle Aktualisierung - kann im Browser aufgerufen werden
-window.updateDueDates = async function() {
-  if (auth.currentUser) {
-    await aktualisiereAlleFaelligkeitsdaten(auth.currentUser.uid);
-  }
-};
-
-async function aktualisiereAlleFaelligkeitsdaten(userId) {
-  try {
-    const invoicesSnapshot = await db.collection("Invoices")
-      .where("einrichtungsId", "==", userId)
-      .get();
-    
-    if (invoicesSnapshot.empty) return;
-    
-    let aktualisiert = 0;
-    
-    for (const invoiceDoc of invoicesSnapshot.docs) {
-      const invoiceData = invoiceDoc.data();
-      const year = invoiceData.year;
-      const month = invoiceData.monthNumber - 1;
-      const neuesFaelligkeitsdatum = new Date(year, month + 1, 6).toISOString().split('T')[0];
-      
-      if (invoiceData.dueDate !== neuesFaelligkeitsdatum) {
-        await invoiceDoc.ref.update({
-          dueDate: neuesFaelligkeitsdatum,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        aktualisiert++;
-      }
-    }
-    
-    if (aktualisiert > 0) {
-      await displayInvoices();
-    }
-  } catch (error) {
-    // Fehler ignorieren
-  }
-}
-
-// Hilfsfunktion: Verarbeite gefundene Activities
-async function verarbeiteGefundeneActivities(activitiesSnapshot, userId) {
-  const existingActivityIds = new Set();
-  let bearbeitet = 0;
-  
-  let invoicesSnapshot;
-  try {
-    invoicesSnapshot = await db.collection("Invoices")
-      .where("einrichtungsId", "==", userId)
-      .get();
-  } catch (invoiceError) {
-    invoicesSnapshot = { docs: [] };
-  }
-  
-  const alreadyProcessedActivities = new Set();
-  invoicesSnapshot.docs.forEach(invoiceDoc => {
-    const invoiceData = invoiceDoc.data();
-    if (invoiceData.visits) {
-      invoiceData.visits.forEach(visit => {
-        alreadyProcessedActivities.add(visit.activityId);
-      });
-    }
-  });
-  
-  for (const doc of activitiesSnapshot.docs) {
-    const data = doc.data();
-    
-    existingActivityIds.add(doc.id);
-    const name = data.nameDerAktivität || data.name || '';
-    
-    if (name.trim() && !alreadyProcessedActivities.has(doc.id)) {
-      await verarbeiteActivity(doc.id, data, userId);
-      bearbeitet++;
-    }
-    
-    processedActivities.add(doc.id);
-  }
-  
-  console.log(`✅ ${bearbeitet} Activities verarbeitet`);
-  
-  await bereinigeVerwaiseRechnungen(userId, existingActivityIds);
-  
-  if (bearbeitet > 0) {
-    await displayInvoices();
-  }
-}
-
-// Rechnungsanzeige
-async function displayInvoices() {
-  if (!invoicesList) return;
-  
-  invoicesList.innerHTML = '<p>Lade Rechnungen...</p>';
-  
-  try {
-    const einrichtungsId = auth.currentUser?.uid;
-    if (!einrichtungsId) throw new Error("Nicht angemeldet");
-    
-    const snapshot = await db.collection("Invoices")
-      .where("einrichtungsId", "==", einrichtungsId)
-      .get();
-    
-    invoiceData = [];
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      invoiceData.push({
-        id: data.invoiceId,
-        month: data.month,
-        visitCount: data.visitCount || 0,
-        pricePerVisit: data.pricePerVisit || standardPreis,
-        totalAmount: data.totalAmount || 0,
-        status: data.status || 'offen',
-        paymentDate: data.paymentDate,
-        dueDate: data.dueDate,
-        visits: data.visits || [],
-        year: data.year || new Date().getFullYear(),
-        monthNumber: data.monthNumber || 1
-      });
-    });
-    
-    invoiceData.sort((a, b) => b.year - a.year || b.monthNumber - a.monthNumber);
-    
-    const existingSummary = document.querySelector('.invoice-summary');
-    if (existingSummary) existingSummary.remove();
-    
-    invoicesList.innerHTML = '';
-    
-    if (invoiceData.length === 0) {
-      invoicesList.innerHTML = '<p>📄 Noch keine Rechnungen vorhanden. Rechnungen werden automatisch erstellt.</p>';
-      return;
-    }
-    
-    const table = document.createElement('table');
-    table.className = 'invoices-table';
-    table.innerHTML = `
-      <thead>
-        <tr>
-          <th>Monat</th>
-          <th>Aktivitäten</th>
-          <th>Betrag</th>
-          <th>Status</th>
-          <th>Fällig am</th>
-          <th>Aktionen</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${invoiceData.map(invoice => createInvoiceRow(invoice)).join('')}
-      </tbody>
+  liste.forEach((eintrag, index) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${eintrag.datum || ''}</td>
+      <td>${eintrag.nameDerAktivität}</td>
+      <td>${eintrag.beginn}</td>
+      <td>${eintrag.ende}</td>
+      <td>${eintrag.notitz}</td>
     `;
-    
-    invoicesList.appendChild(table);
-    addSummary();
-    
-  } catch (error) {
-    if (error.message.includes('index')) {
-      const indexLink = error.message.match(/https:\/\/[^\s]+/)?.[0];
-      invoicesList.innerHTML = `
-        <div style="background: #d1ecf1; padding: 20px; border-radius: 8px; text-align: center;">
-          <h3>🔧 Firebase Index erforderlich</h3>
-          <p>Klicken Sie den Link zum Erstellen:</p>
-          ${indexLink ? `<a href="${indexLink}" target="_blank" style="background: #007bff; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">Index erstellen</a>` : ''}
-          <p style="margin-top: 15px; font-size: 0.9em;">Nach dem Erstellen Seite neu laden.</p>
-        </div>
-      `;
-    } else {
-      invoicesList.innerHTML = '<p>Fehler beim Laden. Bitte neu laden oder anmelden.</p>';
-    }
-  }
-}
 
-function createInvoiceRow(invoice) {
-  const statusInfo = statusConfig[invoice.status];
-  
-  return `
-    <tr>
-      <td><strong>${invoice.month}</strong><br><small>${invoice.id}</small></td>
-      <td>${invoice.visitCount}</td>
-      <td><strong>${formatCurrency(invoice.totalAmount)}</strong><br><small>${formatCurrency(invoice.pricePerVisit)} pro Aktivität</small></td>
-      <td><span class="status-badge ${statusInfo.class}" style="color: ${statusInfo.color}; padding: 4px 8px; border-radius: 4px; font-size: 0.9em;">${statusInfo.icon} ${statusInfo.text}</span></td>
-      <td>${formatDate(invoice.dueDate)}${invoice.paymentDate ? `<br><small>Bezahlt: ${formatDate(invoice.paymentDate)}</small>` : ''}</td>
-      <td>
-        <button class="btn-secondary" onclick="showInvoiceDetails('${invoice.id}')" style="margin-right: 5px; padding: 5px 10px; font-size: 0.9em;">Details</button>
-        ${invoice.status !== 'bezahlt' ? `<button class="btn-primary" onclick="processPayment('${invoice.id}')" style="padding: 5px 10px; font-size: 0.9em;">Bezahlen</button>` : ''}
-      </td>
-    </tr>
-  `;
-}
+    row.addEventListener("click", event => {
+      tbody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
+      row.classList.add("selected");
 
-function createInvoiceCard(invoice) {
-  const statusInfo = statusConfig[invoice.status];
-  
-  return `
-    <div class="invoice-card">
-      <div class="invoice-card-header">
-        <div>
-          <div class="invoice-card-title">${invoice.month}</div>
-          <div class="invoice-card-id">${invoice.id}</div>
-        </div>
-        <span class="status-badge ${statusInfo.class}" style="color: ${statusInfo.color};">
-          ${statusInfo.icon} ${statusInfo.text}
-        </span>
-      </div>
-      
-      <div class="invoice-card-details">
-        <div class="invoice-card-row">
-          <span class="invoice-card-label">Aktivitäten:</span>
-          <span class="invoice-card-value">${invoice.visitCount}</span>
-        </div>
-        <div class="invoice-card-row">
-          <span class="invoice-card-label">Gesamtbetrag:</span>
-          <span class="invoice-card-value"><strong>${formatCurrency(invoice.totalAmount)}</strong></span>
-        </div>
-        <div class="invoice-card-row">
-          <span class="invoice-card-label">Pro Aktivität:</span>
-          <span class="invoice-card-value">${formatCurrency(invoice.pricePerVisit)}</span>
-        </div>
-        <div class="invoice-card-row">
-          <span class="invoice-card-label">Fällig am:</span>
-          <span class="invoice-card-value">${formatDate(invoice.dueDate)}</span>
-        </div>
-        ${invoice.paymentDate ? `
-          <div class="invoice-card-row">
-            <span class="invoice-card-label">Bezahlt am:</span>
-            <span class="invoice-card-value">${formatDate(invoice.paymentDate)}</span>
-          </div>
-        ` : ''}
-      </div>
-      
-      <div class="invoice-card-actions">
-        <button class="btn-secondary" onclick="showInvoiceDetails('${invoice.id}')">Details</button>
-        ${invoice.status !== 'bezahlt' ? `<button class="btn-primary" onclick="processPayment('${invoice.id}')">Bezahlen</button>` : ''}
-      </div>
-    </div>
-  `;
-}
+      const menu = document.getElementById("context-menu");
+      menu.style.display = "block";
+      menu.style.left = `${event.pageX + 5}px`;
+      menu.style.top = `${event.pageY + 5}px`;
 
-function addSummary() {
-  const totalVisits = invoiceData.reduce((sum, inv) => sum + inv.visitCount, 0);
-  const totalAmount = invoiceData.reduce((sum, inv) => sum + inv.totalAmount, 0);
-  const openAmount = invoiceData.filter(inv => inv.status !== 'bezahlt').reduce((sum, inv) => sum + inv.totalAmount, 0);
-  
-  const summaryDiv = document.createElement('div');
-  summaryDiv.className = 'invoice-summary';
-  summaryDiv.innerHTML = `
-    <h2>Zusammenfassung</h2>
-    <div class="summary-stats">
-      <div class="stat-item"><span>Gesamte Aktivitäten:</span><span>${totalVisits}</span></div>
-      <div class="stat-item"><span>Gesamtbetrag:</span><span>${formatCurrency(totalAmount)}</span></div>
-      <div class="stat-item"><span>Offener Betrag:</span><span style="${openAmount > 0 ? 'color: red;' : ''}">${formatCurrency(openAmount)}</span></div>
-    </div>
-  `;
-  
-  invoicesList.parentNode?.insertBefore(summaryDiv, invoicesList);
-}
+      document.getElementById("edit-button").onclick = () => {
+        const modal = document.getElementById("edit-modal-overlay");
+        const dateIn = document.getElementById("modal-datum");
+        const nameIn = document.getElementById("modal-name");
+        const beginnIn = document.getElementById("modal-beginn");
+        const endeIn = document.getElementById("modal-ende");
+        const noteIn = document.getElementById("modal-Notiz");
+        const saveBtn = document.getElementById("modal-save");
+        const cancelBtn = document.getElementById("modal-cancel");
 
-// Event Handler
-function showInvoiceDetails(invoiceId) {
-  const invoice = invoiceData.find(inv => inv.id === invoiceId);
-  if (!invoice) return safeAlert("Rechnung nicht gefunden.");
-  
-  const modalHTML = `
-    <div id="invoice-modal" class="invoice-modal-overlay">
-      <div class="invoice-modal">
-        <div class="invoice-modal-header">
-          <h2>📄 RECHNUNG ${invoice.month}</h2>
-          <button class="invoice-modal-close" onclick="closeInvoiceModal()">&times;</button>
-        </div>
-        <div class="invoice-modal-content">
-          <div class="invoice-summary-section">
-            <div class="invoice-info-grid">
-              <div class="info-item">
-                <strong>Rechnungs-ID:</strong> ${invoice.id}
-              </div>
-              <div class="info-item">
-                <strong>Aktivitäten:</strong> ${invoice.visitCount}
-              </div>
-              <div class="info-item">
-                <strong>Gesamtbetrag:</strong> ${formatCurrency(invoice.totalAmount)}
-              </div>
-              <div class="info-item">
-                <strong>Status:</strong> 
-                <span class="status-badge ${statusConfig[invoice.status].class}" style="color: ${statusConfig[invoice.status].color};">
-                  ${statusConfig[invoice.status].icon} ${statusConfig[invoice.status].text}
-                </span>
-              </div>
-              <div class="info-item">
-                <strong>Fällig am:</strong> ${formatDate(invoice.dueDate)}
-              </div>
-              ${invoice.paymentDate ? `<div class="info-item"><strong>Bezahlt am:</strong> ${formatDate(invoice.paymentDate)}</div>` : ''}
-            </div>
-          </div>
-          
-          <div class="activities-section">
-            <h3>🏥 AKTIVITÄTEN</h3>
-            <div class="activities-list">
-              ${invoice.visits.map((visit, i) => `
-                <div class="activity-item">
-                  <div class="activity-number">${i + 1}</div>
-                  <div class="activity-details">
-                    <div class="activity-date">${formatDate(visit.date)}</div>
-                    <div class="activity-patient"><strong>Patient:</strong> ${visit.patient}</div>
-                    <div class="activity-type"><strong>Typ:</strong> ${visit.type}</div>
-                    <div class="activity-doctor"><strong>Notizen:</strong> ${visit.doctor}</div>
-                    <div class="activity-cost"><strong>Kosten:</strong> ${formatCurrency(visit.cost)}</div>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        </div>
-        <div class="invoice-modal-footer">
-          ${invoice.status !== 'bezahlt' ? 
-            `<button class="btn-primary" onclick="processPayment('${invoice.id}'); closeInvoiceModal();">
-              💳 Zahlung bestätigen (${formatCurrency(invoice.totalAmount)})
-             </button>` : 
-            '<div class="paid-indicator">✅ Diese Rechnung ist bereits bezahlt</div>'
-          }
-          <button class="btn-secondary" onclick="closeInvoiceModal()">Schließen</button>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  const existingModal = document.getElementById('invoice-modal');
-  if (existingModal) existingModal.remove();
-  
-  document.body.insertAdjacentHTML('beforeend', modalHTML);
-  
-  const modal = document.getElementById('invoice-modal');
-  
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      closeInvoiceModal();
-    }
-  });
-  
-  const escapeHandler = (e) => {
-    if (e.key === 'Escape') {
-      closeInvoiceModal();
-      document.removeEventListener('keydown', escapeHandler);
-    }
-  };
-  document.addEventListener('keydown', escapeHandler);
-  
-  modal._escapeHandler = escapeHandler;
-  
-  setTimeout(() => {
-    modal.focus();
-  }, 10);
-}
+        dateIn.value = eintrag.datum || "";
+        nameIn.value = eintrag.nameDerAktivität;
+        beginnIn.value = eintrag.beginn;
+        endeIn.value = eintrag.ende;
+        noteIn.value = eintrag.notitz;
 
-function closeInvoiceModal() {
-  const modal = document.getElementById('invoice-modal');
-  if (modal) {
-    if (modal._escapeHandler) {
-      document.removeEventListener('keydown', modal._escapeHandler);
-    }
-    modal.remove();
-  }
-}
+        modal.style.display = "flex";
+        menu.style.display = "none";
 
-async function processPayment(invoiceId) {
-  const invoice = invoiceData.find(inv => inv.id === invoiceId);
-  if (!invoice || invoice.status === 'bezahlt') return;
-  
-  if (!safeConfirm(`Zahlung bestätigen?\nBetrag: ${formatCurrency(invoice.totalAmount)}`)) return;
-  
-  try {
-    const einrichtungsId = auth.currentUser.uid;
-    const docId = `${invoice.id}_${einrichtungsId}`;
-    
-    await db.collection("Invoices").doc(docId).set({
-      status: 'bezahlt',
-      paymentDate: new Date().toISOString().split('T')[0],
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-    
-    safeAlert("Zahlung erfolgreich!");
-    displayInvoices();
-  } catch (error) {
-    safeAlert('Fehler bei der Zahlung');
-  }
-}
+        saveBtn.onclick = async () => {
+          let ok = true;
+          if (!dateIn.value) { showError(dateIn, 'Datum erforderlich'); ok = false; }
+          if (!validateName(nameIn.value)) { showError(nameIn, 'mind. 2 Zeichen'); ok = false; }
+          if (!validateZeitFormat(beginnIn.value)) { showError(beginnIn, 'HH:MM'); ok = false; }
+          if (!validateZeitFormat(endeIn.value)) { showError(endeIn, 'HH:MM'); ok = false; }
+          if (!ok) return;
+          await aktivität_bearbeiten(index, dateIn.value, nameIn.value, beginnIn.value, endeIn.value, noteIn.value);
+          modal.style.display = "none";
+        };
 
-// Initialisierung
-function initApp() {
-  // CSS-Datei verlinken (falls noch nicht vorhanden)
-  if (!document.getElementById('invoice-responsive-styles')) {
-    const link = document.createElement('link');
-    link.id = 'invoice-responsive-styles';
-    link.rel = 'stylesheet';
-    link.href = 'invoice-responsive.css'; // Pfad zur CSS-Datei anpassen
-    document.head.appendChild(link);
-  }
+        cancelBtn.onclick = () => modal.style.display = "none";
+      };
 
-  auth.onAuthStateChanged(async user => {
-    if (user) {
-      currentUserId = user.uid;
-      console.log(`✅ Benutzer angemeldet: ${currentUserId}`);
-      
-      await displayInvoices();
-      await aktualisiereAlleFaelligkeitsdaten(currentUserId);
-      starteActivitiesUeberwachung(currentUserId);
-      
-      // Suche nach Activities
-      setTimeout(async () => {
-        try {
-          let foundActivities = null;
-          
-          // Test direkte Collections zuerst (da diese funktionieren)
-          const directCollections = [
-            { name: "Activities", func: () => db.collection("Activities").get() },
-            { name: "activities", func: () => db.collection("activities").get() },
-            { name: "aktivitäten", func: () => db.collection("aktivitäten").get() }
-          ];
-          
-          for (const collection of directCollections) {
-            try {
-              const snapshot = await collection.func();
-              if (!snapshot.empty) {
-                foundActivities = snapshot;
-                console.log(`✅ ${snapshot.docs.length} Activities gefunden in Collection: ${collection.name}`);
-                break;
-              }
-            } catch (error) {
-              // Collection nicht verfügbar
-            }
-          }
-          
-          // Fallback: users/{userId}/aktivitäten falls direkte Collections leer sind
-          if (!foundActivities) {
-            console.log(`🔍 Teste UserID: ${currentUserId}`);
-            try {
-              const snapshot = await db.collection("users").doc(currentUserId).collection("aktivitäten").get();
-              if (!snapshot.empty) {
-                foundActivities = snapshot;
-                console.log(`✅ ${snapshot.docs.length} Activities gefunden unter UserID: ${currentUserId}`);
-              }
-            } catch (error) {
-              // User-spezifische Collection nicht verfügbar
-            }
-          }
-          
-          if (foundActivities) {
-            console.log(`✅ ${foundActivities.docs.length} Activities gefunden`);
-            await verarbeiteGefundeneActivities(foundActivities, currentUserId);
-          } else {
-            console.log(`❌ Keine Activities gefunden`);
-          }
-          
-        } catch (error) {
-          console.log(`❌ Unerwarteter Fehler: ${error.message}`);
-        }
-      }, 2000);
-      
-    } else {
-      currentUserId = null;
-      if (activitiesListener) activitiesListener();
-      if (invoicesList) {
-        invoicesList.innerHTML = '<p style="text-align: center; padding: 40px;">🔐 Bitte anmelden</p>';
-      }
-      const summary = document.querySelector('.invoice-summary');
-      if (summary) summary.remove();
-    }
+      document.getElementById("delete-button").onclick = async () => {
+        await aktivität_loeschen(index);
+        menu.style.display = "none";
+      };
+    });
+
+    tbody.appendChild(row);
   });
 }
 
-// Cleanup
-window.addEventListener('beforeunload', () => {
-  if (activitiesListener) activitiesListener();
+// Initial Laden
+document.addEventListener("DOMContentLoaded", async () => {
+  const patienten = ladePatienten();
+  const patient = patienten.find(p => p.id === patientId);
+  aktivitäten = (patient && Array.isArray(patient.aktivitäten)) ? patient.aktivitäten : [];
+  applyFilterAndSort();
+    const nameElem = document.getElementById('patient-name');
+  const { vorname = '', nachname = '' } = patient.personalData || {};
+  nameElem.textContent = `Patient: ${vorname} ${nachname}`.trim();
+
+  await ladeAktivitätenVonFirestore();
 });
 
-// Start
-document.addEventListener('DOMContentLoaded', () => {
-  if (typeof firebase === 'undefined') {
-    if (invoicesList) invoicesList.innerHTML = '<p>❌ Firebase SDK nicht geladen</p>';
-    return;
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('context-menu');
+  if (!menu.contains(e.target) && !e.target.closest('tr')) {
+    menu.style.display = 'none';
   }
-  initApp();
+
 });
 
-if (document.readyState !== 'loading') initApp();
+// Filter & Sortierung
+const filterToggle = document.getElementById("filter-toggle");
+const filterDropdown = document.getElementById("filter-dropdown");
+const sortButtons = document.querySelectorAll(".sort-button");
+let currentSort = "neueste";
+
+function applyFilterAndSort() {
+  const sorted = [...aktivitäten].sort((a, b) => new Date(b.datum) - new Date(a.datum));
+  aktualisiereTabelle(sorted);
+}
+
+filterToggle.addEventListener('click', () => {
+  filterDropdown.style.display = filterDropdown.style.display === 'block' ? 'none' : 'block';
+  sortButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.sort === currentSort));
+});
+
+document.addEventListener('click', e => {
+  if (!filterDropdown.contains(e.target) && !filterToggle.contains(e.target)) {
+    filterDropdown.style.display = 'none';
+  }
+});
+
+
+
+sortButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    currentSort = button.dataset.sort;
+    sortButtons.forEach(btn => btn.classList.toggle('active', btn === button));
+    filterDropdown.style.display = 'none';
+    applyFilterAndSort();
+  });
+});
