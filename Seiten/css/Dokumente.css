@@ -160,18 +160,30 @@
 
 @media (max-width: 480px) {
   .header {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
     padding: 12px;
+  }
+  .header .logo img {
+    max-width: 160px;
+    height: auto;
   }
   .header .tools {
     gap: 8px;
   }
+  .dokumente-page {
+    padding: 12px;
+  }
+  .dokumente-list {
+    padding: 12px;
+  }
   .upload-form input[type="file"] {
     font-size: 0.9rem;
   }
+  .footer {
+    font-size: 0.8rem;
+    padding: 10px 12px;
+  }
 }
+
 
 
 
