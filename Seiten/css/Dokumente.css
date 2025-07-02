@@ -1,5 +1,4 @@
 /* --- Layout --- */
-/* === GLOBAL UND LAYOUTGRUNDLAGE === */
 *, *::before, *::after {
   box-sizing: border-box;
 }
