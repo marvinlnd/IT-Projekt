@@ -4,11 +4,6 @@
   margin: 0;
   padding: 0;
 }
-html, body {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
 body {
   font-family: Arial, sans-serif;
   background: #f9f9f9;
@@ -16,32 +11,20 @@ body {
   line-height: 1.4;
 }
 
-/* 2) Page Wrapper für Sticky Footer & Header-Offset */
-.page-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  /* Header-Höhe (16px + 80px + 16px) */
-  padding-top: 112px;
-}
-
-/* 3) FIXIERTER HEADER */
+/* 2) Header */
 .header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  z-index: 1000;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
 }
-.header .logo img {
+.header img {
   width: 230px;
   height: 80px;
+}
+.header .logo {
   transition: transform 0.3s ease;
 }
 .header .logo:hover,
@@ -53,7 +36,7 @@ body {
   align-items: center;
 }
 
-/* Sprach-Dropdown */
+/* Sprachdropdown */
 .language-switcher {
   position: relative;
   font-size: 0.875rem;
@@ -141,13 +124,22 @@ body {
   background-color: #f0f0f0;
   outline: none;
 }
+
+/* Entfernt Unterstreichung bei Links im Login-Pop-up */
 .login-menu li a {
   text-decoration: none;
   color: inherit;
   display: block;
+  width: 100%;
+  padding: 8px 16px;
+}
+.login-menu li a:hover,
+.login-menu li a:focus {
+  background-color: #f0f0f0;
+  outline: none;
 }
 
-/* 4) Dashboard-Kacheln */
+/* 3) Dashboard-Kacheln */
 .dashboard {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -180,72 +172,68 @@ body {
   color: inherit;
 }
 
-/* 5) STICKY FOOTER */
-.footer {
-  text-align: center;
-  padding: 20px;
-  background: #f4f4f4;
-  color: white;
-}
+/* 4) Footer-Links */
 .footer-nav {
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+}
+.footer-nav ul {
   display: flex;
   list-style: none;
   justify-content: center;
-  padding: 0;
-  margin: 0;
+  padding: 8px 16px;
 }
 .footer-nav li + li {
   margin-left: 40px;
 }
-.footer-nav li a {
-  color: #0078d4;      /* WIEDER BLAU */
+.footer-nav a {
   text-decoration: none;
+  color: #0078d4;
   font-weight: 500;
 }
-.footer-nav li a:hover {
-  text-decoration: underline;
-}
 
-/* 6) Responsive (Tablet bis 760px) */
+/* Responsive */
 @media (max-width: 760px) {
   .dashboard {
-    grid-template-columns: repeat(2, 1fr);  /* 2-spaltig */
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
     padding: 16px;
   }
+  .footer-nav ul {
+    padding: 6px 12px;
+  }
 }
-
-/* 7) Responsive (Smartphone bis 480px) */
+/* Responsive für Smartphone (<=480px) */
 @media (max-width: 480px) {
-  /* Header */
   .header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     padding: 12px;
   }
-  .header .logo img {
-    width: 150px;
-    height: auto;
+  .header .tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0;
+  }
+  .language-switcher {
+    margin: 0;
+  }
+  .login-wrapper {
+    margin: 0;
   }
   .header .tools img {
     width: 22px;
     height: 22px;
   }
-
-  /* Wrapper-Offset */
-  .page-wrapper {
-    padding-top: 80px;  /* ca. 12+56+12 */
-  }
-
-  /* Dashboard: ebenfalls 2-spaltig */
   .dashboard {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    grid-template-columns: 1fr;
     padding: 12px;
   }
-
-  /* Footer-Links untereinander */
-  .footer-nav {
+  .footer-nav ul {
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
   }
   .footer-nav li + li {
     margin-top: 8px;
