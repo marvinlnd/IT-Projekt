@@ -22,12 +22,18 @@
     html, body {
       margin: 0;
       padding: 0;
-      min-height: 100vh;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
     }
 
     body {
-      font-family: Arial, sans-serif;
       background: url("Bilder/Hintergrundbild.jpg") no-repeat center center/cover;
+    }
+
+    .page-wrapper {
+      flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -148,21 +154,6 @@
       display: block;
     }
 
-    @media (max-width: 480px) {
-      .container {
-        padding: 20px 15px;
-      }
-
-      .container h1 {
-        font-size: 1.2rem;
-        padding: 6px 16px;
-      }
-
-      .logo {
-        max-width: 150px;
-      }
-    }
-
     .toast {
       display: none;
       position: fixed;
@@ -176,67 +167,176 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       z-index: 1000;
     }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-size: 0.9rem;
+    }
+
+    /* Tablet */
+    @media (max-width: 768px) {
+      .page-wrapper {
+        padding: 60px 20px;
+      }
+
+      .container {
+        padding: 30px 20px;
+      }
+
+      .container h1 {
+        font-size: 1.3rem;
+        padding: 6px 18px;
+      }
+
+      .logo {
+        max-width: 180px;
+        margin-bottom: 10px;
+      }
+
+      input[type="text"],
+      input[type="password"],
+      input[type="email"] {
+        font-size: 0.95rem;
+      }
+
+      button {
+        font-size: 0.95rem;
+        padding: 10px;
+      }
+
+      .toggle, .link {
+        font-size: 0.85rem;
+      }
+
+      .toast {
+        font-size: 0.9rem;
+        padding: 10px 16px;
+      }
+    }
+
+    /* Smartphone */
+    @media (max-width: 480px) {
+      .page-wrapper {
+        padding: 40px 15px;
+      }
+
+      .container {
+        padding: 20px 15px;
+        border-radius: 12px;
+      }
+
+      .container h1 {
+        font-size: 1.1rem;
+        padding: 6px 14px;
+      }
+
+      .logo {
+        max-width: 140px;
+        margin-bottom: 10px;
+      }
+
+      input[type="text"],
+      input[type="password"],
+      input[type="email"] {
+        font-size: 0.9rem;
+        padding: 10px;
+      }
+
+      button {
+        font-size: 0.9rem;
+        padding: 10px;
+      }
+
+      .toggle,
+      .link {
+        font-size: 0.8rem;
+        margin-top: 16px;
+      }
+
+      .checkbox {
+        font-size: 0.8rem;
+      }
+
+      .toast {
+        font-size: 0.85rem;
+        padding: 10px 16px;
+      }
+
+      .footer {
+        font-size: 0.8rem;
+        padding: 12px;
+      }
+    }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <img src="Bilder/Logo.png" alt="MediAssist Logo" class="logo" />
-  <h1>Willkommen!</h1>
+  <div class="page-wrapper">
+    <div class="container">
+      <img src="Bilder/Logo.png" alt="MediAssist Logo" class="logo" />
+      <h1>Willkommen!</h1>
 
-  <!-- Login -->
-  <div id="login-form">
-    <input type="text" id="login-email" placeholder="E-Mail-Adresse" />
-    <div class="password-container">
-      <input type="password" id="login-password" placeholder="Passwort" />
-      <span class="eye-icon" onclick="togglePasswordVisibility('login-password', this)">
-        <i class="fas fa-eye-slash"></i>
-      </span>
+      <!-- Login -->
+      <div id="login-form">
+        <input type="text" id="login-email" placeholder="E-Mail-Adresse" />
+        <div class="password-container">
+          <input type="password" id="login-password" placeholder="Passwort" />
+          <span class="eye-icon" onclick="togglePasswordVisibility('login-password', this)">
+            <i class="fas fa-eye-slash"></i>
+          </span>
+        </div>
+
+        <button onclick="handleLogin()">Login</button>
+        <div class="toggle" onclick="toggleForms()">Noch kein Konto? Registrieren</div>
+        <div class="link" onclick="showPasswordReset()">Kennwort vergessen?</div>
+      </div>
+
+      <!-- Registrierung -->
+      <div id="register-form" class="hidden">
+        <input type="text" id="register-lastname" placeholder="Nachname" />
+        <input type="text" id="register-firstname" placeholder="Vorname" />
+        <input type="email" id="register-email" placeholder="E-Mail-Adresse" />
+        <div class="password-container">
+          <input type="password" id="register-password" placeholder="Passwort" />
+          <span class="eye-icon" onclick="togglePasswordVisibility('register-password', this)">
+            <i class="fas fa-eye-slash"></i>
+          </span>
+        </div>
+        <div class="checkbox" id="register-checkbox-container">
+          <input type="checkbox" id="privacy-register" class="large-checkbox" />
+          <label for="privacy-register">
+            Ich habe die <a href="html/Datenschutzerklärung.html" style="color: #4da6ff;">Datenschutzerklärung</a> gelesen und akzeptiert.*
+          </label>
+        </div>
+        <div id="register-error" class="error" style="display: none;">Bitte akzeptiere die Datenschutzerklärung!</div>
+        <button onclick="handleRegister()">Registrieren</button>
+        <div class="toggle" onclick="toggleForms()">Bereits registriert? Login</div>
+      </div>
+
+      <!-- Passwort zurücksetzen -->
+      <div id="reset-form" class="hidden">
+        <input type="email" id="reset-email" placeholder="E-Mail-Adresse eingeben" />
+        <div id="reset-error" class="error" style="display: none;">Bitte gib deine E-Mail-Adresse ein!</div>
+        <button onclick="handleReset()">Passwort zurücksetzen</button>
+        <div class="toggle" onclick="backToLogin()">Zurück zum Login</div>
+      </div>
     </div>
 
-    <button onclick="handleLogin()">Login</button>
-    <div class="toggle" onclick="toggleForms()">Noch kein Konto? Registrieren</div>
-    <div class="link" onclick="showPasswordReset()">Kennwort vergessen?</div>
-  </div>
-
-  <!-- Registrierung -->
-  <div id="register-form" class="hidden">
-    <input type="text" id="register-lastname" placeholder="Nachname" />
-    <input type="text" id="register-firstname" placeholder="Vorname" />
-    <input type="email" id="register-email" placeholder="E-Mail-Adresse" />
-    <div class="password-container">
-      <input type="password" id="register-password" placeholder="Passwort" />
-      <span class="eye-icon" onclick="togglePasswordVisibility('register-password', this)">
-        <i class="fas fa-eye-slash"></i>
-      </span>
+    <!-- Erfolgs-Toast -->
+    <div id="login-success-toast" class="toast">  
+      Login erfolgreich!
     </div>
-    <div class="checkbox" id="register-checkbox-container">
-      <input type="checkbox" id="privacy-register" class="large-checkbox" />
-      <label for="privacy-register">
-        Ich habe die <a href="html/Datenschutzerklärung.html" style="color: #4da6ff;">Datenschutzerklärung</a> gelesen und akzeptiert.*
-      </label>
-    </div>
-    <div id="register-error" class="error" style="display: none;">Bitte akzeptiere die Datenschutzerklärung!</div>
-    <button onclick="handleRegister()">Registrieren</button>
-    <div class="toggle" onclick="toggleForms()">Bereits registriert? Login</div>
   </div>
 
-  <!-- Passwort zurücksetzen -->
-  <div id="reset-form" class="hidden">
-    <input type="email" id="reset-email" placeholder="E-Mail-Adresse eingeben" />
-    <div id="reset-error" class="error" style="display: none;">Bitte gib deine E-Mail-Adresse ein!</div>
-    <button onclick="handleReset()">Passwort zurücksetzen</button>
-    <div class="toggle" onclick="backToLogin()">Zurück zum Login</div>
-  </div>
-</div>
+  <footer class="footer">
+    <p>&copy; 2025 MediAssist</p>
+  </footer>
 
-<!-- Erfolgs-Toast -->
-<div id="login-success-toast" class="toast">  
-  Login erfolgreich!
-</div>
-
-<!-- Skript -->
-<script src="Scripts/script.js"></script>
+  <!-- Skript -->
+  <script src="Scripts/script.js"></script>
 
 </body>
 </html>
