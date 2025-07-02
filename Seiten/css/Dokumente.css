@@ -1,39 +1,10 @@
 /* --- Layout --- */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-  font-family: Arial, sans-serif;
-}
-body {
-  display: flex;
-  flex-direction: column;
-}
-.page-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-main {
-  flex: 1;
-  margin-top: 100px; /* Platz für fixierten Header (Header-Höhe = 80px + 2×16px Padding) */ /* Platz für fixierten Header (Header-Höhe = 80px + 2×16px Padding) */ /* Platz für fixierten Header angepasst */ /* Platz für fixierten Header (Header-Höhe = 80px + 2×16px Padding) */
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+.dokumente-page {
+  padding: 24px;
 }
 
-/* === HEADER FIXIERT === */
+/* Header */
 .header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -42,23 +13,24 @@ main {
   border-bottom: 1px solid #e0e0e0;
 }
 .header .logo img {
-  max-width: 200px;
-  height: auto;
+  width: 230px;
+  height: 80px;
+}
+.header .logo {
+  transition: transform 0.3s ease;
+}
+.header .logo:hover,
+.header .logo:focus {
+  transform: scale(1.05);
 }
 .header .tools {
   display: flex;
   align-items: center;
-  gap: 12px;
 }
 
-/* === DOKUMENTE-SEITE === */
-.dokumente-page {
-  flex: 1;
-  padding: 24px;
-  width: 100%;
-}
 .dokumente-list {
-  width: 100%;
+  max-width: 100%;
+  height: 900px;
   margin: 0 auto;
   background: #fff;
   border: 1px solid #e0e0e0;
@@ -67,25 +39,27 @@ main {
   padding: 16px;
 }
 
-/* Upload-Form und Liste */
+/* Header-Bereich mit Upload-Form */
 .list-header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 12px;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 24px 0 12px;
 }
+
 .upload-form {
   display: flex;
-  flex: 1;
   align-items: center;
   gap: 8px;
 }
+
 .upload-form input[type="file"] {
   flex: 1;
   padding: 6px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+
 .upload-form .btn.add {
   background: #0078d4;
   color: #fff;
@@ -94,125 +68,120 @@ main {
   border-radius: 4px;
   cursor: pointer;
 }
+
 .upload-form .btn.add:hover {
   background: #005fa3;
 }
 
-/* Tabelle responsive */
-.table-container {
-  width: 100%;
-  overflow-x: auto;
+
+.btn {
+  margin: 0 5px;
+  padding: 6px 10px;
+  cursor: pointer;
 }
+
+.btn.replace {
+  background-color: #4caf50;  
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: white;
+  border: none;
+  border-radius: 4px;
+   
+}
+
+.btn.replace:hover {
+  background: #218838;
+}
+
+
+
+#documents-table tbody a {
+  color: inherit;        
+  text-decoration: none;  
+  cursor: pointer;       
+   
+}
+
+#documents-table tbody a:hover {
+  text-decoration: none;  
+  color: #007BFF;  
+}
+
+
+/* Dokumente-Tabelle */
 #documents-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
 }
+
 #documents-table th,
 #documents-table td {
   padding: 8px 12px;
   border-bottom: 1px solid #e0e0e0;
   text-align: left;
-  word-wrap: break-word;
 }
+
 #documents-table tr:hover {
   background: #f5f5f5;
 }
 
-/* Links als Buttons */
-#documents-table tbody a {
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
-}
-#documents-table tbody a:hover {
-  color: #0078d4;
-}
-
-/* Aktionsbuttons */
-.btn.replace {
-  background-color: #4caf50;
-  color: #fff;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-.btn.replace:hover {
-  background: #218838;
-}
+/* Aktions-Button „Entfernen“ */
 .btn.delete {
   background: #d9534f;
   color: #fff;
   border: none;
   padding: 6px 10px;
   border-radius: 4px;
-  font-size: 0.9rem;
   cursor: pointer;
+  font-size: 0.9rem;
 }
+
 .btn.delete:hover {
   background: #b52c32;
 }
 
-/* Vorschau-Modal nutzt Inline-Styles im HTML */
-
-/* === FOOTER === */
-.footer {
-  margin-top: auto;
-  text-align: center;
-  padding: 12px 16px;
-  background: #f4f4f4;
-  color: #0078d4;
-  font-size: 0.9rem;
-  border-top: 1px solid #ccc;
-}
-
-/* === ANIMATION === */
-@keyframes pulse {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.02); }
-  100% { transform: scale(1); }
-}
-
-/* === RESPONSIVE BREAKPOINTS === */
-@media (max-width: 800px) {
-  .dokumente-page {
-    padding: 16px;
-  }
+/* --- Responsive --- */
+@media (max-width: 600px) {
   .upload-form {
     flex-direction: column;
+    align-items: stretch;
     gap: 10px;
   }
-}
-@media (max-width: 600px) {
   #documents-table th,
   #documents-table td {
     font-size: 14px;
   }
 }
+
 @media (max-width: 480px) {
   .header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     padding: 12px;
-  }
-  .header .logo img {
-    max-width: 160px;
-    height: auto;
   }
   .header .tools {
     gap: 8px;
   }
-  .dokumente-page {
-    padding: 12px;
-  }
-  .dokumente-list {
-    padding: 12px;
-  }
   .upload-form input[type="file"] {
     font-size: 0.9rem;
   }
-  .footer {
-    font-size: 0.8rem;
-    padding: 10px 12px;
-  }
 }
+
+
+
+
+
+#documents-table thead th:nth-child(2) {
+  padding-left: 65px;
+}
+
+ 
+
+
+
